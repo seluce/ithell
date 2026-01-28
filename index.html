@@ -132,7 +132,7 @@
                     <br><br>
                     Dein Chef hält IT für Vodoo-Zauber, der nichts kosten darf. Deine Kollegen denken, das Internet ist "dieses blaue E". Und du? Du bist der Hausmeister für digitalen Müll.
                     <br><br>
-                    <strong>DEIN ZIEL:</strong> Überlebe bis <strong>16:30 Uhr</strong>. Lass dich nicht feuern. Rast nicht aus. Und lass dich nicht von der <strong>Ticket-Lawine</strong> begraben.
+                    <strong>DEIN ZIEL:</strong> Überlebe bis <strong>16:30 Uhr</strong>. Lass dich nicht feuern. Raste nicht aus. Und lass dich nicht von der <strong>Ticket-Lawine</strong> begraben.
                 </p>
                 <button onclick="engine.start()" 
                     class="bg-blue-600 hover:bg-blue-500 text-white text-xl font-bold py-4 px-8 rounded-xl w-full transition-all shadow-lg">
@@ -147,6 +147,48 @@
                 <div class="flex gap-3"><div class="text-2xl">😡</div><div><strong class="text-orange-400">AGGRO</strong><br>Bei 100% wirfst du den Monitor. Game Over.</div></div>
                 <div class="flex gap-3"><div class="text-2xl">👁️</div><div><strong class="text-red-500">CHEF-RADAR</strong><br>Bei 100% gibt's ne Abmahnung. Dann Rauswurf.</div></div>
                 <div class="flex gap-3"><div class="text-2xl">🎒</div><div><strong class="text-amber-400">LOOT</strong><br>Finde Items, um Probleme zu lösen.</div></div>
+            </div>
+        </div>
+    </div>
+	
+	<div id="difficulty-modal" class="fixed inset-0 bg-black/95 z-[1000] hidden items-center justify-center p-4">
+        <div class="neon-box border-purple bg-slate-900 max-w-5xl w-full p-6 md:p-8 shadow-2xl text-center">
+            <h2 class="text-3xl font-black text-white mb-2">WÄHLE DEINEN TAG</h2>
+            <p class="text-slate-400 mb-8">Wie sehr hasst du dein Leben heute?</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="engine.setDifficulty('easy')" class="group relative bg-slate-800 border border-green-500 hover:bg-green-900/20 p-6 rounded-xl transition-all hover:scale-105">
+                    <div class="text-4xl mb-2">🍺</div>
+                    <h3 class="text-xl font-bold text-green-400 mb-2">FREITAG</h3>
+                    <div class="text-xs text-slate-300 italic mb-4">"Hoch die Hände, Wochenende!"</div>
+                    <ul class="text-left text-[10px] text-slate-400 space-y-1">
+                        <li class="text-green-500">✔ Weniger Tickets</li>
+                        <li class="text-green-500">✔ Kollegen sind entspannt</li>
+                        <li class="text-green-500">✔ Aggro steigt langsam (0.8x)</li>
+                    </ul>
+                </button>
+
+                <button onclick="engine.setDifficulty('normal')" class="group relative bg-slate-800 border border-blue-500 hover:bg-blue-900/20 p-6 rounded-xl transition-all hover:scale-105">
+                    <div class="text-4xl mb-2">☕</div>
+                    <h3 class="text-xl font-bold text-blue-400 mb-2">MITTWOCH</h3>
+                    <div class="text-xs text-slate-300 italic mb-4">"Bergfest. Der Wahnsinn ist Routine."</div>
+                    <ul class="text-left text-[10px] text-slate-400 space-y-1">
+                        <li class="text-blue-500">● Standard Wahnsinn</li>
+                        <li class="text-blue-500">● Normale Ticket-Rate</li>
+                        <li class="text-blue-500">● Standard Multiplikator (1.0x)</li>
+                    </ul>
+                </button>
+
+                <button onclick="engine.setDifficulty('hard')" class="group relative bg-slate-800 border border-red-600 hover:bg-red-900/20 p-6 rounded-xl transition-all hover:scale-105">
+                    <div class="text-4xl mb-2">💀</div>
+                    <h3 class="text-xl font-bold text-red-500 mb-2">MONTAG</h3>
+                    <div class="text-xs text-slate-300 italic mb-4">"Warum tue ich mir das an?"</div>
+                    <ul class="text-left text-[10px] text-slate-400 space-y-1">
+                        <li class="text-red-500">⚠ Startet mit 2 Tickets</li>
+                        <li class="text-red-500">⚠ Startet mit 20% Aggro</li>
+                        <li class="text-red-500">⚠ Boss ruft öfter an (1.5x)</li>
+                    </ul>
+                </button>
             </div>
         </div>
     </div>

@@ -12,6 +12,9 @@ const engine = {
         bossTimer: null,
         ticketWarning: false,
         
+        // NEU: Schwierigkeitsgrad (Standard 1.0)
+        difficultyMult: 1.0, 
+
         // Stats & System
         achievements: [],
         achievedTitles: [],
@@ -30,14 +33,50 @@ const engine = {
         this.log("System v40.0 geladen. Warte auf User...");
     },
 
+    // ÄNDERUNG: Startet nicht mehr das Spiel, sondern zeigt die Auswahl
     start: function() {
         document.getElementById('intro-modal').style.display = 'none';
+        // Wir gehen davon aus, dass das Modal in index.html existiert (id="difficulty-modal")
+        const diffModal = document.getElementById('difficulty-modal');
+        if(diffModal) {
+            diffModal.style.display = 'flex';
+        } else {
+            // Fallback falls HTML noch nicht aktualisiert wurde
+            this.setDifficulty('normal');
+        }
+    },
+
+    // NEU: Setzt Schwierigkeit und startet dann erst den Loop
+    setDifficulty: function(level) {
+        document.getElementById('difficulty-modal').style.display = 'none';
+        
+        if (level === 'easy') {
+            this.state.difficultyMult = 0.8;
+            this.log("Modus: FREITAG. Entspann dich.", "text-green-400");
+        } else if (level === 'normal') {
+            this.state.difficultyMult = 1.0;
+            this.log("Modus: MITTWOCH. Business as usual.", "text-blue-400");
+        } else if (level === 'hard') {
+            this.state.difficultyMult = 1.5;
+            this.state.tickets = 2; // Startet schon mit Arbeit
+            this.state.al = 20;     // Startet genervt
+            this.log("Modus: MONTAG. Viel Glück.", "text-red-500 font-bold");
+        }
+        
+        this.updateUI();
+        // Hier startet jetzt erst der Loop für Mails etc.
+        this.checkRandomEmail(); 
     },
 
     // --- E-MAIL LOGIK ---
     checkRandomEmail: function() {
         if(this.state.isEmailOpen) return;
-        let chance = 0.2 + (this.state.tickets * 0.05); 
+        
+        // ÄNDERUNG: Basis-Chance hängt vom Schwierigkeitsgrad ab
+        // Montag (1.5) = Höhere Wahrscheinlichkeit für Mails
+        let baseChance = 0.2 * this.state.difficultyMult; 
+        
+        let chance = baseChance + (this.state.tickets * 0.05); 
         if(Math.random() < chance) {
             setTimeout(() => { this.triggerEmail(); }, 1500);
         }
@@ -46,7 +85,6 @@ const engine = {
     triggerEmail: function() {
         if(!DB.emails) return; 
         
-        // 1. E-Mail auswählen (ohne Wiederholung)
         let availableEmails = DB.emails.filter(e => !this.state.usedEmails.has(e.subj));
         if(availableEmails.length === 0) {
             this.state.usedEmails.clear(); 
@@ -55,37 +93,32 @@ const engine = {
         let email = availableEmails[Math.floor(Math.random() * availableEmails.length)];
         this.state.usedEmails.add(email.subj);
 
-        // 2. UI Elemente holen
         const overlay = document.getElementById('email-overlay');
         const timerBar = document.getElementById('email-timer-bar');
-        const actionContainer = document.getElementById('email-actions'); // Der neue Container
+        const actionContainer = document.getElementById('email-actions');
         
-        // 3. Text setzen
         document.getElementById('email-sender').innerText = email.sender;
         document.getElementById('email-subject').innerText = email.subj;
         if(email.body) {
              document.getElementById('email-subject').innerText += "\n\n" + email.body;
         }
         
-        // 4. Buttons generieren (Das ist der wichtige neue Teil!)
-        actionContainer.innerHTML = ''; // Vorher leeren
+        actionContainer.innerHTML = '';
         if(email.opts) {
             email.opts.forEach(opt => {
                 const btn = document.createElement('button');
-                // Styling für die Antwort-Buttons
                 btn.className = "bg-blue-600 hover:bg-blue-500 text-white text-xs py-2 px-3 rounded text-left transition-colors";
                 btn.innerText = "➤ " + opt.btn;
-                // Klick löst resolveEmail mit den spezifischen Werten (opt) aus
                 btn.onclick = () => this.resolveEmail(opt, false);
                 actionContainer.appendChild(btn);
             });
         }
         
-        // 5. Anzeigen & Timer starten
         overlay.style.display = 'flex';
         this.state.isEmailOpen = true;
         
-        const DURATION = 15000; // 15 Sekunden
+        // ÄNDERUNG: Timer könnte man am Montag auch kürzer machen (optional, hier noch Standard 15s)
+        const DURATION = 15000; 
         const UPDATE_RATE = 50; 
         let timePassed = 0;
 
@@ -98,7 +131,7 @@ const engine = {
             if(timerBar) timerBar.style.width = percentLeft + '%';
 
             if(timePassed >= DURATION) {
-                this.resolveEmail(null, true); // Timeout
+                this.resolveEmail(null, true); 
             }
         }, UPDATE_RATE);
     },
@@ -109,17 +142,26 @@ const engine = {
         this.state.isEmailOpen = false;
         
         if(timeout) {
-            // FALL 1: ZEIT ABGELAUFEN oder IGNORIEREN GEKLICKT
-            this.log("E-MAIL IGNORIERT! Radar +10", "text-red-500 font-bold");
-            this.state.cr += 10;
+            // Strafe für Ignorieren wird auch multipliziert am Montag
+            let penalty = Math.ceil(10 * this.state.difficultyMult);
+            this.log(`E-MAIL IGNORIERT! Radar +${penalty}`, "text-red-500 font-bold");
+            this.state.cr += penalty;
             this.state.emailsIgnored++;
         } else if(opt) {
-            // FALL 2: EINE ANTWORT GEWÄHLT
-            // Hier werden die Werte aus data.js (f, a, c) angewendet
             this.log("E-Mail: " + opt.txt, "text-blue-400");
-            this.state.fl += (opt.f || 0);
-            this.state.al += (opt.a || 0);
-            this.state.cr += (opt.c || 0);
+            
+            // ÄNDERUNG: Multiplikator anwenden
+            let mult = this.state.difficultyMult;
+            
+            // Negative Effekte (Aggro/Radar steigt) werden verstärkt
+            // Positive Effekte (Abbau) bleiben gleich
+            let addF = opt.f; 
+            let addA = opt.a > 0 ? Math.ceil(opt.a * mult) : opt.a; 
+            let addC = opt.c > 0 ? Math.ceil(opt.c * mult) : opt.c; 
+
+            this.state.fl += (addF || 0);
+            this.state.al += (addA || 0);
+            this.state.cr += (addC || 0);
         }
         
         this.updateUI();
@@ -152,12 +194,8 @@ const engine = {
         const invGrid = document.getElementById('inventory-grid');
         invGrid.innerHTML = '';
         
-        // LOGIK: Mindestens 5 Slots anzeigen. Wenn mehr Items da sind, wächst die Zahl.
         let totalSlots = Math.max(5, this.state.inventory.length);
         
-        // Optional: Wenn du willst, dass immer volle 5er Reihen da sind (also 5, 10, 15):
-        // let totalSlots = Math.ceil(Math.max(5, this.state.inventory.length) / 5) * 5;
-
         for(let i=0; i < totalSlots; i++) {
             let itemData = this.state.inventory[i];
             let slot = document.createElement('div');
@@ -355,9 +393,16 @@ const engine = {
             this.state.lunchDone = true;
         }
 
+        // ÄNDERUNG: Multiplikator für Events (Calls, Serverraum etc.)
+        let mult = this.state.difficultyMult;
+        
+        // Positive Aggro/Radar Werte (also schlecht für Spieler) werden multipliziert
+        let finalA = a > 0 ? Math.ceil(a * mult) : a;
+        let finalC = c > 0 ? Math.ceil(c * mult) : c;
+
         this.state.fl += f;
-        this.state.al += a;
-        this.state.cr += c;
+        this.state.al += finalA;
+        this.state.cr += finalC;
 
         if(loot && loot !== "") {
             if(!this.state.inventory.find(i => i.id === loot)) {
@@ -565,18 +610,17 @@ const engine = {
         this.showModal(title, text, true);
     },
 
-// Log auf/zuklappen für Mobile
+    // Log auf/zuklappen für Mobile
     toggleLog: function() {
         const log = document.getElementById('log-feed');
         const arrow = document.getElementById('log-arrow');
         
-        // Klasse 'hidden' umschalten
         if (log.classList.contains('hidden')) {
             log.classList.remove('hidden');
-            arrow.innerText = "▲"; // Pfeil nach oben
+            if(arrow) arrow.innerText = "▲"; 
         } else {
             log.classList.add('hidden');
-            arrow.innerText = "▼"; // Pfeil nach unten
+            if(arrow) arrow.innerText = "▼";
         }
     }
 };
