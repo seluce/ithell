@@ -233,10 +233,14 @@
             <div class="flex-[2] neon-box p-3 flex flex-col min-h-0 overflow-hidden shrink-0">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-1 mb-2 shrink-0">
                     <span class="text-[10px] text-amber-500 font-bold">INVENTAR</span>
-                    <span class="text-[10px] text-slate-500 font-bold">LOG</span>
+                    <span onclick="engine.toggleLog()" class="text-[10px] text-slate-500 font-bold cursor-pointer lg:pointer-events-none lg:cursor-default flex items-center gap-1">
+                        LOG <span id="log-arrow" class="text-[8px] lg:hidden">▼</span>
+                    </span>
                 </div>
+                
                 <div id="inventory-grid" class="grid grid-cols-5 gap-2 mb-4 shrink-0"></div>
-                <div id="log-feed" class="flex-1 overflow-y-auto font-mono text-[10px] space-y-1 text-slate-400 border-t border-slate-800 pt-2 min-h-0"></div>
+                
+                <div id="log-feed" class="hidden lg:block flex-1 overflow-y-auto font-mono text-[10px] space-y-1 text-slate-400 border-t border-slate-800 pt-2 min-h-0"></div>
             </div>
         </div>
     </div>

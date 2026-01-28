@@ -563,6 +563,21 @@ const engine = {
 
     showEnd: function(title, text, isWin) {
         this.showModal(title, text, true);
+    },
+
+// Log auf/zuklappen für Mobile
+    toggleLog: function() {
+        const log = document.getElementById('log-feed');
+        const arrow = document.getElementById('log-arrow');
+        
+        // Klasse 'hidden' umschalten
+        if (log.classList.contains('hidden')) {
+            log.classList.remove('hidden');
+            arrow.innerText = "▲"; // Pfeil nach oben
+        } else {
+            log.classList.add('hidden');
+            arrow.innerText = "▼"; // Pfeil nach unten
+        }
     }
 };
 
