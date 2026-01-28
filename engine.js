@@ -1,7 +1,7 @@
 const engine = {
     state: {
         time: 8 * 60,
-        fl: 0, al: 0, cr: 0,
+        fl: 0, al: 0, cr: 0, maxTimeReached: 8 * 60,
         tickets: 0,
         inventory: [], 
         warningReceived: false,
@@ -354,10 +354,13 @@ const engine = {
 
         if(type === 'coffee') this.state.coffeeConsumed++;
 
-        let oldTimeChunk = Math.floor(this.state.time / 30);
-        let newTimeChunk = Math.floor((this.state.time + m) / 30);
-        let newTickets = newTimeChunk - oldTimeChunk;
-        this.state.tickets += newTickets;
+        let newTime = this.state.time + m;
+        if(newTime > this.state.maxTimeReached) {
+            let fromChunk = Math.floor(this.state.maxTimeReached / 30);
+            let toChunk = Math.floor(newTime / 30);
+            this.state.tickets += (toChunk - fromChunk);
+            this.state.maxTimeReached = newTime;
+        }
         
         if (type === 'calls') { 
             this.state.tickets = Math.max(0, this.state.tickets - 1);
