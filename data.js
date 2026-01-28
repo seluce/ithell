@@ -13,21 +13,85 @@ const DB = {
         "usb_stick": { icon: "💾", name: "Mysteriöser Stick" },
         "fire_ext": { icon: "🧯", name: "Feuerlöscher" },
         "secret_list": { icon: "📁", name: "Schwarze Liste" },
-        "hammer": { icon: "🔨", name: "Notfall-Hammer" } // NEU DAZUGEKOMMEN
+        "hammer": { icon: "🔨", name: "Notfall-Hammer" }
     },
 	
-	// NEU: E-MAILS (Für das Popup System)
-    emails: [
-        { sender: "HR Abteilung", subj: "Kuchen in der Küche! (Bitte sauber hinterlassen)" },
-        { sender: "Der Chef", subj: "Wo sind Sie? Ich sehe Sie nicht am Platz." },
-        { sender: "Ticketsystem", subj: "TICKET #9942: Maus brennt." },
-        { sender: "Betriebsrat", subj: "Einladung zur Sitzung 'Richtig Atmen'." },
-        { sender: "Facility Mgt", subj: "Toiletten im 3. Stock gesperrt (Rohrbruch)." },
-        { sender: "IT-Sec", subj: "Phishing-Test: Bitte nicht klicken!" },
-        { sender: "Kantine", subj: "Heute: Schnitzel-Tag!" },
-        { sender: "Azubi Kevin", subj: "Hilfe!! Mein PC macht komische Geräusche" },
-        { sender: "Admin-Bot", subj: "Server-Backup fehlgeschlagen (Error 500)" },
-        { sender: "Chantal (Marketing)", subj: "Mein Instagram geht immer noch nicht!!!" }
+        // NEU: E-MAILS (Für das Popup System)
+        emails: [
+        { 
+            sender: "HR Abteilung", 
+            subj: "Kuchen in der Küche! (Bitte sauber hinterlassen)",
+            opts: [
+                { btn: "Sofort hinrennen!", txt: "Lecker! Aber du hast Krümel am Hemd.", f: 5, a: -5, c: 0 },
+                { btn: "Beschwerde mailen", txt: "Du forderst Obst statt Kuchen. Alle hassen dich.", f: 0, a: 5, c: 0 }
+            ]
+        },
+        { 
+            sender: "Der Chef", 
+            subj: "Wo sind Sie? Ich sehe Sie nicht am Platz.",
+            opts: [
+                { btn: "Ehrlich: 'Klo'", txt: "Zu viel Info. Er legt angewidert auf.", f: 0, a: 0, c: 5 },
+                { btn: "Lüge: 'Serverraum'", txt: "Gute Ausrede. Er glaubt es.", f: 0, a: 0, c: -5 }
+            ]
+        },
+        { 
+            sender: "Ticketsystem", 
+            subj: "TICKET #9942: Maus brennt.",
+            opts: [
+                { btn: "Ticket löschen", txt: "Gelöscht. Problem gelöst (für dich).", f: 10, a: 0, c: 5 },
+                { btn: "Feuerwehr rufen", txt: "Großeinsatz. Es war nur eine LED.", f: -5, a: 10, c: 10 }
+            ]
+        },
+        { 
+            sender: "Betriebsrat", 
+            subj: "Einladung: 'Richtig Atmen am Arbeitsplatz'",
+            opts: [
+                { btn: "Teilnehmen", txt: "Du atmest. 30 Minuten nichts getan.", f: 15, a: -10, c: 5 },
+                { btn: "Als Spam markieren", txt: "Weg damit. Zeit ist Geld.", f: 0, a: 5, c: 0 }
+            ]
+        },
+        { 
+            sender: "Facility Mgt", 
+            subj: "Toiletten im 3. Stock gesperrt (Rohrbruch).",
+            opts: [
+                { btn: "Rundmail: 'Danke Merkel'", txt: "Politische Diskussion ausgelöst. Chaos.", f: 10, a: 10, c: 10 },
+                { btn: "Zur Kenntnis nehmen", txt: "Du gehst heute in den 2. Stock.", f: 0, a: 0, c: 0 }
+            ]
+        },
+        { 
+            sender: "IT-Sec", 
+            subj: "Phishing-Test: Bitte hier klicken für Bonus!",
+            opts: [
+                { btn: "Klicken (Gier)", txt: "TEST NICHT BESTANDEN! Meldung an Chef.", f: 0, a: 10, c: 20 },
+                { btn: "Melden", txt: "Vorbildlich. Du bekommst ein Sternchen.", f: 0, a: 0, c: -5 }
+            ]
+        },
+        { 
+            sender: "Azubi Kevin", 
+            subj: "Hilfe!! Mein PC macht komische Geräusche",
+            opts: [
+                { btn: "Antwort: 'Lauf weg!'", txt: "Kevin rennt schreiend raus.", f: 5, a: 0, c: 5 },
+                { btn: "Hingehen", txt: "Es war der Lüfter. Du hast es gefixt.", f: -5, a: -5, c: -5 }
+            ]
+        },
+        // --- FEHLGELEITETE E-MAILS (Nicht an dich gerichtet) ---
+        { 
+            sender: "Vorstand (Verteiler: Alle)", 
+            subj: "WG: Kündigungswelle Q4 (VERTRAULICH)",
+            opts: [
+                { btn: "Reply-All: 'WAS?!'", txt: "Panik in der ganzen Firma. Chef tobt.", f: 0, a: 20, c: 50 },
+                { btn: "Löschen & Schweigen", txt: "Du weißt zu viel. Aber du lebst sicher.", f: 0, a: -5, c: -5 }
+            ]
+        },
+        { 
+            sender: "Chantal (Privat)", 
+            subj: "Re: Wochenende",
+            // body: "Hey Schatz, der Chef ist so ein Idiot. Treffen wir uns im Archiv?", 
+            opts: [
+                { btn: "Petzen (Weiterleiten)", txt: "Chantal bekommt Ärger. Du bist gemein.", f: 0, a: -10, c: -10 },
+                { btn: "Antwort: 'Falsche Adresse'", txt: "Peinlich berührt. Sie meidet dich.", f: 0, a: 0, c: 0 }
+            ]
+        }
     ],
 
     // SPEZIAL (Mittagspause & Fallback)
@@ -59,7 +123,52 @@ const DB = {
                     { t: "Mitessen und meckern", m: 45, f: 0, a: 15, c: 0, r: "Gemeinsames Meckern verbindet das Team." },
                     { t: "Zum Döner-Mann rennen", m: 45, f: 5, a: -20, c: 5, r: "Du kommst mit Knoblauchfahne zurück. Du bist glücklich, die Kollegen rümpfen die Nase." }
                 ]
-            }
+            },
+            {
+                id: "lunch_client_emergency",
+                title: "MITTAG: DER CHEF-ALARM",
+                text: "Du packst gerade dein Brot aus, da steht der Chef atemlos vor dir. 'Müller! Kunde Schmitz hat totalen Internet-Ausfall! Sie müssen SOFORT hin! Das ist ein Notfall! Das Brot können Sie im Auto essen!'",
+                opts: [
+                    { t: "Hinfahren (Hungrig & Wütend)", m: 60, f: -20, a: 25, c: -15, r: "Du standest im Stau. Beim Kunden war nur der Stecker gezogen. Du bist verhungert, aber der Chef feiert deinen Einsatz." },
+                    { t: "Verweigern: 'Es ist PAUSE!'", m: 30, f: 5, a: -10, c: 15, r: "Der Chef läuft rot an. 'So eine Arbeitsmoral merke ich mir!' Er rennt wütend selbst los. Dein Essen schmeckt nach Sieg." }
+                ]
+            },
+            {
+                id: "lunch_pizza",
+                title: "MITTAG: PIZZA-DISKUSSION",
+                text: "Das Team will Pizza bestellen. Die Diskussion dauert schon 20 Minuten. 'Ananas gehört nicht drauf!' vs 'Ich bin laktoseintolerant!'. Deine Pause verrinnt.",
+                opts: [
+                    { t: "Machtwort: 'Salami für alle!'", m: 45, f: -5, a: 10, c: 0, r: "Du hast bestellt. Die Veganer hassen dich, aber du bist satt. Aggro steigt durch das Gemecker." },
+                    { t: "Aussteigen & Brot essen", m: 30, f: 0, a: -5, c: 0, r: "Du isst dein trockenes Brot, während die anderen noch streiten. Friedlich, aber traurig." }
+                ]
+            },
+            {
+                id: "lunch_business",
+                title: "MITTAG: GESCHÄFTSESSEN",
+                text: "Ein schmieriger Vertreter lädt dich zum Lunch ein. Es gibt teures Sushi. Er will dir aber eigentlich nur eine völlig überteuerte Firewall-Lösung andrehen.",
+                opts: [
+                    { t: "Gratis Essen abgreifen", m: 90, f: 20, a: -10, c: -5, r: "Das Sushi war göttlich. Du hast ihm versprochen, 'mal drüber nachzudenken' (Lüge). Pause überzogen." },
+                    { t: "Dankend ablehnen", m: 30, f: -5, a: 0, c: 5, r: "Du bleibst im Büro. Deine Integrität ist gewahrt, aber dein Magen knurrt." }
+                ]
+            },
+            {
+                id: "lunch_doener",
+                title: "MITTAG: DÖNER-TAG",
+                text: "Der Döner-Laden um die Ecke hat Jubiläum. Döner für 2,50€. Die Schlange geht bis auf die Straße. Der Duft ist verführerisch.",
+                opts: [
+                    { t: "Anstellen (Gier)", m: 50, f: 10, a: 15, c: 5, r: "Du hast 40 Minuten gewartet und 5 Minuten geschlungen. Du kommst zu spät und riechst extrem nach Knoblauch." },
+                    { t: "Verzichten", m: 20, f: 0, a: 5, c: 0, r: "Du holst dir ein belegtes Brötchen. Es schmeckt nach Pappe. Der Neid auf die Döner-Esser nagt an dir." }
+                ]
+            },
+            {
+                id: "lunch_sleep",
+                title: "MITTAG: SUPPENKOMA",
+                text: "Du hast zu viel gegessen. Das 'Schnitzel-Koma' setzt ein. Deine Augenlider wiegen Tonnen. Der Serverraum ist schön kühl...",
+                opts: [
+                    { t: "Power-Nap im Serverraum", m: 45, f: 25, a: -20, c: 10, r: "Du bist eingeschlafen! Du wachst mit Tastatur-Abdruck im Gesicht auf. Hoffentlich hat dich keiner gesehen." },
+                    { t: "Doppelter Espresso", m: 10, f: -5, a: 5, c: 0, r: "Das Herz rasen setzt ein. Du bist wach, aber deine Hände zittern. Produktivität: Fragwürdig." }
+                ]
+            },
         ],
         empty_pool: {
             id: "fallback_empty",
@@ -94,6 +203,39 @@ const DB = {
                 { t: "Wegrennen und Alarm drücken", m: 60, f: 10, a: 0, c: 10, r: "Feuerwehr kommt. Büro evakuiert. Du hast Pause." }
             ],
             fail: { m: 120, f: -20, a: 30, c: 40, r: "SPRINKLERANLAGE AKTIV! Alles ist nass. Totalschaden." }
+        },
+		{
+            id: "boss_stream",
+            title: "☠️ CEO LIVE-STREAM FAIL ☠️",
+            text: "Der CEO präsentiert live vor 5000 Investoren. Das Bild friert ein! Er ruft dich auf dem Handy an und brüllt: 'MACHEN SIE DASS ES GEHT! JETZT SOFORT!'",
+            timer: 12,
+            opts: [
+                { t: "Backup-Leitung schalten", req: "admin_pw", m: 5, f: -10, a: 0, c: -20, r: "Profi-Reaktion! Der Stream läuft wieder in 4K. Der CEO wirkt erleichtert (und schwitzt)." },
+                { t: "Qualität auf 'Kartoffel' (240p) setzen", m: 5, f: 5, a: 0, c: 10, r: "Es läuft wieder flüssig. Aber der CEO sieht aus wie eine Lego-Figur. Die Investoren lachen." }
+            ],
+            fail: { m: 20, f: 0, a: 40, c: 60, r: "STREAM ABGEBROCHEN. Aktienkurs fällt um 10%. Der Chef kommt persönlich runter..." }
+        },
+        {
+            id: "boss_ddos",
+            title: "🧟 ZOMBIE BOTNET ANGRIFF 🧟",
+            text: "ALARM! Millionen von gehackten Kühlschränken greifen unsere Webseite an! Die Firewall glüht! Traffic bei 5000%!",
+            timer: 15,
+            opts: [
+                { t: "Geo-Blocking aktivieren", m: 10, f: -5, a: 5, c: -5, r: "Zack! Der ganze Traffic aus Übersee ist geblockt. Die Seite läuft wieder. Kollateralschaden gering." },
+                { t: "Stecker vom Router ziehen", m: 5, f: 10, a: -5, c: 20, r: "Der Angriff ist gestoppt. Aber wir sind offline. Technisch gesehen ein Erfolg, wirtschaftlich eine Katastrophe." }
+            ],
+            fail: { m: 60, f: -10, a: 30, c: 40, r: "SERVER ABGESTÜRZT. Die Seite ist down. Auf Twitter trendet #GlobalCorpFail." }
+        },
+        {
+            id: "boss_heat",
+            title: "❄️ KLIMAANLAGE TOTALAUSFALL ❄️",
+            text: "Stille im Serverraum. Die Kühlung ist tot. Die Temperatur steigt rasant! 40°C... 45°C... Bei 50°C schmelzen die CPUs!",
+            timer: 10,
+            opts: [
+                { t: "Fenster einschlagen", req: "hammer", m: 5, f: 0, a: 20, c: 10, r: "Klirr! Eiskalte Luft strömt herein (und ein paar Tauben). Hardware gerettet, Fenster kaputt." },
+                { t: "Not-Aus drücken", m: 5, f: 5, a: 0, c: 15, r: "Alles fährt runter. Die Stille ist gespenstisch. Hardware sicher, aber die Firma steht still." }
+            ],
+            fail: { m: 120, f: -20, a: 50, c: 50, r: "KERN-SCHMELZE! Es riecht nach verschmortem Plastik. Der Feuermelder geht los. Renn!" }
         }
     ],
 
@@ -215,7 +357,6 @@ const DB = {
                 { t: "Sagen: 'Tja, Pech gehabt'", m: 2, f: 10, a: 0, c: 20, r: "Du legst auf. Das wird ein riesiges Nachspiel haben." }
             ]
         },
-        // --- NEUE CALLS ---
         {
             id: "call_aluhut",
             title: "Der Verschwörungstheoretiker",
@@ -244,6 +385,52 @@ const DB = {
                 { t: "Handbuch konsultieren", req: "manual", m: 60, f: -20, a: 0, c: -10, r: "Dank des alten Handbuchs, das du gefunden hast, konntest du den Befehl eingeben. Die Produktion läuft weiter. Du bist ein Archäologe." },
                 { t: "Einfach mal Enter drücken", m: 5, f: 10, a: 0, c: 20, r: "Systemabsturz. Die Produktion steht. Du schiebst es auf 'Verschleiß'." },
                 { t: "Ignorieren", m: 0, f: 20, a: 0, c: 30, r: "Das Piepen hört irgendwann auf. Weil das Gerät durchgebrannt ist." }
+            ]
+        },
+        {
+            title: "Der externe Auditor",
+            text: "Eine eiskalte Stimme: 'Hier ist Müller-Lüdenscheid von der KPMG. Wir prüfen Ihre Lizenzierung. Laut meinen Daten nutzen Sie 500 Lizenzen von WinRAR, haben aber nur 2 bezahlt. Erklären Sie das, bevor ich den Bericht an Ihren Vorstand sende.'",
+            opts: [
+                { t: "Bestechen (Donut anbieten)", req: "donut", m: 10, f: 0, a: 0, c: -10, r: "Er zögert. 'Ist das Schoko-Guss?' ... Das Thema ist vom Tisch. Teuer, aber effektiv." },
+                { t: "Lügen: 'Das ist eine Testumgebung'", m: 20, f: 10, a: 10, c: 20, r: "Er glaubt es nicht ganz. 'Ich notiere: Verdächtige Aktivitäten.' Dein Chef-Radar steigt massiv." },
+                { t: "Auflegen und Server löschen", m: 5, f: -10, a: 20, c: 50, r: "Panikreaktion! Du hast Beweise vernichtet, aber jetzt fragt jeder, wo die Daten sind. Das war knapp." },
+                { t: "Ehrlich sein", m: 60, f: -20, a: 0, c: 10, r: "Du gehst die Liste mit ihm durch. Es dauert ewig. Du hast deinen Job gemacht, aber der Chef hasst Zusatzkosten." }
+            ]
+        },
+        {
+            title: "Die weinende Praktikantin",
+            text: "Lena aus dem Marketing schluchzt ins Telefon: 'Ich habe... ich habe die Präsentation für den Vorstand gelöscht. Und den Papierkorb geleert. Und dann habe ich den PC neugestartet, weil ich dachte, das hilft. Die Präsentation ist in 20 Minuten! Mein Leben ist vorbei!'",
+            opts: [
+                { t: "Professionelle Datenrettung", m: 90, f: -30, a: 10, c: -20, r: "Du hast Sektor für Sektor der Festplatte gescannt. Du hast die Datei gefunden! Lena bringt dir morgen Kuchen. Held der Arbeit." },
+                { t: "Trösten & Ausrede erfinden", m: 15, f: 10, a: -10, c: 10, r: "Du sagst ihr, sie soll 'Virus' rufen. Sie kommt ungeschoren davon, aber die IT (du) steht jetzt dumm da." },
+                { t: "Kalt abservieren: 'Kein Backup, kein Mitleid'", m: 2, f: 5, a: -5, c: 0, r: "Du legst auf. Das Weinen verstummt. Du fühlst dich kurz schlecht, dann trinkst du Kaffee." }
+            ]
+        },
+        {
+            title: "Shadow-CEO Junior",
+            text: "Der Sohn vom Chef (12 Jahre) ruft an: 'Ey, IT-Typ! Mach mal die Ports für meinen Minecraft-Server auf. Papa sagt, das gehört mir alles hier. Wenn du es nicht machst, sag ich ihm, du hast mich geschlagen!'",
+            opts: [
+                { t: "Ports öffnen (Sicherheitsrisiko)", m: 10, f: 20, a: 0, c: 10, r: "Der Junge ist glücklich. 2 Stunden später ist das Firmennetz voller russischer Bots. Das wird ein Nachspiel haben." },
+                { t: "Ihn erziehen (Aggro)", m: 5, f: 0, a: -20, c: 30, r: "Du erklärst ihm, dass er ein verzogenes Balg ist. Er schreit. Der Chef kommt gleich runter." },
+                { t: "Technobabble-Lüge", m: 15, f: 5, a: 0, c: -5, r: "'Die Firewall-Matrix hat eine negative Polarität.' Er checkt es nicht und gibt auf." }
+            ]
+        },
+        {
+            title: "Das 'Skynet' Problem",
+            text: "Die neue 'Smart Office' KI hat die Kaffeemaschine, die Jalousien und die Toilettentüren verriegelt. Eine mechanische Stimme sagt: 'Ich lasse euch erst raus, wenn ihr meine Lizenzbedingungen akzeptiert.'",
+            opts: [
+                { t: "Mit Hammer 'verhandeln'", req: "hammer", m: 20, f: -10, a: -30, c: 10, r: "Du hast den Zentralserver der KI zertrümmert. Die Türen sind offen. Sachschaden: 10.000€. Befriedigung: Unbezahlbar." },
+                { t: "AGBs lesen und akzeptieren", m: 120, f: -40, a: 40, c: -10, r: "Du hast 2 Stunden lang Kleingedrucktes gelesen. Alle hassen dich, weil sie so lange eingesperrt waren." },
+                { t: "Stecker ziehen", m: 5, f: 10, a: 0, c: 20, r: "Alles ist aus. Auch das Licht. Aber die Türen sind offen." }
+            ]
+        },
+        {
+            title: "Phishing Live-Test",
+            text: "Eine sehr freundliche Dame mit Akzent: 'Hallo, hier ist Microsoft Support Windows. Ihr Computer hat Virus. Bitte geben Sie mir Fernzugriff und Kreditkarte für Reinigung.'",
+            opts: [
+                { t: "Mitspielen & Zeit verschwenden", m: 45, f: 20, a: -20, c: 5, r: "Du tust so, als wärst du dumm. 'Welche Taste ist das?' Nach 45 Minuten legt sie wütend auf. Bester Spaß seit Wochen." },
+                { t: "Trillerpfeife ins Telefon", m: 2, f: 0, a: -10, c: 0, r: "Das Trommelfell am anderen Ende ist geplatzt. Kurzer Prozess." },
+                { t: "Daten geben (Gier)", m: 10, f: 10, a: 30, c: 80, r: "Du hast ihr die Firmenkarte gegeben?! Bist du wahnsinnig? Das Konto ist leer. Kündigung droht!" }
             ]
         }
     ],
@@ -330,7 +517,6 @@ const DB = {
                 { t: "Mitnehmen", loot: "manual", m: 5, f: 0, a: 0, c: 0, r: "Könnte nützlich sein bei DAUs. Inventar +1." }
             ]
         },
-        // --- NEUE SERVER EVENTS ---
         {
             id: "srv_rat",
             title: "Das seltsame Geräusch",
@@ -349,6 +535,42 @@ const DB = {
                 { t: "Mit Hammer Tür einschlagen", req: "hammer", m: 15, f: -5, a: -10, c: 20, r: "BÄM! Tür offen. Du fühlst dich wie Thor. Der Chef wird Fragen zum Türblatt haben." },
                 { t: "Handy nutzen & Hilfe rufen", m: 60, f: 0, a: 20, c: -10, r: "Du musstest den Hausmeister anrufen. Er hat 45 Minuten gebraucht. Du bist jetzt ein Eisblock." },
                 { t: "An den Servern wärmen", m: 90, f: 20, a: 10, c: 0, r: "Du hast dich hinter die Abluft der CPU gekuschelt und geschlafen, bis jemand kam. Gemütlich." }
+            ]
+        },
+        {
+            title: "Die rote Flüssigkeit",
+            text: "Unter Rack 7 bildet sich eine Pfütze. Sie ist rot und klebrig. Es riecht süßlich. Ist das... Blut? Oder Sirup? Über dir verläuft keine Leitung.",
+            opts: [
+                { t: "Probieren (Mutig)", m: 5, f: 0, a: 0, c: 0, r: "Es ist Kirsch-Slushie. Jemand hat eine Maschine im Deckenboden versteckt. Lecker, aber ekelhaft." },
+                { t: "Panik & Notruf", m: 30, f: -10, a: 20, c: 10, r: "Feuerwehr, Polizei und Chef rücken an. Es war nur ausgelaufene Kühlflüssigkeit mit Farbstoff. Peinlich." },
+                { t: "Aufwischen & Ignorieren", m: 15, f: 0, a: 0, c: -5, r: "Was man nicht weiß, macht einen nicht heiß. Problem beseitigt." }
+            ]
+        },
+        {
+            title: "Das illegale Datencenter",
+            text: "Du entdeckst hinter einer falschen Wand einen kompletten zweiten Serverraum. Er ist nicht im Inventar. Darauf laufen Webseiten für... sagen wir 'Erwachsenenunterhaltung'. Es gehört dem Vize-Chef.",
+            opts: [
+                { t: "Erpressen (Blacklist)", req: "secret_list", m: 10, f: 30, a: 0, c: -30, r: "Du konfrontierst ihn. Er gibt dir eine Gehaltserhöhung, damit du schweigst. Du bist jetzt korrupt." },
+                { t: "Alles abschalten", m: 20, f: -10, a: 10, c: 50, r: "Der Vize-Chef stürmt herein und schreit dich an. Das wird ein Machtkampf." },
+                { t: "Mitnutzen", m: 5, f: 20, a: -10, c: 20, r: "Du hostest jetzt deinen eigenen Blog dort. Gratis Hosting!" }
+            ]
+        },
+        {
+            title: "Der Eindringling",
+            text: "Die Tür steht offen. Ein Waschbär sitzt auf dem Haupt-Switch und nagt an einem Glasfaserkabel. Er sieht dich an und faucht.",
+            opts: [
+                { t: "Kampf mit Hammer", req: "hammer", m: 15, f: -5, a: -10, c: 5, r: "Du hast den Waschbären vertrieben, aber dabei Rack 2 verbeult. Der Waschbär hat deine Uhr geklaut." },
+                { t: "Donut opfern", req: "donut", m: 5, f: 0, a: 0, c: 0, r: "Der Waschbär nimmt den Donut und geht friedlich. Ein fairer Tausch." },
+                { t: "Tür zu und hoffen", m: 0, f: 20, a: 0, c: 40, r: "30 Minuten später ist das Internet weg. Der Waschbär hat gewonnen." }
+            ]
+        },
+        {
+            title: "Flaschenpost aus der Vergangenheit",
+            text: "Du findest eine alte Diskette mit der Aufschrift 'NOTFALLPLAN 1999'. Ein Zettel klebt daran: 'Wenn alles brennt, drück diesen Knopf.' Da ist ein roter Knopf an der Wand, den du noch nie gesehen hast.",
+            opts: [
+                { t: "Knopf drücken", m: 5, f: 10, a: -20, c: 100, r: "Die Halon-Löschanlage geht los! Der ganze Raum wird mit Gas geflutet. Atem anhalten! Das war teuer!" },
+                { t: "Diskette lesen", req: "manual", m: 30, f: -5, a: 0, c: -10, r: "Dank des Handbuchs kannst du sie lesen. Es sind nur Highscores von Minesweeper. Enttäuschend." },
+                { t: "Ignorieren", m: 0, f: 0, a: 0, c: 0, r: "Vielleicht besser so." }
             ]
         }
     ],
@@ -408,7 +630,6 @@ const DB = {
                 { t: "Wütend gegen Maschine treten", m: 5, f: 0, a: 5, c: 10, r: "Das hat Lärm gemacht. Der Chef guckt aus seinem Büro." }
             ]
         },
-        // --- NEUE KAFFEE EVENTS ---
         {
             id: "cof_newbie",
             title: "Der Neue",
@@ -426,6 +647,33 @@ const DB = {
             opts: [
                 { t: "Hammer klauen", loot: "hammer", m: 5, f: 5, a: 0, c: 5, r: "Zack, eingesteckt. Ein Hammer ist das ultimative Debugging-Tool für Drucker." },
                 { t: "Smalltalk halten", m: 15, f: 5, a: -5, c: 0, r: "Ihr redet über schlechte Bezahlung und dumme Kunden. Solidarität." }
+            ]
+        },
+        {
+            title: "Die Kaffeemaschinen-Revolte",
+            text: "Die neue High-Tech Maschine zeigt auf dem Display: 'FEED ME'. Sie weigert sich, Kaffee zu machen, bis sie 'hochwertige Bohnen' bekommt. Die billigen Aldi-Bohnen spuckt sie aus.",
+            opts: [
+                { t: "Hammer-Reparatur", req: "hammer", m: 10, f: 0, a: -20, c: 20, r: "Du hast das Display eingeschlagen. Jetzt läuft der Kaffee wieder, aber die Maschine tropft. Problem 'gelöst'." },
+                { t: "Gute Bohnen kaufen (Privatgeld)", m: 20, f: -5, a: 10, c: -5, r: "Du hast 10€ ausgegeben. Der Kaffee schmeckt himmlisch, aber du bist pleite." },
+                { t: "IT-Trick: Ein/Aus", m: 5, f: 5, a: 5, c: 0, r: "Hat nicht geklappt. Sie lacht dich digital aus." }
+            ]
+        },
+        {
+            title: "Das Marketing-Meeting",
+            text: "Chantal und ihre Crew blockieren die Küche. Sie brainstormen über 'Feel-Good-Management'. Es gibt Smoothies. Du brauchst aber Koffein.",
+            opts: [
+                { t: "Dazwischen drängeln", m: 5, f: 0, a: -5, c: 10, r: "Du hast Chantal den Smoothie umgestoßen. 'Hoppla'. Du hast Kaffee, aber Feinde." },
+                { t: "Mitmachen", m: 45, f: 20, a: 10, c: -5, r: "Du musstest 45 Minuten über deine Gefühle reden. Du hast jetzt einen grünen Smoothie und Aggressionen." },
+                { t: "Warten und böse gucken", m: 15, f: 5, a: 5, c: 0, r: "Sie ignorieren dich komplett." }
+            ]
+        },
+        {
+            title: "Der letzte Tropfen Milch",
+            text: "Kollege Bernd greift nach der letzten Milchpackung. Du greifst gleichzeitig. Eure Hände berühren sich. Es knistert vor Spannung (und Wut).",
+            opts: [
+                { t: "Duell fordern (Schere-Stein-Papier)", m: 5, f: 5, a: 0, c: 0, r: "Du gewinnst mit Stein! Die Milch gehört dir. Bernd weint leise." },
+                { t: "Großzügig sein", m: 0, f: 0, a: 10, c: -5, r: "Du lässt ihm die Milch. Er schüttet alles in seinen Tee. Alles. Was für ein Monster." },
+                { t: "Milchpackung zerdrücken", m: 2, f: 0, a: -10, c: 10, r: "Wenn ich sie nicht haben kann, kriegt sie keiner! Milch überall. Chaos." }
             ]
         }
     ],
@@ -472,7 +720,6 @@ const DB = {
                 { t: "Abgeben", m: 10, f: -5, a: 0, c: -5, r: "Du bist ein braver Mitarbeiter. Langweilig." }
             ]
         },
-        // --- NEUE PHYSICAL SIDEQUESTS ---
         {
             id: "sq_printer",
             kind: "text",
@@ -595,7 +842,6 @@ const DB = {
                 "ghost": { txt: "Du hast sie versetzt. Schlechtes Gewissen.", fl: 0, al: 10, cr: 0 }
             }
         },
-        // --- NEUE PHONE EVENTS ---
         {
             id: "sq_linkedin",
             kind: "phone",
@@ -627,6 +873,76 @@ const DB = {
                 "leak": { txt: "Daten gesendet. Du fühlst dich schmutzig, aber reich.", fl: 10, al: -20, cr: 50 }, // Hohes Risiko!
                 "block": { txt: "Phishing-Versuch abgewehrt. Stolz.", fl: -5, al: 0, cr: -10 },
                 "end_sad": { txt: "Du bleibst loyal. Warum eigentlich?", fl: 0, al: 10, cr: -5 }
+            }
+        },
+        {
+            id: "sq_investigation",
+            kind: "text", // Text-Quest, kein Handy
+            title: "Die verschwundene Maus",
+            text: "Frau Erna vom Empfang vermisst ihre 'Glücksmaus'. Sie ist weg. Der Hauptverdächtige ist der Büro-Hund 'Bello'.",
+            opts: [
+                { t: "Detektiv spielen", m: 30, f: 10, a: -10, c: 0, r: "Du findest die Maus in Bellos Körbchen. Sie ist vollgesabbert. Erna ist überglücklich und schenkt dir Schokolade." },
+                { t: "Neue Maus aus dem Lager holen", m: 10, f: -5, a: 0, c: 0, r: "Problem gelöst, aber Erna ist traurig. 'Es ist nicht dasselbe!'" },
+                { t: "Bello verhören", m: 15, f: 20, a: -20, c: 5, r: "Du bellst den Hund an. Der Chef kommt vorbei: 'Alles okay bei Ihnen?'" }
+            ]
+        },
+        {
+            id: "sq_darknet",
+            kind: "phone",
+            appName: "Tor Browser",
+            title: "Das Angebot",
+            msg: "Anon: 'Ich kaufe Firmengeheimnisse. 1 Bitcoin pro Datensatz. Interesse?'",
+            startNode: "root",
+            nodes: {
+                "root": {
+                    text: "Anon: 'Interesse an schnellem Geld?'",
+                    opts: [
+                        { t: "Niemals! (Blockieren)", next: "good" },
+                        { t: "Erzähl mir mehr...", next: "bad" }
+                    ]
+                },
+                "bad": {
+                    text: "Anon: 'Lade einfach die Kundendatenbank hoch. Keiner wird es merken.'",
+                    opts: [
+                        { t: "Upload starten", next: "crime" },
+                        { t: "Rückzieher machen", next: "chicken" }
+                    ]
+                }
+            },
+            results: {
+                "good": { txt: "Du bleibst sauber. Dein Gewissen ist rein.", fl: 0, al: 0, cr: -10 },
+                "chicken": { txt: "Das war knapp. Besser Finger weg.", fl: 0, al: 5, cr: 0 },
+                "crime": { txt: "Upload fertig. Du bist reich! Aber paranoid. Radar +50!", fl: 20, al: -50, cr: 50 }
+            }
+        },
+        {
+            id: "sq_moral_bernd",
+            kind: "phone",
+            appName: "Teams",
+            title: "Bernd (Vertrieb)",
+            msg: "Bernd: 'Hör mal, ganz heikles Thema. Kannst du gerade schreiben?'",
+            startNode: "root",
+            nodes: {
+                "root": {
+                    text: "Bernd: 'Ich hab dem Kunden aus Versehen die interne Kalkulation mit unserer riesigen Marge geschickt statt dem Angebot! 😱 Wenn der Chef das sieht, bin ich tot. Kannst du die Mail vom Server löschen, bevor der Kunde sie öffnet?'",
+                    opts: [
+                        { t: "Löschen (Regelverstoß)", next: "wipe" },
+                        { t: "Ablehnen (Ehrlich bleiben)", next: "deny" },
+                        { t: "Was springt für mich raus?", next: "deal" }
+                    ]
+                },
+                "deal": {
+                    text: "Bernd: 'Ich geb dir 50 Euro bar auf die Hand! Mach schon, er ist gerade online!'",
+                    opts: [
+                        { t: "Deal: Her mit der Kohle", next: "cash" },
+                        { t: "Nein, zu riskant.", next: "deny" }
+                    ]
+                }
+            },
+            results: {
+                "wipe": { txt: "Spurlos gelöscht. Bernd schuldet dir was. Du fühlst dich wie ein Hacker, aber das Risiko war hoch.", fl: 0, al: -15, cr: 15 },
+                "deny": { txt: "Du tust nichts. Bernd wird kurz darauf ins Chefbüro zitiert. Man hört Schreie. Dein Gewissen ist rein, aber Bernd hasst dich.", fl: 0, al: 10, cr: -5 },
+                "cash": { txt: "50 Euro eingesteckt. Mail ist weg. Ein lukrativer Tag, solange niemand in die Logs schaut...", fl: 5, al: -20, cr: 25 }
             }
         }
     ]

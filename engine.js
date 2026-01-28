@@ -46,30 +46,50 @@ const engine = {
     triggerEmail: function() {
         if(!DB.emails) return; 
         
+        // 1. E-Mail auswählen (ohne Wiederholung)
         let availableEmails = DB.emails.filter(e => !this.state.usedEmails.has(e.subj));
         if(availableEmails.length === 0) {
             this.state.usedEmails.clear(); 
             availableEmails = DB.emails;
         }
-
         let email = availableEmails[Math.floor(Math.random() * availableEmails.length)];
         this.state.usedEmails.add(email.subj);
 
+        // 2. UI Elemente holen
         const overlay = document.getElementById('email-overlay');
         const timerBar = document.getElementById('email-timer-bar');
+        const actionContainer = document.getElementById('email-actions'); // Der neue Container
         
+        // 3. Text setzen
         document.getElementById('email-sender').innerText = email.sender;
         document.getElementById('email-subject').innerText = email.subj;
+        if(email.body) {
+             document.getElementById('email-subject').innerText += "\n\n" + email.body;
+        }
         
+        // 4. Buttons generieren (Das ist der wichtige neue Teil!)
+        actionContainer.innerHTML = ''; // Vorher leeren
+        if(email.opts) {
+            email.opts.forEach(opt => {
+                const btn = document.createElement('button');
+                // Styling für die Antwort-Buttons
+                btn.className = "bg-blue-600 hover:bg-blue-500 text-white text-xs py-2 px-3 rounded text-left transition-colors";
+                btn.innerText = "➤ " + opt.btn;
+                // Klick löst resolveEmail mit den spezifischen Werten (opt) aus
+                btn.onclick = () => this.resolveEmail(opt, false);
+                actionContainer.appendChild(btn);
+            });
+        }
+        
+        // 5. Anzeigen & Timer starten
         overlay.style.display = 'flex';
         this.state.isEmailOpen = true;
         
-        const DURATION = 15000; 
+        const DURATION = 15000; // 15 Sekunden
         const UPDATE_RATE = 50; 
         let timePassed = 0;
 
         if(timerBar) timerBar.style.width = '100%';
-
         if(this.state.emailInterval) clearInterval(this.state.emailInterval);
 
         this.state.emailInterval = setInterval(() => {
@@ -78,28 +98,30 @@ const engine = {
             if(timerBar) timerBar.style.width = percentLeft + '%';
 
             if(timePassed >= DURATION) {
-                this.resolveEmail(false, true); 
+                this.resolveEmail(null, true); // Timeout
             }
         }, UPDATE_RATE);
     },
 
-    resolveEmail: function(replied, timeout = false) {
+    resolveEmail: function(opt, timeout = false) {
         clearInterval(this.state.emailInterval);
         document.getElementById('email-overlay').style.display = 'none';
         this.state.isEmailOpen = false;
         
         if(timeout) {
-            this.log("E-MAIL VERPASST! Radar +10", "text-red-500 font-bold");
+            // FALL 1: ZEIT ABGELAUFEN oder IGNORIEREN GEKLICKT
+            this.log("E-MAIL IGNORIERT! Radar +10", "text-red-500 font-bold");
             this.state.cr += 10;
             this.state.emailsIgnored++;
-        } else if(replied) {
-            this.log("E-Mail beantwortet. Aggro -5", "text-blue-400");
-            this.state.al = Math.max(0, this.state.al - 5);
-        } else {
-            this.log("E-Mail weggedrückt. Radar +2", "text-orange-400");
-            this.state.cr += 2;
-            this.state.emailsIgnored++;
+        } else if(opt) {
+            // FALL 2: EINE ANTWORT GEWÄHLT
+            // Hier werden die Werte aus data.js (f, a, c) angewendet
+            this.log("E-Mail: " + opt.txt, "text-blue-400");
+            this.state.fl += (opt.f || 0);
+            this.state.al += (opt.a || 0);
+            this.state.cr += (opt.c || 0);
         }
+        
         this.updateUI();
     },
 
@@ -129,14 +151,21 @@ const engine = {
 
         const invGrid = document.getElementById('inventory-grid');
         invGrid.innerHTML = '';
-        for(let i=0; i<5; i++) {
+        
+        // LOGIK: Mindestens 5 Slots anzeigen. Wenn mehr Items da sind, wächst die Zahl.
+        let totalSlots = Math.max(5, this.state.inventory.length);
+        
+        // Optional: Wenn du willst, dass immer volle 5er Reihen da sind (also 5, 10, 15):
+        // let totalSlots = Math.ceil(Math.max(5, this.state.inventory.length) / 5) * 5;
+
+        for(let i=0; i < totalSlots; i++) {
             let itemData = this.state.inventory[i];
             let slot = document.createElement('div');
             if(itemData) {
                 let dbItem = DB.items[itemData.id];
                 slot.className = `inv-slot ${itemData.used ? 'used' : ''}`;
                 slot.innerText = dbItem ? dbItem.icon : '?';
-                slot.title = dbItem ? dbItem.name : 'Unknown';
+                slot.title = dbItem ? dbItem.name : 'Unbekannt';
             } else {
                 slot.className = 'inv-slot empty';
             }
