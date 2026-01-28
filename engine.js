@@ -3,7 +3,7 @@ const engine = {
         time: 8 * 60,
         fl: 0, al: 0, cr: 0,
         tickets: 0,
-        inventory: [], // [{id: 'abc', used: false}]
+        inventory: [], 
         warningReceived: false,
         activeEvent: null,
         currentPhoneEvent: null,
@@ -12,15 +12,14 @@ const engine = {
         bossTimer: null,
         ticketWarning: false,
         
-        // Stats für Achievements
+        // Stats & System
         achievements: [],
         achievedTitles: [],
+        emailTimer: null,
+        emailTimeout: null,
         coffeeConsumed: 0,
         emailsIgnored: 0,
         spamClicked: 0,
-        
-        // Email System Neu
-        emailInterval: null, // Für den Balken
         usedEmails: new Set(),
         isEmailOpen: false
     },
@@ -28,34 +27,28 @@ const engine = {
     init: function() {
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v33.0 geladen. Warte auf User...");
+        this.log("System v40.0 geladen. Warte auf User...");
     },
 
     start: function() {
         document.getElementById('intro-modal').style.display = 'none';
-        // Wir starten KEINEN Timer-Loop. E-Mails kommen nur nach Aktionen.
     },
 
-    // --- NEUE E-MAIL LOGIK ---
-    
-    // Wird nach jeder Aktion aufgerufen
+    // --- E-MAIL LOGIK ---
     checkRandomEmail: function() {
         if(this.state.isEmailOpen) return;
-
-        // Chance steigt mit Ticket-Anzahl
         let chance = 0.2 + (this.state.tickets * 0.05); 
-        
         if(Math.random() < chance) {
-            setTimeout(() => { this.triggerEmail(); }, 1000);
+            setTimeout(() => { this.triggerEmail(); }, 1500);
         }
     },
 
     triggerEmail: function() {
-        // Filter: Nur unbenutzte Mails
-        let availableEmails = DB.emails.filter(e => !this.state.usedEmails.has(e.subj));
+        if(!DB.emails) return; 
         
+        let availableEmails = DB.emails.filter(e => !this.state.usedEmails.has(e.subj));
         if(availableEmails.length === 0) {
-            this.state.usedEmails.clear(); // Reset pool
+            this.state.usedEmails.clear(); 
             availableEmails = DB.emails;
         }
 
@@ -71,23 +64,21 @@ const engine = {
         overlay.style.display = 'flex';
         this.state.isEmailOpen = true;
         
-        // 15 Sekunden Timer
         const DURATION = 15000; 
         const UPDATE_RATE = 50; 
         let timePassed = 0;
 
-        timerBar.style.width = '100%';
+        if(timerBar) timerBar.style.width = '100%';
 
         if(this.state.emailInterval) clearInterval(this.state.emailInterval);
 
         this.state.emailInterval = setInterval(() => {
             timePassed += UPDATE_RATE;
             let percentLeft = 100 - ((timePassed / DURATION) * 100);
-            
-            timerBar.style.width = percentLeft + '%';
+            if(timerBar) timerBar.style.width = percentLeft + '%';
 
             if(timePassed >= DURATION) {
-                this.resolveEmail(false, true); // Timeout
+                this.resolveEmail(false, true); 
             }
         }, UPDATE_RATE);
     },
@@ -98,7 +89,7 @@ const engine = {
         this.state.isEmailOpen = false;
         
         if(timeout) {
-            this.log("E-MAIL IGNORIERT! Radar +10", "text-red-500 font-bold");
+            this.log("E-MAIL VERPASST! Radar +10", "text-red-500 font-bold");
             this.state.cr += 10;
             this.state.emailsIgnored++;
         } else if(replied) {
@@ -109,12 +100,10 @@ const engine = {
             this.state.cr += 2;
             this.state.emailsIgnored++;
         }
-        
         this.updateUI();
     },
 
     // --- CORE ---
-
     updateUI: function() {
         this.state.fl = Math.max(0, Math.min(100, this.state.fl));
         this.state.al = Math.max(0, Math.min(100, this.state.al));
@@ -136,7 +125,7 @@ const engine = {
 
         const tEl = document.getElementById('ticket-count');
         tEl.innerText = this.state.tickets;
-        tEl.className = this.state.tickets > 7 ? "text-4xl font-black text-white ticket-pulse" : "text-4xl font-black text-white";
+        tEl.className = this.state.tickets > 7 ? "text-4xl font-black text-white ticket-counter ticket-pulse" : "text-4xl font-black text-white ticket-counter";
 
         const invGrid = document.getElementById('inventory-grid');
         invGrid.innerHTML = '';
@@ -146,8 +135,8 @@ const engine = {
             if(itemData) {
                 let dbItem = DB.items[itemData.id];
                 slot.className = `inv-slot ${itemData.used ? 'used' : ''}`;
-                slot.innerText = dbItem.icon;
-                slot.title = dbItem.name + (itemData.used ? " (Benutzt)" : "");
+                slot.innerText = dbItem ? dbItem.icon : '?';
+                slot.title = dbItem ? dbItem.name : 'Unknown';
             } else {
                 slot.className = 'inv-slot empty';
             }
@@ -194,9 +183,7 @@ const engine = {
 
     trigger: function(type) {
         if(this.state.activeEvent) return;
-
         if (type === 'sidequest') { this.handleSideQuest(); return; }
-
         if(Math.random() < 0.05 && type !== 'calls') { this.triggerBossFight(); return; }
 
         let pool = DB[type].filter(ev => !this.state.usedIDs.has(ev.id));
@@ -322,21 +309,17 @@ const engine = {
     resolveTerminal: function(res, m, f, a, c, loot, usedItem, type) {
         if(type === 'coffee') this.state.coffeeConsumed++;
 
-        // BALANCING FIX: Zeit vergeht
+        let oldTimeChunk = Math.floor(this.state.time / 30);
+        let newTimeChunk = Math.floor((this.state.time + m) / 30);
+        let newTickets = newTimeChunk - oldTimeChunk;
+        this.state.tickets += newTickets;
+        
+        if (type === 'calls') { 
+            this.state.tickets = Math.max(0, this.state.tickets - 1);
+        }
+
         this.state.time += m;
-
-        // Tickets steigen durch Zeit:
-        // Alle 30 Min = +1 Ticket
-        let oldTimeChunk = Math.floor((this.state.time - m) / 30);
-        let newTimeChunk = Math.floor(this.state.time / 30);
-        let incomingTickets = newTimeChunk - oldTimeChunk;
         
-        // Aber wenn man telefoniert, arbeitet man ja ein Ticket ab.
-        // Also: +Neue Tickets -1 (wenn Anruf)
-        let resolvedCount = (type === 'calls') ? 1 : 0;
-        
-        this.state.tickets = Math.max(0, this.state.tickets + incomingTickets - resolvedCount);
-
         let triggerLunch = false;
         if (!this.state.lunchDone && this.state.time >= 12 * 60) {
             triggerLunch = true;
@@ -391,7 +374,6 @@ const engine = {
         term.className = "flex-1 flex flex-col justify-center items-center text-center opacity-40";
         term.innerHTML = `<div class="text-6xl mb-4">🖥️</div><h1 class="text-2xl font-bold">SYSTEM BEREIT</h1><p>Wähle eine Aktion unten.</p>`;
         
-        // HIER WIRD DIE E-MAIL GEPRÜFT (Nach der Aktion)
         this.checkRandomEmail();
     },
 
@@ -422,12 +404,35 @@ const engine = {
             btn.onclick = () => this.handlePhoneChoice(opt.t, opt.next);
             actions.appendChild(btn);
         });
+        
+        // AUTO SCROLL
+        setTimeout(() => {
+            content.scrollTop = content.scrollHeight;
+        }, 100);
     },
 
     handlePhoneChoice: function(text, nextId) {
         const content = document.getElementById('app-content');
         content.innerHTML += `<div class="chat-bubble chat-out">${text}</div>`;
+        
+        content.scrollTop = content.scrollHeight;
+
         let ev = this.state.currentPhoneEvent;
+        
+        let validNext = (ev.results && ev.results[nextId]) || (ev.nodes && ev.nodes[nextId]);
+        
+        if (!validNext) {
+            console.error("Missing Node:", nextId);
+            content.innerHTML += `<div class="chat-system text-red-500">Verbindung abgebrochen.</div>`;
+            document.getElementById('app-actions').innerHTML = '';
+            setTimeout(() => {
+                this.closePhone();
+                this.state.activeEvent = false;
+                this.disableButtons(false);
+            }, 2000);
+            return;
+        }
+
         if (ev.results && ev.results[nextId]) {
             let res = ev.results[nextId];
             if(res.loot && !this.state.inventory.find(i => i.id === res.loot)) {
@@ -439,6 +444,8 @@ const engine = {
             this.state.cr += (res.cr || 0);
             content.innerHTML += `<div class="chat-system">${res.txt}</div>`;
             document.getElementById('app-actions').innerHTML = '';
+            content.scrollTop = content.scrollHeight;
+            
             setTimeout(() => {
                 this.closePhone();
                 this.log("Handy: " + res.txt);
