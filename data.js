@@ -944,6 +944,24 @@ const DB = {
                 "deny": { txt: "Du tust nichts. Bernd wird kurz darauf ins Chefbüro zitiert. Man hört Schreie. Dein Gewissen ist rein, aber Bernd hasst dich.", fl: 0, al: 10, cr: -5 },
                 "cash": { txt: "50 Euro eingesteckt. Mail ist weg. Ein lukrativer Tag, solange niemand in die Logs schaut...", fl: 5, al: -20, cr: 25 }
             }
+        },
+		{
+            id: "sq_donation",
+            kind: "text",
+            title: "Das Spiel im Spiel",
+            text: "Du surfst genervt im Netz und stolperst über ein kleines Browsergame. Es heißt 'IT-HELL'. Es simuliert exakt deinen furchtbaren Arbeitstag. Verrückt! Der Entwickler hat einen kleinen 'Kaffee-Button' eingebaut.",
+            opts: [
+                { 
+                    t: "Dem Entwickler einen Kaffee ausgeben", 
+                    m: 5, f: 5, a: -20, c: 0, 
+                    r: "Du bist ein Ehrenmann/eine Ehrenfrau! Dein Karma steigt ins Unermessliche. PayPal für Kaffee: ferris.daehn@outlook.de (Danke!)" 
+                },
+                { 
+                    t: "Einfach nur kurz zocken", 
+                    m: 5, f: 5, a: -10, c: 0, 
+                    r: "Du spielst eine Runde. Im Spiel brennt der Server. Du lachst, weil es nicht dein echter Server ist. Deine Laune bessert sich." 
+                }
+            ]
         }
     ]
 };
