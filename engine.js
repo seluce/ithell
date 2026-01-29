@@ -553,7 +553,7 @@ const engine = {
         feed.innerHTML = `<div><span class="text-slate-500">[${time}]</span> <span class="${colorClass || ''}">${msg}</span></div>` + feed.innerHTML;
     },
 
-    checkEndConditions: function() {
+checkEndConditions: function() {
         if(this.state.al >= 100) this.showEnd("RAGE QUIT", "Du hast den Monitor zerstört. Game Over.");
         else if(this.state.tickets >= 10) this.showEnd("GEFEUERT", "Zu viele offene Tickets! Du bist raus.");
         else if(this.state.tickets >= 7 && !this.state.ticketWarning) {
@@ -561,10 +561,39 @@ const engine = {
             this.showModal("WARNUNG", "Ticket-Stau! Schließe Anrufe ab!", false);
         }
         else if(this.state.time >= 16*60+30) {
+            // 1. Schwierigkeit ermitteln für den Text
+            let diffName = "MITTWOCH (Normal)";
+            if (this.state.difficultyMult < 1.0) diffName = "FREITAG (Leicht)";
+            if (this.state.difficultyMult > 1.0) diffName = "MONTAG (Schwer)";
+
+            // 2. Stats-Box bauen (HTML)
+            let statsHTML = `
+                <div class="bg-slate-950 p-4 rounded-lg border border-slate-700 my-4 shadow-inner">
+                    <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Tagesbericht: <span class="text-white font-bold">${diffName}</span></div>
+                    <div class="grid grid-cols-3 gap-2 text-center font-mono">
+                        <div class="flex flex-col">
+                            <span class="text-emerald-400 font-bold text-xl">${Math.round(this.state.fl)}%</span>
+                            <span class="text-[10px] text-slate-400">FAULHEIT</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-orange-400 font-bold text-xl">${Math.round(this.state.al)}%</span>
+                            <span class="text-[10px] text-slate-400">AGGRO</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-red-500 font-bold text-xl">${Math.round(this.state.cr)}%</span>
+                            <span class="text-[10px] text-slate-400">RADAR</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 3. Achievements bauen
             let achHTML = this.state.achievedTitles.length > 0 ? 
-                `<div class="mt-4 border-t border-slate-700 pt-4"><div class="font-bold text-yellow-400 mb-2">ERRUNGENSCHAFTEN:</div>${this.state.achievedTitles.map(t => `<div class="text-sm text-slate-300">🏆 ${t}</div>`).join('')}</div>` 
+                `<div class="mt-2 border-t border-slate-700 pt-2"><div class="font-bold text-yellow-400 mb-2 text-xs uppercase">Errungenschaften:</div>${this.state.achievedTitles.map(t => `<div class="text-xs text-slate-300">🏆 ${t}</div>`).join('')}</div>` 
                 : "";
-            this.showEnd("FEIERABEND", "16:30! Du hast überlebt.<br>" + achHTML, true);
+
+            // 4. Alles zusammenfügen
+            this.showEnd("FEIERABEND", "16:30! Du hast überlebt.<br>" + statsHTML + achHTML, true);
         }
         else if(this.state.cr >= 100) {
             if(!this.state.warningReceived) {
