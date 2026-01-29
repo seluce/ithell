@@ -283,7 +283,11 @@
             
             <div class="flex-[2] neon-box p-3 flex flex-col min-h-0 overflow-hidden shrink-0">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-1 mb-2 shrink-0">
-                    <span class="text-[10px] text-amber-500 font-bold">INVENTAR</span>
+					<div onclick="engine.openInventory()" class="cursor-pointer hover:bg-slate-800 rounded px-1 -ml-1 transition-colors flex items-center gap-2">
+						<span class="text-[10px] text-amber-500 font-bold">INVENTAR</span>
+						<span id="inv-badge" class="hidden bg-amber-500 text-black text-[9px] font-bold px-1.5 rounded-full">+0</span>
+						<span class="text-[10px] text-slate-600">🔍</span>
+					</div>
                     <span onclick="engine.toggleLog()" class="text-[10px] text-slate-500 font-bold cursor-pointer lg:pointer-events-none lg:cursor-default flex items-center gap-1">
                         LOG <span id="log-arrow" class="text-[8px] lg:hidden">▼</span>
                     </span>
@@ -305,6 +309,19 @@
 
     <div id="modal-overlay" class="fixed inset-0 hidden bg-black/95 z-50 flex items-center justify-center p-8">
         <div id="modal-content" class="max-w-xl w-full bg-slate-900 border-2 border-red-600 p-8 rounded-xl text-center shadow-2xl"></div>
+    </div>
+	
+	<div id="inventory-modal" class="fixed inset-0 hidden bg-black/95 z-[1100] items-center justify-center p-4">
+        <div class="neon-box border-amber-500 bg-slate-900 max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="engine.closeInventory()" class="absolute top-2 right-4 text-slate-400 hover:text-white text-xl">✕</button>
+            <h2 class="text-xl font-bold text-amber-400 mb-6 flex items-center gap-2">🎒 DEIN RUCKSACK</h2>
+            
+            <div id="full-inventory-grid" class="grid grid-cols-5 gap-3"></div>
+            
+            <div class="mt-6 text-center">
+                <button onclick="engine.closeInventory()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-2 rounded text-xs font-bold uppercase">Schließen</button>
+            </div>
+        </div>
     </div>
 
     <script src="data.js"></script>

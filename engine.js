@@ -191,23 +191,37 @@ const engine = {
         tEl.innerText = this.state.tickets;
         tEl.className = this.state.tickets > 7 ? "text-4xl font-black text-white ticket-counter ticket-pulse" : "text-4xl font-black text-white ticket-counter";
 
+		// --- INVENTAR UPDATE (Hauptansicht) ---
         const invGrid = document.getElementById('inventory-grid');
+        const invBadge = document.getElementById('inv-badge');
         invGrid.innerHTML = '';
         
-        let totalSlots = Math.max(5, this.state.inventory.length);
-        
-        for(let i=0; i < totalSlots; i++) {
-            let itemData = this.state.inventory[i];
+        // Zeige immer genau 5 Slots im Hauptmenü (stabilisiert das Layout)
+        // Wir nehmen nur die ersten 5 Items aus dem Inventar für die Schnellansicht
+        for(let i=0; i < 5; i++) {
+            let itemData = this.state.inventory[i]; // Kann undefined sein
             let slot = document.createElement('div');
+            
             if(itemData) {
                 let dbItem = DB.items[itemData.id];
-                slot.className = `inv-slot ${itemData.used ? 'used' : ''}`;
+                slot.className = 'inv-slot';
                 slot.innerText = dbItem ? dbItem.icon : '?';
                 slot.title = dbItem ? dbItem.name : 'Unbekannt';
+                // Klick öffnet auch den großen Rucksack
+                slot.onclick = () => this.openInventory();
             } else {
                 slot.className = 'inv-slot empty';
             }
             invGrid.appendChild(slot);
+        }
+
+        // Badge Logik: Zeige "+X" wenn mehr als 5 Items da sind
+        if(this.state.inventory.length > 5) {
+            let diff = this.state.inventory.length - 5;
+            invBadge.innerText = `+${diff}`;
+            invBadge.classList.remove('hidden');
+        } else {
+            invBadge.classList.add('hidden');
         }
 
         this.checkAchievements();
@@ -215,20 +229,45 @@ const engine = {
     },
 
     checkAchievements: function() {
+        // --- BESTEHENDE ERFOLGE ---
         if(this.state.coffeeConsumed >= 5 && !this.hasAch('ach_coffee')) {
             this.unlockAchievement('ach_coffee', '☕ Koffein-Junkie', '5 Kaffees getrunken.');
         }
         if(this.state.emailsIgnored >= 3 && !this.hasAch('ach_ignore')) {
             this.unlockAchievement('ach_ignore', '🙈 Ignorant', '3 Mails ignoriert.');
         }
-        if(this.state.inventory.length >= 4 && !this.hasAch('ach_hoarder')) {
-            this.unlockAchievement('ach_hoarder', '🎒 Messie', 'Taschen vollgestopft.');
+        if(this.state.inventory.length >= 5 && !this.hasAch('ach_hoarder')) {
+            this.unlockAchievement('ach_hoarder', '🎒 Messie', 'Taschen platzen gleich.');
         }
-        if(this.state.fl >= 80 && !this.hasAch('ach_lazy')) {
-            this.unlockAchievement('ach_lazy', '🦥 Faulpelz', '80% Faulheit.');
+        if(this.state.fl >= 80 && this.state.fl < 100 && !this.hasAch('ach_lazy')) {
+            this.unlockAchievement('ach_lazy', '🦥 Faulpelz', '80% Faulheit erreicht.');
         }
         if(this.state.time > 14*60 && this.state.cr < 10 && !this.hasAch('ach_ninja')) {
-            this.unlockAchievement('ach_ninja', '🥷 Ninja', 'Fast unsichtbar.');
+            this.unlockAchievement('ach_ninja', '🥷 Ninja', 'Fast unsichtbar für den Chef.');
+        }
+
+        // 1. MACGYVER: Besitze die heiligen 4 Werkzeuge
+        // Wir prüfen, ob alle 4 IDs im Inventar sind
+        const tools = ['hammer', 'tape', 'screw', 'zip_ties'];
+        const hasAllTools = tools.every(toolId => this.state.inventory.find(i => i.id === toolId));
+        
+        if(hasAllTools && !this.hasAch('ach_macgyver')) {
+            this.unlockAchievement('ach_macgyver', '🛠️ MacGyver', 'Hammer, Tape, Schrauber & Kabelbinder.');
+        }
+
+        // 2. MILLIONÄR: Das Nigeria-Prinz Event (Faulheit auf 100)
+        if(this.state.fl >= 100 && !this.hasAch('ach_rich')) {
+            this.unlockAchievement('ach_rich', '💸 Der Millionär', 'Du hast dem Prinzen vertraut. Nie mehr arbeiten!');
+        }
+
+        // 3. MR ROBOT: Root Passwort gefunden
+        if(this.state.inventory.find(i => i.id === 'admin_pw') && !this.hasAch('ach_hacker')) {
+            this.unlockAchievement('ach_hacker', '💻 Mr. Robot', 'Du hast die volle Kontrolle (Root-PW).');
+        }
+
+        // 4. ZEN MEISTER: Nach 15 Uhr und 0 Aggro (schwer!)
+        if(this.state.time >= 15*60 && this.state.al === 0 && !this.hasAch('ach_zen')) {
+            this.unlockAchievement('ach_zen', '🧘 Zen-Meister', '15 Uhr und Puls auf 60. Respekt.');
         }
     },
 
@@ -241,7 +280,7 @@ const engine = {
         if(container) {
             const toast = document.createElement('div');
             toast.className = 'achievement-toast';
-            toast.innerHTML = `<div class="ach-icon">🏆</div><div class="ach-text"><span class="ach-title">${title}</span><span class="ach-desc">${text}</span></div>`;
+            toast.innerHTML = `<div class="ach-icon">🏆</div><div class="ach-text"><span class="ach-title">${title}</span><br><span class="ach-desc">${text}</span></div>`;
             container.appendChild(toast);
             setTimeout(() => { toast.remove(); }, 5000);
         }
@@ -412,7 +451,16 @@ const engine = {
         }
         if(usedItem && usedItem !== "") {
             let itemObj = this.state.inventory.find(i => i.id === usedItem);
-            if(itemObj) itemObj.used = true;
+            // Checken, ob das Item in der DB als "keep: true" markiert ist
+            let dbItem = DB.items[usedItem];
+            
+            if(itemObj) {
+                // Wenn es kein dauerhaftes Item ist: LÖSCHEN
+                if (!dbItem || !dbItem.keep) {
+                    // Wir filtern das Inventar neu und entfernen das verbrauchte Item
+                    this.state.inventory = this.state.inventory.filter(i => i !== itemObj);
+                }
+            }
         }
 
         this.log(res);
@@ -554,54 +602,69 @@ const engine = {
     },
 
 checkEndConditions: function() {
-        if(this.state.al >= 100) this.showEnd("RAGE QUIT", "Du hast den Monitor zerstört. Game Over.");
-        else if(this.state.tickets >= 10) this.showEnd("GEFEUERT", "Zu viele offene Tickets! Du bist raus.");
-        else if(this.state.tickets >= 7 && !this.state.ticketWarning) {
-            this.state.ticketWarning = true;
-            this.showModal("WARNUNG", "Ticket-Stau! Schließe Anrufe ab!", false);
-        }
-        else if(this.state.time >= 16*60+30) {
-            // 1. Schwierigkeit ermitteln für den Text
-            let diffName = "MITTWOCH (Normal)";
-            if (this.state.difficultyMult < 1.0) diffName = "FREITAG (Leicht)";
-            if (this.state.difficultyMult > 1.0) diffName = "MONTAG (Schwer)";
+        // 1. BERICHT GENERIEREN (Wird jetzt für ALLE Enden benutzt)
+        
+        // Schwierigkeit ermitteln
+        let diffName = "MITTWOCH (Normal)";
+        if (this.state.difficultyMult < 1.0) diffName = "FREITAG (Leicht)";
+        if (this.state.difficultyMult > 1.0) diffName = "MONTAG (Schwer)";
 
-            // 2. Stats-Box bauen (HTML)
-            let statsHTML = `
-                <div class="bg-slate-950 p-4 rounded-lg border border-slate-700 my-4 shadow-inner">
-                    <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Tagesbericht: <span class="text-white font-bold">${diffName}</span></div>
-                    <div class="grid grid-cols-3 gap-2 text-center font-mono">
-                        <div class="flex flex-col">
-                            <span class="text-emerald-400 font-bold text-xl">${Math.round(this.state.fl)}%</span>
-                            <span class="text-[10px] text-slate-400">FAULHEIT</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-orange-400 font-bold text-xl">${Math.round(this.state.al)}%</span>
-                            <span class="text-[10px] text-slate-400">AGGRO</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-red-500 font-bold text-xl">${Math.round(this.state.cr)}%</span>
-                            <span class="text-[10px] text-slate-400">RADAR</span>
-                        </div>
+        // Stats-Box bauen
+        let statsHTML = `
+            <div class="bg-slate-950 p-4 rounded-lg border border-slate-700 my-4 shadow-inner">
+                <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2">Tagesbericht: <span class="text-white font-bold">${diffName}</span></div>
+                <div class="grid grid-cols-3 gap-2 text-center font-mono">
+                    <div class="flex flex-col">
+                        <span class="text-emerald-400 font-bold text-xl">${Math.round(this.state.fl)}%</span>
+                        <span class="text-[10px] text-slate-400">FAULHEIT</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-orange-400 font-bold text-xl">${Math.round(this.state.al)}%</span>
+                        <span class="text-[10px] text-slate-400">AGGRO</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-red-500 font-bold text-xl">${Math.round(this.state.cr)}%</span>
+                        <span class="text-[10px] text-slate-400">RADAR</span>
                     </div>
                 </div>
-            `;
+            </div>
+        `;
 
-            // 3. Achievements bauen
-            let achHTML = this.state.achievedTitles.length > 0 ? 
-                `<div class="mt-2 border-t border-slate-700 pt-2"><div class="font-bold text-yellow-400 mb-2 text-xs uppercase">Errungenschaften:</div>${this.state.achievedTitles.map(t => `<div class="text-xs text-slate-300">🏆 ${t}</div>`).join('')}</div>` 
-                : "";
+        // Achievements auflisten
+        let achHTML = this.state.achievedTitles.length > 0 ? 
+            `<div class="mt-2 border-t border-slate-700 pt-2"><div class="font-bold text-yellow-400 mb-2 text-xs uppercase">Errungenschaften:</div>${this.state.achievedTitles.map(t => `<div class="text-xs text-slate-300">🏆 ${t}</div>`).join('')}</div>` 
+            : "";
 
-            // 4. Alles zusammenfügen
-            this.showEnd("FEIERABEND", "16:30! Du hast überlebt.<br>" + statsHTML + achHTML, true);
+        // Der komplette HTML Block für das Modal
+        let fullReport = statsHTML + achHTML;
+
+        // 2. END-BEDINGUNGEN PRÜFEN
+
+        // A. RAGE QUIT (Aggro >= 100)
+        if(this.state.al >= 100) {
+            this.showEnd("RAGE QUIT", "Du hast den Monitor aus dem Fenster geworfen. Es hat sich gut angefühlt.<br>" + fullReport, false);
         }
+        // B. TICKET LAWINE (Zu viele Tickets)
+        else if(this.state.tickets >= 10) {
+            this.showEnd("GEFEUERT", "Zu viele offene Tickets! Das System ist kollabiert.<br>" + fullReport, false);
+        }
+        // C. WARNUNG (Tickets >= 7)
+        else if(this.state.tickets >= 7 && !this.state.ticketWarning) {
+            this.state.ticketWarning = true;
+            this.showModal("WARNUNG", "Ticket-Stau! Schließe Anrufe ab, sonst fliegst du!", false);
+        }
+        // D. FEIERABEND (Zeit abgelaufen)
+        else if(this.state.time >= 16*60+30) {
+            this.showEnd("FEIERABEND", "16:30! Du hast den Tag überlebt.<br>" + fullReport, true);
+        }
+        // E. GEFEUERT (Chef-Radar >= 100)
         else if(this.state.cr >= 100) {
             if(!this.state.warningReceived) {
                 this.state.warningReceived = true;
                 this.state.cr = 50;
-                this.showModal("ABMAHNUNG", "Letzte Chance! Radar auf 50% gesetzt.", false);
+                this.showModal("ABMAHNUNG", "Der Chef steht an deinem Tisch: 'Noch ein Fehler und Sie fliegen!' (Radar auf 50% gesetzt).", false);
             } else {
-                this.showEnd("GEFEUERT", "Der Sicherheitsdienst begleitet dich raus.");
+                this.showEnd("GEFEUERT", "Der Sicherheitsdienst begleitet dich raus. Deine Karriere hier ist vorbei.<br>" + fullReport, false);
             }
         }
     },
@@ -651,6 +714,46 @@ checkEndConditions: function() {
             log.classList.add('hidden');
             if(arrow) arrow.innerText = "▼";
         }
+    },
+
+// --- INVENTAR SYSTEM ---
+    openInventory: function() {
+        const modal = document.getElementById('inventory-modal');
+        const grid = document.getElementById('full-inventory-grid');
+        
+        grid.innerHTML = '';
+        
+        // Alle Items rendern
+        this.state.inventory.forEach(itemData => {
+            let slot = document.createElement('div');
+            let dbItem = DB.items[itemData.id];
+            slot.className = 'inv-slot';
+            slot.innerText = dbItem ? dbItem.icon : '?';
+            slot.title = dbItem ? dbItem.name : 'Unbekannt';
+            
+            // Name unter dem Icon im Modal anzeigen für Klarheit
+            slot.innerHTML += `<div class="absolute -bottom-6 w-full text-center text-[8px] text-slate-400 truncate">${dbItem.name}</div>`;
+            slot.style.marginBottom = "15px"; // Platz für Text
+            
+            grid.appendChild(slot);
+        });
+
+        // Leere Slots auffüllen, damit es gut aussieht (mindestens 10 Slots im Rucksack)
+        let fillCount = Math.max(0, 10 - this.state.inventory.length);
+        for(let i=0; i<fillCount; i++) {
+            let slot = document.createElement('div');
+            slot.className = 'inv-slot empty opacity-20';
+            grid.appendChild(slot);
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    },
+
+    closeInventory: function() {
+        const modal = document.getElementById('inventory-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
     }
 };
 
