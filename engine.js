@@ -256,7 +256,7 @@ const engine = {
         }
 
         // 2. MILLIONÄR: Das Nigeria-Prinz Event (Faulheit auf 100)
-        if(this.state.fl >= 100 && !this.hasAch('ach_rich')) {
+        if(this.state.inventory.find(i => i.id === 'black_card') && !this.hasAch('ach_rich')) {
             this.unlockAchievement('ach_rich', '💸 Der Millionär', 'Du hast dem Prinzen vertraut. Nie mehr arbeiten!');
         }
 

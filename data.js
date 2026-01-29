@@ -18,7 +18,8 @@ const DB = {
         "fire_ext": { icon: "🧯", name: "Feuerlöscher", keep: true },
         "hammer": { icon: "🔨", name: "Notfall-Hammer", keep: true },
         "zip_ties": { icon: "➰", name: "Kabelbinder", keep: true },
-        "headphones": { icon: "🎧", name: "NC-Kopfhörer", keep: true }
+        "headphones": { icon: "🎧", name: "NC-Kopfhörer", keep: true },
+		"black_card": { icon: "💳", name: "Schwarze Amex", keep: true }
     },
 	
     // E-MAILS (Für das Popup System)
@@ -801,13 +802,13 @@ const DB = {
             text: "HILFE! Hier ist die Praktikantin Lena! Ich wollte Druckerpapier aus dem Keller holen und die Tür ist zugefallen! Hier ist ein Tastenfeld, aber ich kenne den Code nicht! Es ist dunkel und hier sind Spinnen!",
             opts: [
                 { 
-                    t: "Probier mal '1234'", // Falle (Standard-Code)
+                    t: "Probier mal '1234'",
                     m: 45, f: -10, a: 20, c: 0, 
                     r: "Falsch! Die Anlage hat sich gesperrt. Du musstest runterlaufen, Egon suchen (der unauffindbar war) und sie manuell befreien. Lena hat geheult." 
                 },
                 { 
-                    t: "Tipp '0000' ein", // Richtige Antwort (Wissen)
-                    m: 5, f: 10, a: -5, c: 5, 
+                    t: "Probier mal '0000'",
+                    m: 5, f: 10, a: -5, c: -10, 
                     r: "Piep-Piep-Klick. 'Oh mein Gott, es geht! Du bist mein Held!' Sie ist frei. Du fühlst dich wie ein Hacker." 
                 },
                 { 
@@ -823,12 +824,12 @@ const DB = {
             text: "Du, ich hab hier ein loses Kabel im Serverraum gefunden. Ich wollte das mal aufräumen. Am Haupt-Switch ist Port 42 noch frei. Soll ich das da reinstecken? Passt perfekt.",
             opts: [
                 { 
-                    t: "Ja, mach mal (Ordnung muss sein)", // Falle!
+                    t: "Ja, mach mal (Ordnung muss sein)",
                     m: 120, f: -20, a: 40, c: 50, 
                     r: "ZAPP! Ein Knall, dann Dunkelheit. Kevin hat den Haupt-Switch gegrillt. Die ganze Firma ist offline. Du verbringst den Rest des Tages mit Notfall-Recovery." 
                 },
                 { 
-                    t: "NEIN! FINGER WEG VON PORT 42!", // Richtige Antwort (Wissen)
+                    t: "NEIN! FINGER WEG VON PORT 42!",
                     m: 5, f: 5, a: -5, c: -5, 
                     r: "Kevin zuckt zusammen: 'Okay, okay! Chill mal!' Er lässt das Kabel fallen. Katastrophe abgewendet." 
                 },
@@ -845,12 +846,12 @@ const DB = {
             text: "Herr Müller... mir ist so schwindelig... Unterzucker... Ich brauche Schokolade... sofort! Aber der Automat ist leer! Haben wir nirgendwo was Süßes?!",
             opts: [
                 { 
-                    t: "Ich glaube im Kühlschrank ist Senf?", // Falle
+                    t: "Ich glaube im Kühlschrank ist Senf?",
                     m: 10, f: 0, a: 10, c: 0, 
                     r: "Gabi legt auf. Später hörst du, dass sie vor Schwäche ohnmächtig geworden ist. Der Sanitäter musste kommen." 
                 },
                 { 
-                    t: "Guck mal in den Ordner 'Steuer 1990'...", // Richtige Antwort (Wissen)
+                    t: "Guck mal in den Ordner 'Steuer 1990'...",
                     m: 5, f: 10, a: -10, c: -5, 
                     r: "Stille. Dann ein Rascheln und Schmatzen. 'Oh Gott, Sie sind ein Lebensretter! Woher wussten Sie...? Egal! Danke!'" 
                 },
@@ -868,12 +869,12 @@ const DB = {
             text: "Eine tiefe Stimme am Telefon: 'Hier ist Herr Löffel aus der Kantine. Mein Bondrucker streikt! Ich kann keine Belege für das Finanzamt drucken! Kommen Sie sofort her!'",
             opts: [
                 { 
-                    t: "Sagen: 'Ja, Herr Koch, ich komme.'", // Falle!
+                    t: "Sagen: 'Ja, Herr Koch, ich komme.'",
                     m: 30, f: 0, a: 20, c: 5, 
                     r: "Stille. Dann Gebrüll: 'KOCH?! ICH BIN NUTRITION ARTIST!' Er knallt den Hörer auf. Du musst hingehen und er lässt dich 20 Minuten warten." 
                 },
                 { 
-                    t: "Sagen: 'Ja, Herr Senior Nutrition Artist.'", // Richtige Antwort (Wissen)
+                    t: "Sagen: 'Ja, Herr Senior Nutrition Artist.'",
                     m: 5, f: 5, a: -5, c: 0, 
                     r: "Er schnurrt fast: 'Endlich jemand mit Respekt!' Er drückt vor Freude einfach mal auf 'Feed' und der Drucker geht wieder. 'Danke, Müller!'" 
                 },
@@ -881,6 +882,72 @@ const DB = {
                     t: "Auflegen", 
                     m: 2, f: 5, a: 0, c: 10, 
                     r: "Kein Mittagessen für dich heute." 
+                }
+            ]
+        },
+		{
+            id: "call_elster_excel",
+            title: "Frau Elster (Buchhaltung)",
+            text: "Schluchz... 'Herr Müller? Meine Excel-Tabelle ist weg! Alles schwarz! Ich drücke Tasten, aber nichts passiert! Ich bin so zittrig heute...'",
+            opts: [
+                { 
+                    t: "Kalt: 'Haben Sie ein Ticket?'", 
+                    m: 5, f: 5, a: 5, c: 5, 
+                    r: "Sie legt weinend auf. Das Problem ist nicht gelöst." 
+                },
+                { 
+                    t: "Beruhigen & Auto-Save prüfen", 
+                    m: 20, f: -5, a: -10, c: 0, 
+                    r: "Du redest ihr gut zu. Die Datei ist wieder da. Sie atmet auf: 'Danke! Sie sind so lieb. Genau wie mein Kater *Rüdiger*. Der spürt auch immer, wenn es mir schlecht geht. Rüdiger ist mein einziger Halt.'" 
+                },
+                { 
+                    t: "Neustart befehlen", 
+                    m: 5, f: 10, a: 10, c: 0, 
+                    r: "Hat funktioniert, aber sie wirkt immer noch verstört." 
+                }
+            ]
+        },
+        {
+            id: "call_manager_stress",
+            title: "Projektleiter 'High-Performance'",
+            text: "SCHNELL! Ich brauche diesen Export! Deadline war gestern! Wenn das nicht klappt, springe ich aus dem Fenster! Ich halte diesen Druck nicht mehr aus!",
+            opts: [
+                { 
+                    t: "Datei sofort senden",
+                    m: 10, f: -5, a: 5, c: 0,
+                    r: "Er atmet schwer aus. 'Danke. Puh. Ich muss runterkommen. Wissen Sie, eigentlich will ich nur tanzen. Das ist meine wahre Leidenschaft. Nicht Excel.'" 
+                },
+                { 
+                    t: "Ihn warten lassen (Erziehung)", 
+                    m: 5, f: 5, a: 20, c: 10, 
+                    r: "Er schreit dich an, bis die Adern an seiner Stirn platzen. Sein Blutdruck ist kritisch. Aufgelegt." 
+                },
+                { 
+                    t: "Auf Ticket bestehen",
+                    m: 15, f: 0, a: 10, c: 0, 
+                    r: "Er fängt an zu weinen: 'BITTE!'. Du hast Mitleid und schickst die Datei doch. Er bedankt sich kurz angebunden." 
+                }
+            ]
+        },
+		{
+            id: "call_boss_pocket",
+            title: "Anruf vom Chef (Handy)",
+            text: "Du hörst nur Rascheln und Windgeräusche. Er hat wohl aus Versehen gewählt. Im Hintergrund hörst du ihn prahlen: '...diese Idioten in der Firma. Zahlen 2 Euro für die Plörre! Dabei hab ich die Maschine so eingestellt: Wenn man *Espresso* drückt und gleichzeitig den *Becher-Sensor* zuhält, gibt's den *Premium-Gold-Röstung* umsonst! Hahaha!'",
+            opts: [
+                { 
+                    t: "Still zuhören & auflegen",
+                    m: 5, f: 5, a: -5, c: 0, 
+                    r: "Du legst leise auf. 'Espresso + Sensor zuhalten'. Das merkst du dir. Wissen ist Koffein." 
+                },
+                { 
+                    t: "Laut 'HALLO?!' rufen", 
+                    m: 2, f: 0, a: 10, c: 15, 
+                    r: "Gerumpel am anderen Ende. 'WER IST DA?! MÜLLER?! LAUSCHEN SIE MIR ETWA NACH?!' Er legt wütend auf. Das war keine gute Idee." 
+                },
+                { 
+                    t: "Sofort auflegen", 
+                    m: 1, f: 0, a: 0, c: 0, 
+                    r: "Besser nichts riskieren. Du hast nichts gehört (und nichts gelernt)." 
                 }
             ]
         }
@@ -1028,7 +1095,6 @@ const DB = {
                 { t: "Ignorieren", m: 0, f: 0, a: 0, c: 0, r: "Vielleicht besser so." }
             ]
         },
-        // --- NEUE SERVER EVENTS ---
         {
             id: "srv_loot_box",
             title: "Die offene Werkzeugkiste",
@@ -1136,6 +1202,28 @@ const DB = {
                     t: "Ignorieren", 
                     m: 0, f: 5, a: 0, c: 0, 
                     r: "Du hast es eilig. Hoffentlich behältst du das trotzdem im Hinterkopf." 
+                }
+            ]
+        },
+		{
+            id: "srv_crying_elster",
+            title: "Tränen im Serverraum",
+            text: "Du hörst ein leises Wimmern hinter Rack 4. Es ist Frau Elster aus der Buchhaltung. Sie sitzt auf dem Boden, das Gesicht in den Händen vergraben. 'Ich kann das alles nicht mehr...', flüstert sie.",
+            opts: [
+                { 
+                    t: "Leise wieder rausgehen", 
+                    m: 0, f: 0, a: 0, c: 0, 
+                    r: "Du lässt sie in Ruhe. Manchmal braucht man Privatsphäre." 
+                },
+                { 
+                    t: "Fragen: 'Alles okay mit der Bilanz?'", 
+                    m: 10, f: 0, a: 10, c: 5, 
+                    r: "Sie schaut dich entsetzt an. 'Ist Ihnen Arbeit wichtiger als Menschen?!' Sie rennt weinend raus." 
+                },
+                { 
+                    t: "Fragen: 'Wie geht es Rüdiger?'",
+                    m: 15, f: 10, a: -20, c: -5, 
+                    r: "Sie blickt überrascht auf. Ein kleines Lächeln erscheint. 'Rüdiger... ja, der wartet zuhause. Er braucht sein Futter.' Sie wischt sich die Tränen weg. 'Danke, Herr Müller. Ich gehe jetzt heim zu ihm.' Du hast ihren Tag gerettet." 
                 }
             ]
         }
@@ -1335,6 +1423,34 @@ const DB = {
                     r: "Er wirft dir einen bösen Blick zu. Dein nächstes Essen wird furchtbar schmecken." 
                 }
             ]
+        },
+		{
+            id: "cof_premium_hack",
+            title: "Der 'Gold' Modus",
+            text: "Du stehst vor der Maschine. Dein Magen knurrt. Auf dem Display steht: 'PREMIUM RÖSTUNG - NUR FÜR VORSTAND (Karte erforderlich)'. Für das Fußvolk gibt es nur 'Wasser mit brauner Farbe' für 2,50€.",
+            opts: [
+                { 
+                    t: "2,50€ bezahlen", 
+                    m: 5, f: 0, a: 10, c: 0, 
+                    r: "Du wirfst das Geld ein. Der Kaffee schmeckt nach verbrannten Reifen. Du fühlst dich ausgeraubt." 
+                },
+                { 
+                    t: "Espresso + Sensor zuhalten", // Die Insider-Lösung!
+                    m: 5, f: 10, a: -20, c: 0, 
+                    r: "Die Maschine piept leise. Das Display zeigt: 'WELCOME MASTER'. Goldene Flüssigkeit fließt in deine Tasse. Es ist der beste Kaffee deines Lebens. Gratis." 
+                },
+                { 
+                    t: "Mit Hammer 'bezahlen'", 
+                    req: "hammer", 
+                    m: 5, f: 0, a: -10, c: 20, 
+                    r: "Du schlägst gegen den Schlitz. Eine Münze fällt raus. Immerhin 50 Cent gewonnen, aber der Kaffee fehlt." 
+                },
+                { 
+                    t: "Wild Tasten drücken", 
+                    m: 5, f: 0, a: 5, c: 0, 
+                    r: "ERROR. Die Maschine sperrt sich für 5 Minuten. Toll gemacht." 
+                }
+            ]
         }
     ],
 
@@ -1525,7 +1641,30 @@ const DB = {
                 }
             ]
         },
-
+{
+            id: "sq_sad_manager",
+            kind: "text",
+            title: "Der Zusammenbruch",
+            text: "Im Flur steht der Projektleiter. Er starrt gegen die Wand und wirkt völlig apathisch. Er reagiert nicht, als du vorbeigehst.",
+            opts: [
+                { 
+                    t: "Schulter klopfen: 'Kopf hoch!'", 
+                    m: 5, f: 0, a: 5, c: 0, 
+                    r: "Er zuckt zusammen. 'Lassen Sie mich einfach in Ruhe.' Leere Phrase, keine Wirkung." 
+                },
+                { 
+                    t: "Flüstern: 'Ein Schritt vor, zwei zurück...'",
+                    m: 5, f: 5, a: -10, c: 0, 
+                    r: "Seine Augen leuchten kurz auf. Er richtet sich auf, nimmt Haltung an. 'Tango... ja. Die Leidenschaft. Sie haben Recht. Ich muss heute Abend wieder zum Kurs.' Er nickt dir dankbar zu." 
+                },
+                { 
+                    t: "Brüllen: 'TSCHAKKA! MINDSET!'",
+                    m: 5, f: 0, a: 15, c: 10, 
+                    r: "Er dreht sich langsam um und funkelt dich böse an. 'Gehen Sie weg. Bevor ich etwas tue, was das HR nicht erlaubt.' Das war wohl zu viel." 
+                }
+            ]
+        },
+		
         // --- PHONE EVENTS (Chat-System) ---
         {
             id: "sq_telegram",
@@ -1930,7 +2069,8 @@ const DB = {
                 "chicken": { txt: "Du hast den Kontakt abgebrochen. Sicher ist sicher.", fl: 0, al: 0, cr: 0 },
                 "send_iban": { 
                     txt: "PING! Dein Handy vibriert. Banking-App: 'Eingang: +7.500.000,00 USD'. ... Es hat wirklich geklappt?! Du bist reich! Warum warnen einen Leute eigentlich immer davor?", 
-                    fl: 100, al: -100, cr: 0 
+                    fl: 100, al: -100, cr: 0,
+                    loot: "black_card"					
                 }
             }
         },
