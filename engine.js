@@ -228,46 +228,68 @@ const engine = {
         this.checkEndConditions();
     },
 
-    checkAchievements: function() {
-        // --- BESTEHENDE ERFOLGE ---
+checkAchievements: function() {
+        // --- GRIND & SAMMELN ---
         if(this.state.coffeeConsumed >= 5 && !this.hasAch('ach_coffee')) {
-            this.unlockAchievement('ach_coffee', '☕ Koffein-Junkie', '5 Kaffees getrunken.');
+            this.unlockAchievement('ach_coffee', '☕ Koffein-Junkie', '5 Kaffees getrunken. Dein Herz bedankt sich.');
         }
         if(this.state.emailsIgnored >= 3 && !this.hasAch('ach_ignore')) {
-            this.unlockAchievement('ach_ignore', '🙈 Ignorant', '3 Mails ignoriert.');
+            this.unlockAchievement('ach_ignore', '🙈 Ignorant', '3 Mails ignoriert. Problem? Welches Problem?');
         }
         if(this.state.inventory.length >= 5 && !this.hasAch('ach_hoarder')) {
-            this.unlockAchievement('ach_hoarder', '🎒 Messie', 'Taschen platzen gleich.');
-        }
-        if(this.state.fl >= 80 && this.state.fl < 100 && !this.hasAch('ach_lazy')) {
-            this.unlockAchievement('ach_lazy', '🦥 Faulpelz', '80% Faulheit erreicht.');
-        }
-        if(this.state.time > 14*60 && this.state.cr < 10 && !this.hasAch('ach_ninja')) {
-            this.unlockAchievement('ach_ninja', '🥷 Ninja', 'Fast unsichtbar für den Chef.');
+            this.unlockAchievement('ach_hoarder', '🎒 Messie', 'Deine Taschen platzen gleich.');
         }
 
-        // 1. MACGYVER: Besitze die heiligen 4 Werkzeuge
-        // Wir prüfen, ob alle 4 IDs im Inventar sind
+        // --- STATS STATUS ---
+        if(this.state.fl >= 80 && this.state.fl < 100 && !this.hasAch('ach_lazy')) {
+            this.unlockAchievement('ach_lazy', '🦥 Faulpelz', '80% Faulheit. Du bist ein Effizienz-Experte im Nichtstun.');
+        }
+        // DER CHOLERIKER: Wut auf Anschlag
+        if (this.state.al >= 92 && !this.hasAch('ach_rage')) {
+            this.unlockAchievement('ach_rage', '🤬 Der Choleriker', 'Puls auf 180. Du bist eine tickende Zeitbombe.');
+        }
+
+        // --- SPECIFIC ITEM SETS ---
+        // MACGYVER
         const tools = ['hammer', 'tape', 'screw', 'zip_ties'];
         const hasAllTools = tools.every(toolId => this.state.inventory.find(i => i.id === toolId));
-        
         if(hasAllTools && !this.hasAch('ach_macgyver')) {
-            this.unlockAchievement('ach_macgyver', '🛠️ MacGyver', 'Hammer, Tape, Schrauber & Kabelbinder.');
+            this.unlockAchievement('ach_macgyver', '🛠️ MacGyver', 'Hammer, Tape, Schrauber & Kabelbinder. Du kannst alles fixen.');
         }
-
-        // 2. MILLIONÄR: Das Nigeria-Prinz Event (Faulheit auf 100)
+        // MILLIONÄR
         if(this.state.inventory.find(i => i.id === 'black_card') && !this.hasAch('ach_rich')) {
             this.unlockAchievement('ach_rich', '💸 Der Millionär', 'Du hast dem Prinzen vertraut. Nie mehr arbeiten!');
         }
-
-        // 3. MR ROBOT: Root Passwort gefunden
+        // MR ROBOT
         if(this.state.inventory.find(i => i.id === 'admin_pw') && !this.hasAch('ach_hacker')) {
             this.unlockAchievement('ach_hacker', '💻 Mr. Robot', 'Du hast die volle Kontrolle (Root-PW).');
         }
 
-        // 4. ZEN MEISTER: Nach 15 Uhr und 0 Aggro (schwer!)
+        // --- END GAME CHALLENGES (Zeitabhängig) ---
+        
+        // NINJA (Heimlich faul) - Ab 14:00
+        if(this.state.time > 14*60 && this.state.cr < 10 && !this.hasAch('ach_ninja')) {
+            this.unlockAchievement('ach_ninja', '🥷 Ninja', 'Fast unsichtbar für den Chef.');
+        }
+
+        // ZEN MEISTER (Keine Wut) - Ab 15:00
         if(this.state.time >= 15*60 && this.state.al === 0 && !this.hasAch('ach_zen')) {
             this.unlockAchievement('ach_zen', '🧘 Zen-Meister', '15 Uhr und Puls auf 60. Respekt.');
+        }
+
+        // MITARBEITER DES MONATS (Anti-Faul) - Ab 16:00
+        if (this.state.time > 16*60 && this.state.fl <= 5 && !this.hasAch('ach_workaholic')) {
+            this.unlockAchievement('ach_workaholic', '👔 Mitarbeiter des Monats', 'Du hast tatsächlich gearbeitet? In dieser Firma?!');
+        }
+
+        // DER STREBER (Inbox Zero) - Ab 16:20 (980 Min)
+        if (this.state.time >= 980 && this.state.tickets === 0 && !this.hasAch('ach_streber')) {
+            this.unlockAchievement('ach_streber', '🤓 Der Streber', 'Alle Tickets erledigt? Jetzt sehen wir anderen schlecht aus.');
+        }
+
+        // TANZ AUF DEM VULKAN (High Risk Survival) - Ab 16:20 (980 Min)
+        if (this.state.time >= 980 && this.state.al >= 90 && this.state.cr >= 90 && !this.hasAch('ach_survivor')) {
+            this.unlockAchievement('ach_survivor', '🌋 Tanz auf dem Vulkan', 'Maximaler Stress kurz vor Feierabend. Du brauchst Urlaub.');
         }
     },
 
@@ -754,7 +776,45 @@ checkEndConditions: function() {
         const modal = document.getElementById('inventory-modal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
-    }
+    },
+	
+	// --- TEAM / CHARAKTERE ---
+    openTeam: function() {
+        const modal = document.getElementById('team-modal');
+        const grid = document.getElementById('team-grid');
+        grid.innerHTML = '';
+
+        DB.chars.forEach(char => {
+            // Hover ist jetzt weiß (hover:border-white)
+            const card = document.createElement('div');
+            card.className = "bg-slate-800 p-4 rounded-lg border border-slate-700 flex gap-4 hover:border-white transition-colors";
+            
+            // Rolle ist jetzt hellgrau/weiß (text-slate-300)
+            card.innerHTML = `
+                <div class="text-4xl shrink-0 bg-slate-900 w-16 h-16 flex items-center justify-center rounded-full border border-slate-600">
+                    ${char.icon}
+                </div>
+                <div>
+                    <div class="flex items-baseline gap-2 mb-1">
+                        <h3 class="font-bold text-white text-lg">${char.name}</h3>
+                        <span class="text-[10px] text-slate-300 uppercase tracking-widest">${char.role}</span>
+                    </div>
+                    <p class="text-xs text-slate-400 italic leading-relaxed">"${char.desc}"</p>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    },
+
+    closeTeam: function() {
+        const modal = document.getElementById('team-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    },
+	
 };
 
 engine.init();

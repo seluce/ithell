@@ -1200,8 +1200,8 @@ const DB = {
                 },
                 { 
                     t: "Panisch abwimmeln: 'Werner, ich arbeite!'", 
-                    m: 5, f: 0, a: 15, c: -5, 
-                    r: "Stille am anderen Ende. Dann ganz leise: 'Schon gut... Ich wollte ja nicht stören. Die Renate hatte Recht, du hast nie Zeit für die Familie. Tschüss.' Klick. Das schlechte Gewissen wird dich den ganzen Tag verfolgen (Aggro +15)." 
+                    m: 5, f: 0, a: 20, c: -5, 
+                    r: "Stille am anderen Ende. Dann ganz leise: 'Schon gut... Ich wollte ja nicht stören. Die Renate hatte Recht, du hast nie Zeit für die Familie. Tschüss.' Klick. Das schlechte Gewissen wird dich den ganzen Tag verfolgen." 
                 },
                 { 
                     t: "NC-Kopfhörer nutzen & 'Ja' sagen", 
@@ -2124,7 +2124,7 @@ const DB = {
                 }
             ]
         },
-		{
+{
             id: "cof_elster_fight",
             title: "Streit um den Kühlschrank",
             text: "Frau Elster wirft dein Essen weg! 'Das stinkt nach Zwiebeln!', keift sie. Du stellst sie zur Rede.",
@@ -2132,43 +2132,43 @@ const DB = {
                 { 
                     t: "Anbrüllen: 'Das war mein Mittag!'", 
                     m: 10, f: 0, a: 20, c: 10, 
-                    r: "Sie schreit zurück: 'Ich bin hochsensibel! Wenn ich nur **Erdnüsse** rieche, schwillt mein Hals zu! Nimm gefälligst Rücksicht!' Sie atmet schwer. Jetzt weißt du es." 
+                    r: "Sie schreit zurück: 'Ich bin hochsensibel! Wenn ich nur **Erdnüsse** rieche, schwillt mein Hals zu! Nimm gefälligst Rücksicht!' Sie atmet schwer und hält sich den Hals. Oha, wunde Stelle entdeckt." 
                 },
                 { 
                     t: "Klein beigeben", 
                     m: 5, f: 5, a: -5, c: 0, 
-                    r: "Du entschuldigst dich. Sie beruhigt sich, verrät aber nichts Persönliches." 
+                    r: "Du entschuldigst dich kleinlaut. Sie rückt ihre Brille zurecht, schnaubt: 'Man muss eben an die Gemeinschaft denken!' und rauscht ab. Der Streit ist vorbei, dein Essen aber auch." 
                 }
             ]
         },
-		{
+        {
             id: "srv_intern_access",
             title: "Dringende Daten",
             text: "Der Praktikant ist krank. Der Chef steht vor dessen PC: 'Müller! Knacken Sie das Ding! Da ist die Präsentation drauf! Ich wette, der Idiot hat was Kompliziertes genommen!'",
             opts: [
                 { 
-                    t: "Passwort 'Puschel123' tippen",
+                    t: "Eingabe: 'Puschel123'",
                     m: 5, f: 10, a: -10, c: -5, 
                     r: "Du tippst es blind ein. 'ZUGRIFF ERLAUBT'. Der Chef starrt dich an: 'Woher...? Egal. Gute Arbeit, Müller!'" 
                 },
                 { 
-                    t: "Admin-Reset durchführen",
+                    t: "Admin-Reset erzwingen",
                     req: "admin_pw",
                     m: 15, f: -5, a: 0, c: 0, 
-                    r: "Dauert 15 Minuten, funktioniert aber. Der Chef trommelt ungeduldig mit den Fingern." 
+                    r: "Dauert 15 Minuten, funktioniert aber sicher. Der Chef trommelt ungeduldig mit den Fingern." 
                 },
                 { 
-                    t: "Passwort '123456' raten",
+                    t: "Eingabe: '123456'",
                     m: 5, f: 0, a: 10, c: 5, 
                     r: "Falsch. PC sperrt sich für 1 Stunde. Der Chef explodiert." 
                 },
                 { 
-                    t: "Sagen: 'Keine Chance'",
-                    m: 2, f: 0, a: 0, c: 20, 
-                    r: "Chef: 'Wofür bezahle ich Sie eigentlich?!' Er tritt gegen den PC." 
+                    t: "Eingabe: 'Passwort'",
+                    m: 5, f: 0, a: 10, c: 10, 
+                    r: "Natürlich nicht. Der Chef schüttelt den Kopf: 'Halten Sie mich für blöd? Probieren Sie was Richtiges!'" 
                 }
             ]
-        }
+        },
     ],
 
 // === SIDE QUESTS ===
@@ -2434,11 +2434,11 @@ const DB = {
                 }
             ]
         },
-		{
+{
             id: "sq_alarm_fail",
             kind: "text",
             title: "Der rote Knopf",
-            text: "Du lehnst dich im Flur an die Wand. Plötzlich: SCHRILL! Du hast den Feueralarm ausgelöst! Der Hausmeister rennt wütend herbei und schaltet ihn mit einem Code ab.",
+            text: "Du lehnst dich im Flur an die Wand. Plötzlich: SCHRILL! Du hast den Feueralarm ausgelöst! Der Hausmeister rennt wütend herbei.",
             opts: [
                 { 
                     t: "Entschuldigen & Wegrennen", 
@@ -2446,26 +2446,26 @@ const DB = {
                     r: "Du rennst weg. Der Hausmeister brüllt dir nach: 'IDIOT! Jedes Mal muss ich **4-7-1-1** eingeben wegen solchen Deppen!' Du hast Ärger, aber den Code gehört." 
                 },
                 { 
-                    t: "So tun als wäre es ein Test", 
+                    t: "So tun als wäre es ein Test",
                     m: 2, f: 5, a: 0, c: 0, 
-                    r: "Er glaubt dir nicht. 'Verschwinde!' Er tippt den Code verdeckt ein. Du lernst nichts." 
+                    r: "Er glaubt dir nicht. 'Verschwinde!' Er dreht dir demonstrativ den Rücken zu, schirmt das Tastenfeld mit seinem breiten Kreuz ab und bringt die Sirene zum Schweigen." 
                 }
             ]
         },
-		{
+        {
             id: "sq_elster_blockade",
             title: "Der Drache bewacht den Hort",
-            text: "Frau Elster sitzt auf dem Aktenordner, den du brauchst. 'Den gebe ich nicht raus! Nur über meine Leiche!' Sie sieht hungrig aus.",
+            text: "Frau Elster sitzt auf dem Aktenordner, den du brauchst. 'Den gebe ich nicht raus! Nur über meine Leiche!' Sie sieht hungrig aus und starrt auf deine Snacks.",
             opts: [
                 { 
-                    t: "Snickers anbieten (Erdnüsse!)",
+                    t: "Einen 'Erdnuss-Power' Riegel anbieten",
                     m: 5, f: -10, a: 50, c: 100, 
-                    r: "Sie beißt rein. 'Oh Gott... Luft...' Der Notarzt muss kommen. Du hast den Ordner, aber fast jemanden umgebracht. Anzeige droht!" 
+                    r: "Sie beißt rein. 'Oh Gott... mein Hals...' Sie läuft blau an. Der Notarzt muss kommen. Du hast den Ordner, aber fast jemanden umgebracht. Anzeige droht!" 
                 },
                 { 
-                    t: "Schokolade (ohne Nüsse) anbieten",
+                    t: "Eine Tafel Alpenmilch-Schokolade anbieten",
                     m: 10, f: 5, a: -10, c: 0, 
-                    r: "Du sagst extra: 'Garantiert nussfrei.' Sie lächelt: 'Sie merken sich ja Dinge!' Sie gibt dir den Ordner." 
+                    r: "Sie prüft die Packung. 'Oh, ohne Nüsse? Sehr aufmerksam!' Sie lächelt und gibt dir den Ordner. 'Sie merken sich ja Dinge!'" 
                 },
                 { 
                     t: "Einfach wegnehmen",
@@ -3081,4 +3081,57 @@ const DB = {
             }
         }
     ],
+	
+	// === CHARAKTERE (Wall of Shame) ===
+    chars: [
+        { 
+            name: "Kevin", 
+            role: "Der Azubi", 
+            icon: "🧢", 
+            desc: "Sein 'Ups' kostet die Firma jährlich ca. 50.000€. Denkt, die 'Cloud' hat was mit dem Wetterbericht zu tun. Versucht ständig, Minecraft auf dem Server zu installieren." 
+        },
+        { 
+            name: "Chantal", 
+            role: "Marketing & Feel Good", 
+            icon: "💅", 
+            desc: "Nutzt Wörter wie 'Synergie' und 'Mindset', hat aber keine Ahnung, wie man eine PDF öffnet. Fordert täglich neue Apple-Produkte, weil die Farbe 'Holo-Pink' ihre Kreativität fördert." 
+        },
+        { 
+            name: "Egon", 
+            role: "Hausmeister", 
+            icon: "🔧", 
+            desc: "Der wahre Herrscher des Gebäudes. Hasst Technik, liebt seine Schlüssel. Wenn du ihn fragst, war früher (1980) alles besser, besonders die Kabel." 
+        },
+        { 
+            name: "Dr. Wichtig", 
+            role: "Der CEO", 
+            icon: "👔", 
+            desc: "Hat Visionen, die physikalisch unmöglich sind. Ruft gerne aus Tunneln an, um sich über schlechten Empfang zu beschweren. Denkt, KI kann Kaffee kochen." 
+        },
+        { 
+            name: "Frau Elster", 
+            role: "Buchhaltung", 
+            icon: "🦉", 
+            desc: "Wächterin über Excel und den Kühlschrank. Hat Augen wie ein Luchs, wenn es um fehlende Belege oder falsche Mülltrennung geht. Ihr Kater 'Rüdiger' ist ihr einziger Freund." 
+        },
+        { 
+            name: "Markus", 
+            role: "Vertriebsleiter", 
+            icon: "💪", 
+            desc: "Verkauft dem Kunden Dinge, die wir gar nicht haben. Brüllt gerne 'Zeit ist Geld!', während er Solitär spielt. Sein Drucker ist sein persönlicher Erzfeind." 
+        },
+        { 
+            name: "Gabi", 
+            role: "Empfang", 
+            icon: "☎️", 
+            desc: "Die Nachrichtenzentrale. Weiß alles über jeden, bevor es passiert. Ruft die IT, wenn die Maus leer ist (oder der Kaffee)." 
+        },
+        { 
+            name: "Du (Müller)", 
+            role: "SysAdmin", 
+            icon: "💀", 
+            desc: "Mädchen für alles. Brandlöscher. Seelsorger. Eigentlich wolltest du nur Computer reparieren, jetzt reparierst du Menschen. Dein Kaffee-Konsum ist medizinisch bedenklich." 
+        }
+    ],
+	
 };
