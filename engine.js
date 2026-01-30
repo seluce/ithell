@@ -12,7 +12,7 @@ const engine = {
         bossTimer: null,
         ticketWarning: false,
         
-        // NEU: Schwierigkeitsgrad (Standard 1.0)
+        // Schwierigkeitsgrad (Standard 1.0)
         difficultyMult: 1.0, 
 
         // Stats & System
@@ -24,7 +24,10 @@ const engine = {
         emailsIgnored: 0,
         spamClicked: 0,
         usedEmails: new Set(),
-        isEmailOpen: false
+        isEmailOpen: false,
+		
+		// Speichert das Ende, damit wir es verzögert anzeigen können
+        pendingEnd: null
     },
 
     init: function() {
@@ -165,6 +168,11 @@ const engine = {
         }
         
         this.updateUI();
+		
+		// NEU: Wenn die E-Mail dich gekillt hat, sofort beenden
+        if (this.state.pendingEnd) {
+            this.finishGame();
+        }
     },
 
     // --- CORE ---
@@ -434,7 +442,7 @@ checkAchievements: function() {
         container.className = "flex-1 flex flex-col p-4";
     },
 
-    resolveTerminal: function(res, m, f, a, c, loot, usedItem, type) {
+resolveTerminal: function(res, m, f, a, c, loot, usedItem, type) {
         if(type === 'coffee') this.state.coffeeConsumed++;
 
         let oldTimeChunk = Math.floor(this.state.time / 30);
@@ -454,10 +462,10 @@ checkAchievements: function() {
             this.state.lunchDone = true;
         }
 
-        // ÄNDERUNG: Multiplikator für Events (Calls, Serverraum etc.)
+        // ÄNDERUNG: Multiplikator für Events
         let mult = this.state.difficultyMult;
         
-        // Positive Aggro/Radar Werte (also schlecht für Spieler) werden multipliziert
+        // Positive Aggro/Radar Werte werden multipliziert
         let finalA = a > 0 ? Math.ceil(a * mult) : a;
         let finalC = c > 0 ? Math.ceil(c * mult) : c;
 
@@ -473,13 +481,10 @@ checkAchievements: function() {
         }
         if(usedItem && usedItem !== "") {
             let itemObj = this.state.inventory.find(i => i.id === usedItem);
-            // Checken, ob das Item in der DB als "keep: true" markiert ist
             let dbItem = DB.items[usedItem];
             
             if(itemObj) {
-                // Wenn es kein dauerhaftes Item ist: LÖSCHEN
                 if (!dbItem || !dbItem.keep) {
-                    // Wir filtern das Inventar neu und entfernen das verbrauchte Item
                     this.state.inventory = this.state.inventory.filter(i => i !== itemObj);
                 }
             }
@@ -488,9 +493,26 @@ checkAchievements: function() {
         this.log(res);
         this.updateUI();
 
+        // --- HIER BEGINNT DER NEUE TEIL ---
         const term = document.getElementById('terminal-content');
+        
+        // Standard-Werte für "Spiel geht weiter"
         let btnAction = triggerLunch ? "engine.triggerLunch()" : "engine.reset()";
         let btnText = triggerLunch ? "ZUR MITTAGSPAUSE" : "WEITER";
+        let btnColor = "bg-blue-600 hover:bg-blue-500"; // Standard Blau
+
+        // Wenn ein Game Over wartet (pendingEnd ist gesetzt), ändern wir den Button!
+        if (this.state.pendingEnd) {
+            btnAction = "engine.finishGame()";
+            
+            if (this.state.pendingEnd.isWin) {
+                btnText = "FEIERABEND MACHEN 🎉";
+                btnColor = "bg-green-600 hover:bg-green-500";
+            } else {
+                btnText = "DAS WAR'S... (GAME OVER)";
+                btnColor = "bg-red-600 hover:bg-red-500";
+            }
+        }
 
         term.innerHTML = `
             <div class="w-full max-w-xl text-left fade-in flex flex-col h-full justify-center">
@@ -498,7 +520,7 @@ checkAchievements: function() {
                     <h3 class="font-bold text-white mb-2 uppercase text-xs tracking-widest text-emerald-500">Ergebnis</h3>
                     <p class="text-slate-300 italic text-lg leading-relaxed">"${res}"</p>
                 </div>
-                <button onclick="${btnAction}" class="bg-blue-600 text-white w-full py-4 rounded-xl font-bold uppercase hover:bg-blue-500 transition-all shadow-lg">
+                <button onclick="${btnAction}" class="${btnColor} text-white w-full py-4 rounded-xl font-bold uppercase transition-all shadow-lg">
                     ${btnText}
                 </button>
             </div>
@@ -595,9 +617,15 @@ checkAchievements: function() {
                 this.log("Handy: " + res.txt);
                 this.state.time += 15; 
                 this.updateUI();
-                this.state.activeEvent = false;
-                this.disableButtons(false);
-                this.checkRandomEmail(); 
+                
+                // Wenn Handy dich gekillt hat, sofort beenden
+                if (this.state.pendingEnd) {
+                    this.finishGame();
+                } else {
+                    this.state.activeEvent = false;
+                    this.disableButtons(false);
+                    this.checkRandomEmail(); 
+                }
             }, 2000);
         } else if (ev.nodes[nextId]) {
             setTimeout(() => { this.renderPhoneNode(ev.nodes[nextId]); }, 500);
@@ -624,7 +652,10 @@ checkAchievements: function() {
     },
 
 checkEndConditions: function() {
-        // 1. BERICHT GENERIEREN (Wird jetzt für ALLE Enden benutzt)
+        // WICHTIG: Wenn schon ein Ende wartet, nicht nochmal prüfen (verhindert Dopplungen)
+        if (this.state.pendingEnd) return;
+
+        // 1. BERICHT GENERIEREN
         
         // Schwierigkeit ermitteln
         let diffName = "MITTWOCH (Normal)";
@@ -664,29 +695,49 @@ checkEndConditions: function() {
 
         // A. RAGE QUIT (Aggro >= 100)
         if(this.state.al >= 100) {
-            this.showEnd("RAGE QUIT", "Du hast den Monitor aus dem Fenster geworfen. Es hat sich gut angefühlt.<br>" + fullReport, false);
+            // ALT: this.showEnd("RAGE QUIT", "Du hast den Monitor aus dem Fenster geworfen...", false);
+            // NEU:
+            this.state.pendingEnd = { 
+                title: "RAGE QUIT", 
+                text: "Du hast den Monitor aus dem Fenster geworfen. Es hat sich gut angefühlt.<br>" + fullReport, 
+                isWin: false 
+            };
         }
         // B. TICKET LAWINE (Zu viele Tickets)
         else if(this.state.tickets >= 10) {
-            this.showEnd("GEFEUERT", "Zu viele offene Tickets! Das System ist kollabiert.<br>" + fullReport, false);
+            this.state.pendingEnd = { 
+                title: "GEFEUERT", 
+                text: "Zu viele offene Tickets! Das System ist kollabiert.<br>" + fullReport, 
+                isWin: false 
+            };
         }
-        // C. WARNUNG (Tickets >= 7)
+        // C. WARNUNG (Tickets >= 7) -> Das bleibt so! Warnungen sollen sofort kommen.
         else if(this.state.tickets >= 7 && !this.state.ticketWarning) {
             this.state.ticketWarning = true;
             this.showModal("WARNUNG", "Ticket-Stau! Schließe Anrufe ab, sonst fliegst du!", false);
         }
         // D. FEIERABEND (Zeit abgelaufen)
         else if(this.state.time >= 16*60+30) {
-            this.showEnd("FEIERABEND", "16:30! Du hast den Tag überlebt.<br>" + fullReport, true);
+            this.state.pendingEnd = { 
+                title: "FEIERABEND", 
+                text: "16:30! Du hast den Tag überlebt.<br>" + fullReport, 
+                isWin: true 
+            };
         }
         // E. GEFEUERT (Chef-Radar >= 100)
         else if(this.state.cr >= 100) {
             if(!this.state.warningReceived) {
+                // Die erste Abmahnung kommt SOFORT (wie bisher), damit man gewarnt ist
                 this.state.warningReceived = true;
                 this.state.cr = 50;
                 this.showModal("ABMAHNUNG", "Der Chef steht an deinem Tisch: 'Noch ein Fehler und Sie fliegen!' (Radar auf 50% gesetzt).", false);
             } else {
-                this.showEnd("GEFEUERT", "Der Sicherheitsdienst begleitet dich raus. Deine Karriere hier ist vorbei.<br>" + fullReport, false);
+                // Der endgültige Rauswurf wartet jetzt auf den Klick
+                this.state.pendingEnd = { 
+                    title: "GEFEUERT", 
+                    text: "Der Sicherheitsdienst begleitet dich raus. Deine Karriere hier ist vorbei.<br>" + fullReport, 
+                    isWin: false 
+                };
             }
         }
     },
@@ -722,6 +773,14 @@ checkEndConditions: function() {
 
     showEnd: function(title, text, isWin) {
         this.showModal(title, text, true);
+    },
+	
+	finishGame: function() {
+        if (this.state.pendingEnd) {
+            const end = this.state.pendingEnd;
+            this.showEnd(end.title, end.text, end.isWin);
+            this.state.pendingEnd = null; // Reset
+        }
     },
 
     // Log auf/zuklappen für Mobile

@@ -926,7 +926,7 @@ const DB = {
             title: "Kevin (Azubi)",
             text: "Duuu? Ich hab glaub ich das Internet gelöscht. Ich wollte Fortnite installieren und hab den Ordner 'System32' in den Papierkorb geschoben, um Platz zu machen. Jetzt ist der Bildschirm blau und schreit mich an.",
             opts: [
-                { t: "Anschreien (Stressabbau)", m: 15, f: 0, a: 25, c: 0, r: "Du brüllst ins Telefon. Kevin weint leise. Deine Wut sinkt leicht, aber das Problem bleibt bestehen." },
+                { t: "Anschreien (Stressabbau)", m: 15, f: 0, a: -20, c: 20, r: "Du brüllst ins Telefon. Kevin weint leise. Deine Wut sinkt leicht, aber das Problem bleibt bestehen." },
                 { t: "Format C: befehlen", m: 30, f: 10, a: 0, c: 5, r: "Kevin formatiert den PC. Er ist den ganzen Tag beschäftigt und lernt eine Lektion fürs Leben." },
                 { t: "Retten (Arbeit)", m: 90, f: -30, a: 10, c: -10, r: "Du hast den PC neu aufgesetzt. 1,5 Stunden Lebenszeit verschwendet. Kevin fragt, ob er jetzt Minecraft installieren darf." }
             ]
@@ -1999,7 +1999,7 @@ const DB = {
                 { t: "Kommentieren", m: 5, f: 0, a: 10, c: 5, r: "Es gibt Streit. Stimmung im Keller." }
             ]
         },
-		{
+{
             id: "cof_gossip",
             title: "Tratsch am Wasserspender",
             text: "Du hörst Frau Gräte flüstern: 'Der Chef war gestern im Seminar 'Positive Leadership'. Er flippt jetzt total aus, wenn jemand das Wort 'Problem' sagt. Er will nur noch 'Herausforderung' hören. Wer 'Problem' sagt, kriegt sofort die Kündigungsandrohung.'",
@@ -2007,12 +2007,12 @@ const DB = {
                 { 
                     t: "Ins Gespräch einsteigen", 
                     m: 10, f: 5, a: -5, c: 10,
-                    r: "Du lästerst eine Runde mit. Plötzlich steht der Chef hinter euch und rollt genervt mit den Augen. 'Haben wir nichts zu tun, Müller?' Er notiert sich deinen Namen. Aber die Info hast du." 
+                    r: "Du nickst eifrig und lästerst mit. Plötzlich räuspert sich jemand hinter dir. Der Chef starrt dich an, tippt auf seine Uhr und notiert sich deinen Namen. Die Gruppe löst sich panisch auf." 
                 },
                 { 
                     t: "Ignorieren und Kaffee holen", 
                     m: 2, f: 0, a: 0, c: 0, 
-                    r: "Du hältst dich aus dem Flurfunk raus. Besser für die Karriere, aber du hast vielleicht was verpasst." 
+                    r: "Du stellst die Ohren auf Durchzug. 'Nicht mein Zirkus, nicht meine Affen.' Du nimmst deinen Becher und gehst wortlos zurück an den Platz. Sicher ist sicher." 
                 }
             ]
         },
@@ -2159,7 +2159,7 @@ const DB = {
                 },
                 { 
                     t: "Eingabe: '123456'",
-                    m: 5, f: 0, a: 10, c: 5, 
+                    m: 5, f: 0, a: 10, c: 15, 
                     r: "Falsch. PC sperrt sich für 1 Stunde. Der Chef explodiert." 
                 },
                 { 
@@ -2264,7 +2264,7 @@ const DB = {
             text: "Im Lager droht das Regal mit den Tonern umzukippen.",
             opts: [
                 { t: "Anbinden", req: "zip_ties", m: 10, f: -5, a: 0, c: 0, r: "Mit 10 Kabelbindern an der Heizung befestigt. Hält." },
-                { t: "Dübeln (zu viel Arbeit)", m: 60, f: -20, a: 10, c: -5, r: "Du hast es richtig repariert. Keiner dankt es dir." },
+                { t: "Dübeln (zu viel Arbeit)", m: 60, f: -20, a: 15, c: -5, r: "Du hast es richtig repariert. Keiner dankt es dir." },
                 { t: "Warnschild (Zettel)", req: "wifi_note", m: 5, f: 5, a: 0, c: 0, r: "Zettel 'Vorsicht!' drangeklebt. Pflicht erfüllt." }
             ]
         },
@@ -2348,12 +2348,12 @@ const DB = {
                 { 
                     t: "Eine stibitzen & Klappe halten", 
                     loot: "donut",
-                    m: 5, f: 5, a: 0, c: 0, 
+                    m: 2, f: 5, a: 0, c: 0, 
                     r: "Schmeckt nach altem Alkohol. Aber du weißt jetzt, wo der Vorrat liegt." 
                 },
                 { 
                     t: "Ordner zurückstellen", 
-                    m: 5, f: 0, a: -5, c: 0, 
+                    m: 2, f: 0, a: -5, c: 0, 
                     r: "Du lässt Gabi ihren Schatz. Diskretion ist Ehrensache." 
                 }
             ]
@@ -3049,7 +3049,7 @@ const DB = {
                 }
             },
             results: {
-                "run": { txt: "Du rennst runter. Du erwischst ihn gerade noch. Essen ist kalt, aber da. Sport +1.", fl: -5, al: -5, cr: 5 },
+                "run": { txt: "Du rennst runter. Du erwischst ihn gerade noch. Essen ist kalt, aber da. Sport +1.", fl: -5, al: 5, cr: 0 },
                 "too_late": { txt: "Er ist weg. Dein Essen steht auf der Biotonne. Eine Ratte guckt es schon an. Hunger +100.", fl: 0, al: 30, cr: 0 }
             }
         },
