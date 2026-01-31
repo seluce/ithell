@@ -36,7 +36,7 @@ const engine = {
         this.log("System v40.0 geladen. Warte auf User...");
     },
 
-    // ÄNDERUNG: Startet nicht mehr das Spiel, sondern zeigt die Auswahl
+    // Startet nicht mehr das Spiel, sondern zeigt die Auswahl
     start: function() {
         document.getElementById('intro-modal').style.display = 'none';
         // Wir gehen davon aus, dass das Modal in index.html existiert (id="difficulty-modal")
@@ -49,7 +49,7 @@ const engine = {
         }
     },
 
-    // NEU: Setzt Schwierigkeit und startet dann erst den Loop
+    // Setzt Schwierigkeit und startet dann erst den Loop
     setDifficulty: function(level) {
         document.getElementById('difficulty-modal').style.display = 'none';
         
@@ -75,7 +75,7 @@ const engine = {
     checkRandomEmail: function() {
         if(this.state.isEmailOpen) return;
         
-        // ÄNDERUNG: Basis-Chance hängt vom Schwierigkeitsgrad ab
+        // Basis-Chance hängt vom Schwierigkeitsgrad ab
         // Montag (1.5) = Höhere Wahrscheinlichkeit für Mails
         let baseChance = 0.2 * this.state.difficultyMult; 
         
@@ -636,7 +636,7 @@ resolveTerminal: function(res, m, f, a, c, loot, usedItem, type) {
                     this.disableButtons(false);
                     this.checkRandomEmail(); 
                 }
-            }, 2000);
+            }, 3000);
         } else if (ev.nodes[nextId]) {
             setTimeout(() => { this.renderPhoneNode(ev.nodes[nextId]); }, 500);
         }
