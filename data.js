@@ -4045,41 +4045,44 @@ const DB = {
             id: "sq_gabi_pc",
             title: "Sicherheitslücke",
             text: "Gabi ist in der Pause. Ihr PC ist entsperrt, Outlook ist offen. Ein grober Verstoß gegen Richtlinie 404.",
-            type: "quest",
             opts: [
                 { 
-                    t: "Richtlinie vortragen", 
-                    m: 5, f: -5, a: 0, c: 0,
-                    r: "Gabi kommt zurück, liest den Zettel und rollt mit den Augen. Du fühlst dich sicher, aber unbeliebt." 
+                    t: "Gabi suchen & belehren", 
+                    m: 10, f: -5, a: 10, c: -5, 
+                    r: "Du findest sie in der Küche und zitierst das Handbuch. Sie rollt mit den Augen. Du fühlst dich im Recht, aber unbeliebt." 
                 },
                 { 
-                    t: "Kalender checken", 
-                    m: 5, f: 5, a: 0, c: 0,
-                    r: "Du wirfst einen schnellen Blick in den Kalender. Oha, was steht denn da?",
+                    t: "Den offenen Kalender checken", 
+                    m: 5, f: 5, a: 0, c: 0, 
+                    r: "Ein schneller Blick: 'Lieferung Sessel'. Und direkt danach: 'Externes Meeting (Golfplatz) - Open End'. Aha! Das Büro ist also sturmfrei..." 
                 },
                 { 
-                    t: "Ignorieren", 
-                    m: 2, f: 0, a: 0, c: 0,
-                    r: "Nicht mein Zirkus, nicht meine Affen. Du gehst weiter."
+                    t: "Computer sperren & weitergehen", 
+                    m: 2, f: 0, a: -5, c: 0, 
+                    r: "Klick. Der PC ist gesperrt. Du hinterlässt einen Post-it 'Gern geschehen' auf dem Monitor. Ein guter Tag für die IT-Sicherheit." 
                 }
             ]
         },
         {
             id: "sq_boss_chair",
             title: "Operation Rückgrat",
-            text: "Die Tür zum Chefbüro steht sperrangelweit offen. Von Dr. Wichtig fehlt jede Spur. Mitten im Raum thront eine frisch ausgepackte Lieferung: Ein High-End Massagesessel, der aussieht wie ein Raumschiff-Cockpit.",
-            type: "quest",
+            text: "Die Tür zum Chefbüro steht sperrangelweit offen. Dr. Wichtig ist nirgends zu sehen. Mitten im Raum thront die frisch ausgepackte Lieferung: Ein High-End Massagesessel.",
             opts: [
-            { 
+                { 
                     t: "Probeliegen (Shiatsu-Test)", 
-                    m: 20, f: 20, a: -40, c: 0,
-                    r: "Oh Gott, ist das gut. Die Rollen kneten deinen Hass einfach weg. Du schläfst ein und wachst sabbernd aber tiefenentspannt wieder auf." 
-            },
-            { 
+                    m: 20, f: 20, a: -40, c: 0, 
+                    r: "Oh Gott, ist das gut. Die Rollen kneten deinen Hass einfach weg. Du nickst kurz weg... und schreckst hoch. Sabber im Mundwinkel. Aber das Büro ist immer noch leer. Glück gehabt." 
+                },
+                { 
                     t: "Kartons filzen", 
-                    m: 10, f: -5, a: 0, c: 0,
                     loot: "bubble_wrap", 
+                    m: 10, f: -5, a: 0, c: 0, 
                     r: "Du durchsuchst den Müll nach Brauchbarem. Du findest eine riesige Rolle unbenutzte Luftpolsterfolie! *Plopp* *Plopp*. Perfekt für schlechte Zeiten." 
+                },
+                { 
+                    t: "Tür diskret schließen", 
+                    m: 5, f: 0, a: 0, c: -15, 
+                    r: "Du ziehst die Tür leise ins Schloss. Niemand soll sehen, dass das Büro leer ist. Deine Diskretion bleibt unbemerkt, aber dein Chef-Radar sinkt." 
                 }
             ]
         },
