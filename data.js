@@ -2324,11 +2324,10 @@ const DB = {
     {
         id: "call_meyer_1",
         title: "Frau Meyer (Buchhaltung)",
-        text: "Herr Müller! Mein Bildschirm ist schwarz! Ich habe NICHTS gemacht! Die Bilanzen müssen in 10 Minuten raus!",
         startNode: "root",
         nodes: {
             root: {
-                text: "Sie klingt panisch. Man hört hektisches Klicken.",
+                text: "Herr Müller! Mein Bildschirm ist schwarz! Ich habe NICHTS gemacht! Die Bilanzen müssen in 10 Minuten raus!.\n\nSie klingt panisch. Man hört hektisches Klicken.",
                 opts: [
                     { t: "Frage: 'Ist der PC an?'", next: "ask_on" },
                     { t: "Befehl: 'Kabel prüfen'", next: "check_cable" }
@@ -2360,11 +2359,10 @@ const DB = {
         id: "call_meyer_2",
         reqStory: "meyer_blackout",
         title: "Hausmeister Egon",
-        text: "Sag mal, warum ruft mich Frau Meyer an, dass DU ihren PC angezündet hast?",
         startNode: "root",
         nodes: {
             root: {
-                text: "Egon ist genervt. Er hasst Elektrik.",
+                text: "'Sag mal, warum ruft mich Frau Meyer an, dass DU ihren PC angezündet hast?'\n\nEgon ist genervt. Er hasst Elektrik.",
                 opts: [
                     { t: "Sie war es selbst!", next: "truth" },
                     { t: "Ich übernehme die Schuld.", next: "lie" }
@@ -2440,11 +2438,10 @@ const DB = {
         {
         id: "call_vip_1",
         title: "Unbekannte Nummer",
-        text: "Eine heisere Stimme brüllt ins Telefon: 'MÜLLER?! Wo sind meine Lizenzen?! Ich verliere hier Millionen pro Sekunde!'",
         startNode: "root",
         nodes: {
             root: {
-                text: "Der Mann klingt cholerisch.",
+                text: "Eine heisere Stimme brüllt ins Telefon: 'MÜLLER?! Wo sind meine Lizenzen?! Ich verliere hier Millionen pro Sekunde!'\n\nDer Mann klingt cholerisch.",
                 opts: [
                     { t: "Auflegen (Angst)", next: "hangup" },
                     { t: "Professionell bleiben: 'Wer sind Sie?'", next: "ask_who" }
@@ -2479,11 +2476,10 @@ const DB = {
         id: "call_vip_2",
         reqStory: "vip_angry", 
         title: "UNBEKANNT (Wieder)",
-        text: "Das Telefon klingelt aggressiv. Du weißt genau, wer das ist.",
         startNode: "root",
         nodes: {
             root: {
-                text: "'Haben Sie... HABEN SIE GERADE AUFGELEGT?!'",
+                text: "Das Telefon klingelt aggressiv. Du weißt genau, wer das ist..\n\n'Haben Sie... HABEN SIE GERADE AUFGELEGT?!'",
                 opts: [
                     { t: "Lüge: 'Tunnel! Funkloch!'", next: "lie_tunnel" },
                     { t: "Wahrheit: 'Sie haben geschrien.'", next: "truth" }
@@ -2600,11 +2596,10 @@ const DB = {
 {
         id: "call_grandma_1",
         title: "Oma Erna",
-        text: "Junge? Bist du das? Mein 'Google' ist kaputt. Da ist so eine blaue Seite.",
         startNode: "root",
         nodes: {
             root: {
-                text: "Oma Erna klingt verzweifelt. Im Hintergrund läuft Volksmusik.",
+                text: "'Junge? Bist du das? Mein 'Google' ist kaputt. Da ist so eine blaue Seite.'\n\nOma Erna klingt verzweifelt. Im Hintergrund läuft Volksmusik.",
                 opts: [
                     { t: "Ferndiagnose starten", next: "diagnose" },
                     { t: "Abwimmeln: 'Arbeite gerade.'", next: "busy" }
@@ -2638,11 +2633,10 @@ const DB = {
         id: "call_grandma_2",
         reqStory: "grandma_darkness",
         title: "Hausmeister Egon",
-        text: "Müller! Warum ist die Sicherung im Keller rausgeflogen? Da war so ne alte Frau am Kasten!",
         startNode: "root",
         nodes: {
             root: {
-                text: "Er ist stinksauer.",
+                text: "'Müller! Warum ist die Sicherung im Keller rausgeflogen? Da war so ne alte Frau am Kasten!'\n\nEr ist stinksauer.",
                 opts: [
                     { t: "Das war ein Hacker-Angriff!", next: "lie_hacker" },
                     { t: "Das war meine Oma...", next: "truth_oma" }
@@ -2856,11 +2850,10 @@ const DB = {
     {
         id: "call_silence_creepy",
         title: "Keine Nummer",
-        text: "...",
         startNode: "root",
         nodes: {
             root: {
-                text: "Nur schweres Atmen am anderen Ende.",
+                text: "'...' Nur schweres Atmen am anderen Ende.",
                 opts: [
                     { t: "Hallo?!", next: "hello" },
                     { t: "Zurückatmen", next: "breath" }
@@ -2944,14 +2937,13 @@ const DB = {
                 }
             ]
         },
-{
+        {
         id: "call_kevin_button_1",
         title: "Kevin (Serverraum)",
-        text: "Chef? Hier ist so ein großer roter Knopf mit 'DO NOT TOUCH' drauf. Der leuchtet so schön. Was macht der?",
         startNode: "root",
         nodes: {
             root: {
-                text: "Kevins Stimme zittert vor Neugier.",
+                text: "'Chef? Hier ist so ein großer roter Knopf mit 'DO NOT TOUCH' drauf. Der leuchtet so schön. Was macht der?'\n\nKevins Stimme zittert vor Neugier.",
                 opts: [
                     { t: "FASS NICHTS AN!", next: "scream" },
                     { t: "Drück ihn. (Sarkasmus)", next: "sarcasm" }
@@ -2987,11 +2979,10 @@ const DB = {
         id: "call_kevin_button_2",
         reqStory: "kevin_alarm",
         title: "Feuerwehr-Leitstelle",
-        text: "Hier ist die Feuerwehr. Wir haben einen Alarm. Brennt es wirklich, oder ist das wieder Ihr Azubi?",
         startNode: "root",
         nodes: {
             root: {
-                text: "Man hört genervtes Atmen.",
+                text: "'Hier ist die Feuerwehr. Wir haben einen Alarm. Brennt es wirklich, oder ist das wieder Ihr Azubi?'\n\nMan hört genervtes Atmen.",
                 opts: [
                     { t: "Es ist der Azubi.", next: "truth" },
                     { t: "Wir brennen! (Lüge)", next: "lie" }
@@ -3297,11 +3288,10 @@ const DB = {
     {
         id: "call_scam_microsoft",
         title: "Microsoft Support (Indien)",
-        text: "Hello Sir. This is Windows Support. Your computer has virus. Please install TeamViewer.",
         startNode: "root",
         nodes: {
             root: {
-                text: "Klassischer Scam.",
+                text: "'Hello Sir. This is Windows Support. Your computer has virus. Please install TeamViewer.'\n\nKlassischer Scam.",
                 opts: [
                     { t: "Mitspielen & Zeit verschwenden", next: "troll" },
                     { t: "Anschreien", next: "rage" }
@@ -3346,11 +3336,10 @@ const DB = {
     {
         id: "call_story_gabi_1",
         title: "Gabi (Empfang)",
-        text: "Gabi ruft an. Ihre Stimme zittert gefährlich. 'Hier stehen fünf Kuriere, das Telefon klingelt ununterbrochen und mein Outlook hängt. Wenn jetzt noch einer fragt, wo die Toilette ist, fange ich an zu schreien.'",
         startNode: "root",
         nodes: {
             root: {
-                text: "Sie steht kurz vor dem Burnout.",
+                text: "'Gabi ruft an. Ihre Stimme zittert gefährlich. 'Hier stehen fünf Kuriere, das Telefon klingelt ununterbrochen und mein Outlook hängt. Wenn jetzt noch einer fragt, wo die Toilette ist, fange ich an zu schreien.''\n\nSie steht kurz vor dem Burnout.",
                 opts: [
                     { t: "Lösung: 'Remote Neustart'", next: "res_restart" },
                     { t: "Abwimmeln: 'Schreib ein Ticket'", next: "res_ticket" },
@@ -3521,11 +3510,10 @@ const DB = {
     {
         id: "call_recruit_1",
         title: "Unbekannt (London)",
-        text: "Good morning Mr. Muller! This is John from 'Silicon Valley Stars'. Do you have a moment?",
         startNode: "root",
         nodes: {
             root: {
-                text: "Er spricht extrem schnell Englisch.",
+                text: "'Good morning Mr. Muller! This is John from 'Silicon Valley Stars'. Do you have a moment?'\n\nEr spricht extrem schnell Englisch.",
                 opts: [
                     { t: "I don't speak English.", next: "no_english" },
                     { t: "Yes! Get me out of here!", next: "yes_job" },
@@ -3567,11 +3555,10 @@ const DB = {
         id: "call_fbi_1",
         reqStory: "fbi_watch",
         title: "Behörde für Sicherheit",
-        text: "Guten Tag. Wir haben Ihren Anruf mit 'John' abgehört. Planen Sie wirklich einen Angriff auf das Pentagon?",
         startNode: "root",
         nodes: {
             root: {
-                text: "Die Stimme ist kalt und mechanisch.",
+                text: "'Guten Tag. Wir haben Ihren Anruf mit 'John' abgehört. Planen Sie wirklich einen Angriff auf das Pentagon?'\n\nDie Stimme ist kalt und mechanisch.",
                 opts: [
                     { t: "Das war ein Witz!", next: "joke" },
                     { t: "Auflegen & SIM-Karte essen", next: "paranoid" }
@@ -3586,11 +3573,10 @@ const DB = {
     {
         id: "call_pizza_wrong",
         title: "Luigi's Pizza",
-        text: "Hallo? Ich stehe unten. 15 Pizzen 'Quattro Stagioni' für die IT? Der Aufzug ist kaputt, können Sie runterkommen?",
         startNode: "root",
         nodes: {
             root: {
-                text: "Du hast nichts bestellt. Aber es riecht bis hier oben.",
+                text: "'Hallo? Ich stehe unten. 15 Pizzen 'Quattro Stagioni' für die IT? Der Aufzug ist kaputt, können Sie runterkommen?'\n\nDu hast nichts bestellt. Aber es riecht bis hier oben.",
                 opts: [
                     { t: "Ehrlich sein: 'Falsch verbunden'", next: "res_honest" },
                     { t: "Lügen: 'Ich komme!' (Diebstahl)", next: "steal_pizza" }

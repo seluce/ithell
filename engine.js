@@ -47,7 +47,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v1.0.1 geladen. Warte auf User...");
+        this.log("System v1.0.2 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -74,10 +74,12 @@ const engine = {
         }
     },
 
-// --- ARCHIV UI ---
+// --- ARCHIV UI (Sammelalbum) ---
     openArchive: function() {
         const modal = document.getElementById('archive-modal');
         const content = document.getElementById('archive-content');
+        
+        // Modal anzeigen
         modal.classList.remove('hidden');
         modal.classList.add('flex');
 
@@ -87,10 +89,12 @@ const engine = {
         const totalAchs = DB.achievements.length;
         const unlockedAchs = this.state.archive.achievements.length;
 
-        document.getElementById('stats-items').innerText = `${foundItems} / ${totalItems}`;
-        document.getElementById('stats-achs').innerText = `${unlockedAchs} / ${totalAchs}`;
+        const statItems = document.getElementById('stats-items');
+        const statAchs = document.getElementById('stats-achs');
+        if(statItems) statItems.innerText = `${foundItems} / ${totalItems}`;
+        if(statAchs) statAchs.innerText = `${unlockedAchs} / ${totalAchs}`;
 
-        // 2. ITEMS TRENNEN
+        // 2. ITEMS SORTIEREN
         let normalItems = [];
         let questItems = [];
 
@@ -103,79 +107,85 @@ const engine = {
         }
 
         // 3. INHALT RENDERN
-        content.innerHTML = '';
         let html = '';
 
-        // --- SEKTION A: NORMALE ITEMS ---
+        // --- A) NORMALE ITEMS ---
         html += `<div class="mb-8"><h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">📦 GEFUNDENE AUSRÜSTUNG</h3>`;
         html += `<div class="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">`;
         
         normalItems.forEach(({id, item}) => {
             const unlocked = this.state.archive.items.includes(id);
-            // Standard Style (Grau/Blau)
-            let borderClass = unlocked ? 'border-slate-500/50 text-slate-200 bg-slate-800' : 'border-slate-800 opacity-20 text-slate-700 bg-slate-900';
             
+            // Design: Identisch zu Erfolgen (1px Border, dashed bei leer)
+            let borderClass = unlocked 
+                ? 'border-slate-500/50 text-slate-200 bg-slate-800' 
+                : 'border-slate-700 opacity-50 text-slate-600 bg-slate-900 border-dashed'; 
+            
+            // WICHTIG: Hier stand vorher "border-2". Jetzt nur noch "border" für feine Linien.
             html += `
-                <div class="aspect-square rounded border ${borderClass} flex items-center justify-center text-xl cursor-help transition-all hover:scale-110 hover:border-blue-400 hover:z-10 relative group" title="${unlocked ? item.name : '???' }">
+                <div class="aspect-square rounded border ${borderClass} flex items-center justify-center text-xl cursor-help transition-all relative group" title="${unlocked ? item.name : 'Unbekannt' }">
                     ${unlocked ? item.icon : '?'}
                 </div>`;
         });
         html += `</div></div>`;
 
-        // --- SEKTION B: QUEST ITEMS (TROPHÄEN) ---
+        // --- B) LEGENDÄRE TROPHÄEN ---
         if (questItems.length > 0) {
             html += `<div class="mb-8"><h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">🏆 LEGENDÄRE TROPHÄEN</h3>`;
             html += `<div class="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">`;
             
             questItems.forEach(({id, item}) => {
                 const unlocked = this.state.archive.items.includes(id);
-                // Premium Style (Gold/Amber)
-                let borderClass = unlocked ? 'border-amber-500/50 text-amber-100 bg-amber-900/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]' : 'border-slate-800 opacity-20 text-slate-700 bg-slate-900';
+                
+                let borderClass = unlocked 
+                    ? 'border-amber-500/50 text-amber-100 bg-amber-900/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]' 
+                    : 'border-slate-700 opacity-50 text-slate-600 bg-slate-900 border-dashed';
 
+                // Auch hier: "border" statt "border-2"
                 html += `
-                    <div class="aspect-square rounded border ${borderClass} flex items-center justify-center text-xl cursor-help transition-all hover:scale-110 hover:border-amber-400 hover:z-10 relative group" title="${unlocked ? item.name : '???' }">
+                    <div class="aspect-square rounded border ${borderClass} flex items-center justify-center text-xl cursor-help transition-all relative group" title="${unlocked ? item.name : '???' }">
                         ${unlocked ? item.icon : '?'}
                     </div>`;
             });
             html += `</div></div>`;
         }
 
-        // --- SEKTION C: ERFOLGE (Wie bisher) ---
-        html += `<h3 class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">🏆 ERFOLGE</h3>`;
+        // --- C) ERFOLGE ---
+        html += `<h3 class="text-xs font-bold text-purple-500 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2">🏅 ERRUNGENSCHAFTEN</h3>`;
         html += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">`;
 
         if(DB.achievements) {
             DB.achievements.forEach(ach => {
                 const unlocked = this.state.archive.achievements.includes(ach.id);
-                
-                // Schwierigkeit auslesen
                 let diff = "none";
                 if (this.state.archive.achievementDiffs) {
                     diff = this.state.archive.achievementDiffs[ach.id] || "easy";
                 }
 
-                // Styling
-                let borderClass = "border-slate-800 opacity-40";
-                let bgClass = "bg-slate-900/30";
+                // Standard Style (GESPERRT)
+                let borderClass = "border-slate-700 opacity-50 border-dashed"; 
+                let bgClass = "bg-slate-900/40";
                 let badge = "";
                 let icon = "🔒";
                 let title = "???";
-                let desc = "noch nicht freigeschaltet...";
+                let desc = "Noch nicht freigeschaltet...";
 
                 if (unlocked) {
                     icon = ach.icon;
                     title = ach.title;
                     desc = ach.desc;
+                    // Reset opacity & border style
+                    borderClass = "opacity-100 border-solid"; 
                     
                     if (diff === 'hard') {
-                        borderClass = "border-red-500/50 bg-red-900/10 shadow-[0_0_10px_rgba(239,68,68,0.1)]"; 
-                        badge = '<span class="text-[9px] text-red-400 font-bold border border-red-500/30 px-1.5 rounded ml-auto bg-red-950/30">MONTAG</span>';
+                        borderClass += " border-red-500/50 bg-red-900/10 shadow-[0_0_10px_rgba(239,68,68,0.1)]"; 
+                        badge = '<span class="text-[9px] text-red-400 font-bold border border-red-500/30 px-1.5 rounded ml-auto bg-red-950/30">SCHWER</span>';
                     } else if (diff === 'normal') {
-                        borderClass = "border-blue-500/50 bg-blue-900/10"; 
-                        badge = '<span class="text-[9px] text-blue-400 font-bold border border-blue-500/30 px-1.5 rounded ml-auto bg-blue-950/30">MITTWOCH</span>';
+                        borderClass += " border-blue-500/50 bg-blue-900/10"; 
+                        badge = '<span class="text-[9px] text-blue-400 font-bold border border-blue-500/30 px-1.5 rounded ml-auto bg-blue-950/30">MITTEL</span>';
                     } else {
-                        borderClass = "border-green-500/50 bg-green-900/10"; 
-                        badge = '<span class="text-[9px] text-green-400 font-bold border border-green-500/30 px-1.5 rounded ml-auto bg-green-950/30">FREITAG</span>';
+                        borderClass += " border-green-500/50 bg-green-900/10"; 
+                        badge = '<span class="text-[9px] text-green-400 font-bold border border-green-500/30 px-1.5 rounded ml-auto bg-green-950/30">EINFACH</span>';
                     }
                 }
 
@@ -194,7 +204,7 @@ const engine = {
             });
         }
         html += `</div>`;
-        content.innerHTML += html;
+        content.innerHTML = html;
     },
 
     closeArchive: function() {
@@ -870,7 +880,7 @@ trigger: function(type) {
         const term = document.getElementById('terminal-content');
         
         // WICHTIG: Container-Styling für Zentrierung
-        term.className = "flex-1 flex flex-col justify-center items-center p-4 w-full h-full";
+        term.className = "flex-1 flex flex-col justify-center items-center py-3 w-full h-full";
 
         // ENTSCHEIDUNG: Neu (Nodes) oder Alt (Opts)?
         if (ev.nodes && ev.startNode) {
@@ -938,13 +948,13 @@ trigger: function(type) {
             case 'sidequest': // SIDE-QUEST (Lila)
                 color = 'text-purple-400';
                 borderColor = 'border-purple-500';
-                icon = '🔮'; // Magische Kugel / Quest Icon
+                icon = '🎲'; // Magische Kugel / Quest Icon
                 break;
             
             case 'server': // SERVERRAUM (Grün)
                 color = 'text-emerald-400';
                 borderColor = 'border-emerald-500';
-                icon = '💻'; // Laptop / Terminal
+                icon = '💾'; // Laptop / Terminal
                 break;
 
             case 'coffee': // KAFFEE (Amber, aber spezielles Icon)
@@ -953,9 +963,9 @@ trigger: function(type) {
         }
 
         let html = `
-            <div class="w-full max-w-2xl text-left fade-in bg-slate-900 border border-slate-700 p-6 rounded-xl shadow-2xl">
+            <div class="w-full max-w-2xl text-left fade-in bg-slate-900 border border-slate-700 p-4 md:p-6 rounded-xl shadow-2xl mx-auto">
                 
-                <div class="flex items-center gap-3 mb-6 border-b border-slate-600 pb-4">
+                <div class="flex items-center gap-3 mb-4 md:mb-6 border-b border-slate-600 pb-3 md:pb-4">
                     <span class="text-3xl">${icon}</span>
                     <div class="flex flex-col">
                         <span class="${color} font-black uppercase tracking-widest text-sm">${type}</span>
@@ -1696,7 +1706,7 @@ checkEndConditions: function() {
         let fillCount = Math.max(0, 10 - normalItems.length);
         for(let i=0; i<fillCount; i++) {
             let slot = document.createElement('div');
-            slot.className = 'inv-slot empty opacity-10';
+            slot.className = 'inv-slot empty';
             gridNormal.appendChild(slot);
         }
         sectionNormal.appendChild(gridNormal);
