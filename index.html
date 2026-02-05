@@ -71,18 +71,26 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(10px); } }
 
-        /* EMAIL POPUP */
-        .email-overlay {
-            position: absolute; top: 10%; left: 5%; right: 5%; 
-            background: #1e293b; border: 2px solid #fbbf24; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.9); z-index: 60;
-            border-radius: 8px; padding: 15px;
-            display: none; flex-direction: column;
-            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .email-timer-bg { width: 100%; height: 4px; background: #334155; margin-bottom: 10px; }
-        .email-timer-fill { height: 100%; background: #ef4444; width: 100%; transition: width 1s linear; }
-        @keyframes popIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+    /* E-Mail Animation START
+	
+    @keyframes slide-up {
+        0% { transform: translateY(20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+    .animate-slide-up {
+        animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+	
+	/* Sanfte E-Mail Animation */
+	@keyframes pop-in {
+    0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+	}
+	.animate-pop-in {
+ 	   animation: pop-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+	
+    /* E-Mail Animation END
 
         /* PHONE & CHAT */
         #smartphone {
@@ -178,7 +186,7 @@
                 
                 <div class="flex gap-4 items-start">
                     <div class="text-2xl bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">👁️</div>
-                    <div><strong class="text-red-500 block mb-1">CHEF-RADAR</strong>Bei 100% fliegst du raus. (Tipp: Arbeit senkt Radar).</div>
+                    <div><strong class="text-red-500 block mb-1">CHEF-RADAR</strong>Bei 100% gibt es eine Abmahnung. Dann Rauswurf.</div>
                 </div>
                 
                 <div class="flex gap-4 items-start">
@@ -218,25 +226,10 @@
     <div class="flex-1 flex flex-col lg:flex-row gap-4 min-h-0 mb-4 overflow-hidden">
 
         <div id="terminal" class="flex-[2] neon-box p-4 md:p-6 overflow-y-auto flex flex-col relative min-h-[300px] shrink-0">
-            <div class="absolute top-2 right-4 text-[10px] text-slate-600">TicketSystem v1.0.2</div>
+            <div class="absolute top-2 right-4 text-[10px] text-slate-600">TicketSystem v1.1.0</div>
             
             <div id="boss-timer-container">
                 <div id="boss-timer-bar"></div>
-            </div>
-
-            <div id="email-overlay" class="email-overlay">
-                <div class="email-header flex justify-between">
-                    <span>📧 NEUE E-MAIL</span>
-                    <span id="email-sender">Absender</span>
-                </div>
-                <div class="email-timer-bg"><div id="email-timer-bar" class="email-timer-fill"></div></div>
-                <div id="email-subject" class="email-body mb-4">Betreff...</div>
-                
-                <div id="email-actions" class="grid grid-cols-1 gap-2 mt-auto"></div>
-                
-                <button onclick="engine.resolveEmail(null, true)" class="bg-slate-800 border border-slate-600 hover:bg-slate-700 text-slate-400 text-[10px] py-2 rounded mt-2 w-full">
-                    IGNORIEREN
-                </button>
             </div>
 
             <div id="terminal-content" class="flex-1 flex flex-col justify-center items-center text-center opacity-40">
@@ -406,6 +399,58 @@
                 </div>
         </div>
     </div>
+	
+<div id="email-modal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-600 rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col font-sans text-slate-200 overflow-hidden relative animate-pop-in">
+        
+        <div class="px-5 py-4 border-b border-slate-700 bg-slate-800/50">
+            <h2 id="email-subject" class="text-lg font-bold text-white mb-3 leading-tight tracking-wide">Betreff Platzhalter</h2>
+            
+            <div class="flex items-start gap-4">
+                <div id="email-avatar" class="w-10 h-10 rounded bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-lg shrink-0 border border-blue-500/50">
+                    A
+                </div>
+                
+                <div class="flex flex-col w-full min-w-0 justify-center">
+                    <div class="flex items-baseline justify-between mb-1">
+                        <span id="email-sender" class="font-bold text-blue-400 text-sm truncate">Absender Name</span>
+                        <span id="email-timestamp" class="text-xs font-mono text-slate-400">00:00</span>
+                    </div>
+                    
+                    <div class="flex flex-col text-xs text-slate-400 leading-tight">
+                        <div class="flex gap-2">
+                            <span class="w-6 text-slate-500 font-bold text-right">An:</span>
+                            <span class="text-slate-300">Mich (SysAdmin)</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="w-6 text-slate-500 font-bold text-right">CC:</span>
+                            <span id="email-cc" class="text-slate-500">Management; IT-Verteiler</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-5 bg-slate-950/50 text-sm leading-relaxed text-slate-300 min-h-[100px] max-h-[40vh] overflow-y-auto border-b border-slate-800 shadow-inner">
+            <p id="email-body">Laden...</p>
+        </div>
+
+        <div class="p-3 bg-slate-900 flex flex-col gap-2">
+            <div id="email-actions" class="grid gap-2">
+                </div>
+            
+            <button type="button" onclick="engine.resolveEmail(null, true)" class="w-full text-left px-3 py-2 bg-slate-800 hover:bg-red-950/30 border border-slate-700 hover:border-red-500/50 text-slate-400 hover:text-red-400 rounded transition-colors duration-75 flex items-center group font-medium text-xs">
+                <span class="mr-2 text-slate-600 group-hover:text-red-500 transition-colors duration-75 text-base">🗑️</span>
+                <span>E-Mail löschen & ignorieren</span>
+            </button>
+        </div>
+
+        <div class="w-full h-1 bg-slate-800">
+            <div id="email-timer-bar" class="h-full bg-amber-600 w-full shadow-[0_0_10px_rgba(217,119,6,0.5)]"></div>
+        </div>
+    </div>
+</div>
 
     <div id="difficulty-modal" class="fixed inset-0 bg-black/95 z-[1000] hidden items-center justify-center p-4">
         <div class="neon-box border-purple bg-slate-900 max-w-5xl w-full p-6 md:p-8 shadow-2xl text-center">

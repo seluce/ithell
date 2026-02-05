@@ -18,14 +18,16 @@ const engine = {
         // Stats & System
         achievements: [],
         achievedTitles: [],
-        emailTimer: null,
-        emailTimeout: null,
         coffeeConsumed: 0,
-        emailsIgnored: 0,
-        spamClicked: 0,
-        usedEmails: new Set(),
-        isEmailOpen: false,
+		spamClicked: 0,
+		emailsIgnored: 0,
 
+        // E-Mail System
+		emailTimer: null,
+        usedEmails: new Set(),
+		isEmailOpen: false,
+		emailPending: false,
+		
         // Story-Entscheidungen
         storyFlags: {},
 		
@@ -47,7 +49,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v1.0.2 geladen. Warte auf User...");
+        this.log("System v1.1.0 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -157,26 +159,28 @@ const engine = {
         if(DB.achievements) {
             DB.achievements.forEach(ach => {
                 const unlocked = this.state.archive.achievements.includes(ach.id);
+                
+                // Schwierigkeit auslesen
                 let diff = "none";
                 if (this.state.archive.achievementDiffs) {
                     diff = this.state.archive.achievementDiffs[ach.id] || "easy";
                 }
 
-                // Standard Style (GESPERRT)
-                let borderClass = "border-slate-700 opacity-50 border-dashed"; 
-                let bgClass = "bg-slate-900/40";
+                // VARIABLEN VORBEREITEN
+                let borderClass = "";
+                let bgClass = "";
                 let badge = "";
-                let icon = "🔒";
-                let title = "???";
-                let desc = "Noch nicht freigeschaltet...";
+                let icon = ach.icon;   // Wir zeigen IMMER das Icon
+                let title = ach.title; // Wir zeigen IMMER den Titel
+                let desc = "";         // Text ist dynamisch
 
                 if (unlocked) {
-                    icon = ach.icon;
-                    title = ach.title;
-                    desc = ach.desc;
-                    // Reset opacity & border style
+                    // --- ZUSTAND: FREIGESCHALTET ---
+                    desc = ach.desc; // Belohnungs-Text
                     borderClass = "opacity-100 border-solid"; 
-                    
+                    bgClass = "bg-slate-900/40";
+
+                    // Farb-Codierung nach Schwierigkeit
                     if (diff === 'hard') {
                         borderClass += " border-red-500/50 bg-red-900/10 shadow-[0_0_10px_rgba(239,68,68,0.1)]"; 
                         badge = '<span class="text-[9px] text-red-400 font-bold border border-red-500/30 px-1.5 rounded ml-auto bg-red-950/30">SCHWER</span>';
@@ -187,17 +191,36 @@ const engine = {
                         borderClass += " border-green-500/50 bg-green-900/10"; 
                         badge = '<span class="text-[9px] text-green-400 font-bold border border-green-500/30 px-1.5 rounded ml-auto bg-green-950/30">EINFACH</span>';
                     }
+
+                } else {
+                    // --- ZUSTAND: GESPERRT (HINT) ---
+                    // Hier nutzen wir den neuen Hint-Text aus der data.js
+                    desc = ach.hint ? ach.hint : "???";
+                    
+                    // Design: Grayscale (Schwarz-Weiß), gestrichelt, etwas transparenter
+                    borderClass = "border-slate-700 opacity-60 border-dashed grayscale"; 
+                    bgClass = "bg-slate-950/30";
+                    
+                    // Badge für "Gesperrt"
+                    badge = '<span class="text-[9px] text-slate-500 font-bold border border-slate-700 px-1.5 rounded ml-auto">LOCKED</span>';
                 }
 
+                // --- RENDERING ---
                 html += `
-                    <div class="flex gap-3 p-3 rounded border ${borderClass} ${bgClass} transition-all hover:bg-slate-800 group">
-                        <div class="text-2xl shrink-0 group-hover:scale-110 transition-transform">${icon}</div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <div class="font-bold text-xs truncate ${unlocked ? 'text-white' : 'text-slate-500'}">${title}</div>
+                    <div class="flex gap-3 p-3 rounded border ${borderClass} ${bgClass} transition-all hover:bg-slate-800 group relative overflow-hidden">
+                        
+                        <div class="text-2xl shrink-0 group-hover:scale-110 transition-transform flex items-center justify-center w-10 h-10 bg-slate-900 rounded-full border border-slate-700/50">
+                            ${icon}
+                        </div>
+                        
+                        <div class="flex-1 min-w-0 flex flex-col justify-center">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <div class="font-bold text-xs truncate ${unlocked ? 'text-white' : 'text-slate-400'}">${title}</div>
                                 ${badge}
                             </div>
-                            <div class="text-[10px] text-slate-400 leading-tight line-clamp-2">${desc}</div>
+                            <div class="text-[10px] ${unlocked ? 'text-slate-400' : 'text-slate-500 italic'} leading-tight line-clamp-2">
+                                ${desc}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -265,38 +288,54 @@ const engine = {
         }, 500);
     },
 
-// --- E-MAIL SYSTEM ---
+    // --- E-MAIL SYSTEM (Clean Light / Logik Fixes) ---
 
-    // Prüft basierend auf Wahrscheinlichkeit, ob eine zufällige E-Mail getriggert wird
     checkRandomEmail: function() {
-        if(this.state.isEmailOpen) return;
+        // 1. Grund-Checks (Offen? Unterwegs? Tutorial?)
+        if(this.state.isEmailOpen || this.state.emailPending) return; // <--- FIX: Auch prüfen ob Pending!
         if(typeof tutorial !== 'undefined' && tutorial.isActive) return;
 
-        // Wahrscheinlichkeit berechnen (Basis + Ticket-Last)
+        // 2. BLOCKADE-LOGIK (Events filtern)
+        const type = this.state.currentEventType; 
+        const allowedTypes = ['call', 'server', 'coffee', 'sidequest', 'story'];
+        
+        if (!type || !allowedTypes.includes(type)) return;
+        if (this.state.currentEventId && this.state.currentEventId.includes('boss')) return;
+        if (this.state.currentEventId && this.state.currentEventId.includes('lunch')) return;
+
+        // 3. SPAM-SCHUTZ (Letztes Event)
+        if (this.state.lastEmailEventId === this.state.currentEventId) return;
+
+        // 4. Wahrscheinlichkeit
         let baseChance = 0.2 * this.state.difficultyMult; 
         let chance = baseChance + (this.state.tickets * 0.05); 
         
         if(Math.random() < chance) {
-            setTimeout(() => { this.triggerEmail(); }, 1500);
+            this.state.lastEmailEventId = this.state.currentEventId;
+            
+            // FIX: Sofort blockieren!
+            this.state.emailPending = true; 
+            
+            setTimeout(() => { 
+                this.triggerEmail(); 
+                // Pending wird in triggerEmail (oder bei Fehler) wieder false gesetzt
+            }, 2000);
         }
     },
 
-    // Öffnet eine E-Mail (Zufall oder gezielt per ID)
+    // Öffnet das E-Mail Overlay (Dark Mode, Blue Hover, Bug-Safe)
     triggerEmail: function(forcedId = null) {
+        this.state.emailPending = false; 
+
         if(!DB.emails) return; 
         
         let email;
-
         if (forcedId) {
-            // Gezielte Auswahl für Antwort-Ketten
             email = DB.emails.find(e => e.id === forcedId);
         } else {
-            // Zufällige Auswahl aus dem Pool (filtert verknüpfte E-Mails aus)
             let availableEmails = DB.emails.filter(e => 
                 !this.state.usedEmails.has(e.subj) && !e.linked
             );
-            
-            // Pool zurücksetzen, wenn leer (außer verknüpfte Mails)
             if(availableEmails.length === 0) {
                 this.state.usedEmails.clear(); 
                 availableEmails = DB.emails.filter(e => !e.linked);
@@ -306,102 +345,157 @@ const engine = {
 
         if (!email) return;
 
-        // Als gelesen markieren
+        // 1. FREEZE & STATUS
         this.state.usedEmails.add(email.subj);
+        this.state.isEmailOpen = true; 
 
-        // UI Referenzen
-        const overlay = document.getElementById('email-overlay');
-        const timerBar = document.getElementById('email-timer-bar');
-        const actionContainer = document.getElementById('email-actions');
-        
-        // Inhalt setzen
+        // 2. UI REFERENZEN
+        const modal = document.getElementById('email-modal');
+        if (!modal) return;
+
+        // Animation Reset
+        const container = modal.firstElementChild; 
+        if(container) {
+            container.classList.remove('animate-pop-in');
+            void container.offsetWidth; 
+            container.classList.add('animate-pop-in');
+        }
+
+        // 3. DATEN SETZEN
         document.getElementById('email-sender').innerText = email.sender;
         document.getElementById('email-subject').innerText = email.subj;
         
-        if(document.getElementById('email-body')) {
-            document.getElementById('email-body').innerText = email.body || "";
-        } else {
-            // Fallback für alte HTML-Struktur
-            document.getElementById('email-subject').innerText += "\n\n" + (email.body || "");
-        }
+        // Uhrzeit
+        let h = Math.floor(this.state.time / 60);
+        let m = this.state.time % 60;
+        let timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        document.getElementById('email-timestamp').innerText = timeStr;
+
+        // Avatar
+        let initial = email.sender.charAt(0).toUpperCase();
+        document.getElementById('email-avatar').innerText = initial;
+
+        // --- NEU: Dynamisches CC (Humor) ---
+        let ccText = "IT-Verteiler"; // Standard
+        const s = email.sender.toLowerCase();
         
-        // Buttons generieren
+        if(s.includes('chef') || s.includes('management')) ccText = "Rechtsabteilung; HR";
+        else if(s.includes('kevin')) ccText = "Mama; World_of_Warcraft_Gilde";
+        else if(s.includes('marketing') || s.includes('chantal')) ccText = "Alle Mitarbeiter (ALL); Presse";
+        else if(s.includes('buchhaltung') || s.includes('elster')) ccText = "Finanzamt; Controlling";
+        else if(s.includes('hr') || s.includes('personal')) ccText = "Betriebsrat";
+        else if(s.includes('sicherheit') || s.includes('wachschutz')) ccText = "Polizei (Notruf)";
+        else if(s.includes('prinz')) ccText = ""; // Betrüger haben oft kein CC
+
+        // Element füllen (Falls ID vorhanden)
+        const ccEl = document.getElementById('email-cc');
+        if(ccEl) {
+            ccEl.innerText = ccText;
+            // Wenn leer, ganze Zeile ausblenden? Optional. Hier lassen wir es einfach leer.
+            ccEl.parentElement.style.display = ccText ? 'flex' : 'none';
+        }
+        // -----------------------------------
+
+        // Body
+        const bodyEl = document.getElementById('email-body');
+        if(bodyEl) bodyEl.innerHTML = (email.body || "").replace(/\n/g, "<br>");
+
+        // 4. BUTTONS
+        const actionContainer = document.getElementById('email-actions');
         actionContainer.innerHTML = '';
+        
         if(email.opts) {
             email.opts.forEach(opt => {
                 const btn = document.createElement('button');
-                btn.className = "bg-blue-600 hover:bg-blue-500 text-white text-xs py-2 px-3 rounded text-left transition-colors";
-                btn.innerText = "➤ " + opt.btn;
-                btn.onclick = () => this.resolveEmail(opt, false);
+                btn.type = "button"; 
+                btn.className = "w-full text-left px-3 py-2 bg-slate-800 hover:bg-blue-900/30 border border-slate-700 hover:border-blue-500/50 text-slate-300 hover:text-blue-300 rounded transition-colors flex items-center group font-medium text-xs";
+                
+                btn.innerHTML = `
+                    <span class="mr-2 text-slate-500 group-hover:text-blue-400 transition-colors duration-75 text-base">➥</span>
+                    <span>${opt.btn}</span>
+                `;
+                
+                btn.onclick = (e) => {
+                    e.stopPropagation(); 
+                    e.preventDefault();  
+                    this.resolveEmail(opt, false);
+                };
                 actionContainer.appendChild(btn);
             });
         }
         
-        overlay.style.display = 'flex';
-        this.state.isEmailOpen = true;
+        // 5. ANZEIGEN
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
         
-        // Timer initialisieren (15 Sekunden)
+        // 6. TIMER
+        const timerBar = document.getElementById('email-timer-bar');
         const DURATION = 15000; 
-        const UPDATE_RATE = 50; 
-        let timePassed = 0;
+        
+        if(timerBar) {
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
+            
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    timerBar.style.transition = `width ${DURATION}ms linear`;
+                    timerBar.style.width = '0%';
+                });
+            });
+        }
 
-        if(timerBar) timerBar.style.width = '100%';
-        if(this.state.emailInterval) clearInterval(this.state.emailInterval);
-
-        this.state.emailInterval = setInterval(() => {
-            timePassed += UPDATE_RATE;
-            let percentLeft = 100 - ((timePassed / DURATION) * 100);
-            if(timerBar) timerBar.style.width = percentLeft + '%';
-
-            if(timePassed >= DURATION) {
-                this.resolveEmail(null, true); 
-            }
-        }, UPDATE_RATE);
+        if(this.state.emailTimer) clearTimeout(this.state.emailTimer);
+        this.state.emailTimer = setTimeout(() => {
+            this.resolveEmail(null, true); 
+        }, DURATION);
     },
 
-    // Verarbeitet die Entscheidung oder den Timeout
     resolveEmail: function(opt, timeout = false) {
-        // Timer und Overlay zurücksetzen
-        clearInterval(this.state.emailInterval);
-        document.getElementById('email-overlay').style.display = 'none';
-        this.state.isEmailOpen = false;
+        if(this.state.emailTimer) clearTimeout(this.state.emailTimer);
         
-        // Fall A: Zeit abgelaufen (Timeout)
+        const modal = document.getElementById('email-modal');
+        if(modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        this.state.isEmailOpen = false;
+
+        // Game Logik
+        let message = "";
+        let color = "";
+
         if(timeout) {
             let penalty = Math.ceil(10 * this.state.difficultyMult);
-            this.log(`E-MAIL IGNORIERT! Radar +${penalty}`, "text-red-500 font-bold");
             this.state.cr += penalty;
             this.state.emailsIgnored++;
-        } 
-        // Fall B: Benutzerentscheidung
-        else if(opt) {
-            this.log("E-Mail: " + opt.txt, "text-blue-400");
+            message = `E-MAIL IGNORIERT! Radar +${penalty}%`;
+            color = "text-red-500 font-bold";
+        } else if(opt) {
+            message = `Gesendet: "${opt.btn}"`;
+            color = "text-blue-400";
             
-            // Schwierigkeitsgrad auf Stats anwenden
             let mult = this.state.difficultyMult;
-            
-            let addF = opt.f; 
-            let addA = opt.a > 0 ? Math.ceil(opt.a * mult) : opt.a; 
-            let addC = opt.c > 0 ? Math.ceil(opt.c * mult) : opt.c; 
+            if(opt.f) this.state.fl += opt.f;
+            if(opt.a) this.state.al += Math.ceil(opt.a * mult);
+            if(opt.c) this.state.cr += Math.ceil(opt.c * mult);
 
-            this.state.fl += (addF || 0);
-            this.state.al += (addA || 0);
-            this.state.cr += (addC || 0);
+            if(opt.txt) {
+                setTimeout(() => this.log(`Re: ${opt.txt}`, "text-slate-400 italic"), 500);
+            }
 
-            // Prüfen auf Folgemails (Chaining)
             if (opt.nextEmail) {
+                // Bei Ketten-Mails erlauben wir sofort die nächste,
+                // auch wenn wir "1 Mail pro Event" haben.
+                // Dafür setzen wir lastEmailEventId kurz zurück oder nutzen forcedId logic.
                 setTimeout(() => {
                     this.triggerEmail(opt.nextEmail);
-                }, 2000);
+                }, 2500);
             }
         }
         
+        this.log(message, color);
         this.updateUI();
-        
-        // Prüfung auf Spielende durch Statusänderung
-        if (this.state.pendingEnd) {
-            this.finishGame();
-        }
+        if (this.state.pendingEnd) this.finishGame();
     },
 
     // --- CORE ---
@@ -831,48 +925,14 @@ trigger: function(type) {
         }
     },
 
-// --- TERMINAL RENDERING (UPDATED) ---
-
-    renderTerminal: function(ev, type) {
-        this.state.activeEvent = true;
-        if(ev.id) this.state.usedIDs.add(ev.id); 
-        this.disableButtons(true);
-        const term = document.getElementById('terminal-content');
-
-        // ENTSCHEIDUNG: Ist es ein neuer Story-Call (Nodes) oder ein alter (Opts)?
-        if (ev.nodes && ev.startNode) {
-            // NEU: Story-Chain starten
-            this.state.currentChainEvent = ev;
-            this.state.currentChainType = type;
-            this.renderChainNode(ev.startNode);
-        } else {
-            // ALT: Standard Event rendern
-            this.renderEventHTML(ev, type, term);
-        }
-    },
-
-// --- TERMINAL RENDERING & CALL SYSTEM (FIXED) ---
-
-    renderTerminal: function(ev, type) {
-        this.state.activeEvent = true;
-        if(ev.id) this.state.usedIDs.add(ev.id); 
-        this.disableButtons(true);
-
-        // ENTSCHEIDUNG: Ist es ein neuer Story-Call (Nodes)?
-        if (ev.nodes && ev.startNode) {
-            this.state.currentChainEvent = ev;
-            this.state.currentChainType = type;
-            this.renderChainNode(ev.startNode);
-        } else {
-            // ALT: Standard Event
-            const term = document.getElementById('terminal-content');
-            this.renderEventHTML(ev, type, term);
-        }
-    },
-
 // --- TERMINAL & CALL SYSTEM (FINAL FIX) ---
 
     renderTerminal: function(ev, type) {
+		// --- Event-Status für E-Mail-System speichern ---
+        this.state.currentEventId = ev.id;     // Damit wir wissen: "Für dieses Event schon gemailt?"
+        this.state.currentEventType = type;    // Damit wir wissen: "Ist das ein Bossfight?"
+        // -----------------------------------------------------
+		
         this.state.activeEvent = true;
         if(ev.id) this.state.usedIDs.add(ev.id); 
         this.disableButtons(true);
@@ -1321,7 +1381,9 @@ handlePhoneChoice: function(text, nextId) {
             </div>
         </div>`;
         
+        setTimeout(() => {
         content.scrollTo({ top: content.scrollHeight, behavior: 'smooth' });
+        }, 50);
 
         let ev = this.state.currentPhoneEvent;
         let validNext = (ev.results && ev.results[nextId]) || (ev.nodes && ev.nodes[nextId]);
@@ -1373,7 +1435,9 @@ handlePhoneChoice: function(text, nextId) {
                      <div class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                 </div>
             </div>`;
+            setTimeout(() => {
             content.scrollTo({ top: content.scrollHeight, behavior: 'smooth' });
+            }, 50);
 
             // Kurze Wartezeit vor dem Ergebnis (1.5 Sekunden)
             setTimeout(() => {
@@ -1387,7 +1451,9 @@ handlePhoneChoice: function(text, nextId) {
                         ${res.txt}
                     </div>
                 </div>`;
+                setTimeout(() => {
                 content.scrollTo({ top: content.scrollHeight, behavior: 'smooth' });
+                }, 50);
 
                 setTimeout(() => {
                     this.closePhone();
@@ -1419,7 +1485,9 @@ handlePhoneChoice: function(text, nextId) {
                      <div class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                 </div>
             </div>`;
+            setTimeout(() => {
             content.scrollTo({ top: content.scrollHeight, behavior: 'smooth' });
+            }, 50);
 
             // ZUFALLS-ZEIT: Zwischen 1.5 und 2.5 Sekunden
             // Das wirkt organisch, mal schneller, mal langsamer.
