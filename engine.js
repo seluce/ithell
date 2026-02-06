@@ -49,7 +49,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v1.1.1 geladen. Warte auf User...");
+        this.log("System v1.1.2 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -632,8 +632,7 @@ checkAchievements: function() {
 
         // --- ITEM SETS  ---
         
-        // MACGYVER (Fix: Items angepasst, die es wirklich gibt)
-        // Prüfe: Tape, Schraubendreher, Kabel, Handbuch
+        // MACGYVER (Prüfe: Tape, Schraubendreher, Kabel, Handbuch)
         const tools = ['tape', 'screw', 'kabel', 'manual'];
         const hasAllTools = tools.every(toolId => this.state.inventory.find(i => i.id === toolId));
         if(hasAllTools && !this.hasAch('ach_macgyver')) {

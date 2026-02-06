@@ -1,3 +1,8 @@
+\[1.1.2 - 2026-02-05
+* Einige E-Mails hatten keine ID, wo durch sie häufiger als einmalig kommen konnten.
+* Einige neue Folgeevents für verschiedene Bereiche
+* Duplikate wurden bereinigt
+
 \[1.1.1] - 2026-02-05
 * Ein Event war in der falschen Kategorie zugewiesen, was behoben wurde
 * Einige neue Folgeevents für Serverraum und Sidequests (Phone)
