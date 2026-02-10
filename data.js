@@ -2423,15 +2423,37 @@ const DB = {
             ]
         },
         {
-            id: "call_sekretary",
-            title: "Die Sekretärin (Wütend)",
-            text: "Der Drucker streikt schon wieder! Er macht Geräusche wie eine Kaffeemühle! Ich habe seit heute morgen keinen Kaffee und jetzt das! Ich raste gleich aus!",
-            opts: [
-                { t: "Donut anbieten", req: "donut", m: 10, f: 10, a: -20, c: 5, r: "Der Donut hat sie beruhigt. Sie isst und vergisst den Drucker. Problem (sozial) gelöst." },
-                { t: "Mit Schraubendreher öffnen", req: "screw", m: 25, f: -10, a: 0, c: -5, r: "Du hast eine Büroklammer aus dem Walzwerk geholt. Profi-Arbeit." },
-                { t: "Technischen Vortrag halten", m: 30, f: -5, a: 30, c: 0, r: "Sie hat dich angeschrien, weil sie Hunger hat. Du bist geflohen." }
-            ]
-        },
+        id: "call_sekretary_1",
+        title: "Die Sekretärin (Wütend)",
+        text: "Gabi vom Empfang brüllt ins Telefon: 'Der Drucker macht Geräusche wie eine sterbende Kaffeemühle! Ich habe seit heute Morgen keinen Kaffee und jetzt das! Tu was, sonst fliegt das Ding aus dem Fenster!'",
+        opts: [
+            { t: "Donut anbieten", req: "donut", r: "Du opferst deinen Notfall-Donut. Gabi beißt rein, ihr Blutzucker steigt, die Wut sinkt. Der Drucker ist immer noch kaputt, aber sie ignoriert es jetzt.", m: 10, f: 10, a: -20, c: 5 },
+            { t: "Aufschrauben", req: "screw", next: "call_sekretary_cable", r: "Du öffnest die Wartungsklappe. Eine Büroklammer und drei Gummibärchen blockieren die Walze. Du holst sie raus. 'So, geht wieder!' ... Denkste.", m: 15, f: -5, a: 0, c: 0 },
+            { t: "Vortrag halten", next: "call_sekretary_rage", r: "Du erklärst ihr den Unterschied zwischen Lasertrommel und Fixiereinheit. Ihre Augenbraue zuckt gefährlich.", m: 10, f: -5, a: 10, c: 0 }
+        ]
+    },
+    {
+        id: "call_sekretary_2a",
+        title: "Drucker: Fehler 404",
+        reqStory: "call_sekretary_cable",
+        text: "Die Mechanik läuft, aber das Display blinkt rot: 'OFFLINE'. Du schaust hinter das Gerät. Die LAN-Buchse ist leer. Daneben liegt ein Zettel von Chantal: 'Hab das Kabel für meinen Insta-Ringlicht-Strom gebraucht, Bussi!'",
+        opts: [
+            { t: "Neues Kabel legen", req: "cable", r: "Zack. Kabel rein. Grüne LED. Der Drucker spuckt sofort 50 Seiten 'Wichtige Akten' aus. Gabi schaut dich an wie einen Halbgott.", m: 2, f: -5, a: -10, c: -5 },
+            { t: "Chantal suchen", r: "Du rennst durchs Haus, findest Chantal, streitest dich um das Kabel, kommst zurück. Gabi hat in der Zwischenzeit den Stecker gezogen. 'Jetzt ist er aus. Auch gut.'", m: 30, f: -10, a: 20, c: 10 },
+            { t: "WLAN-Antenne basteln", req: "tape", r: "Du versuchst, aus einer Büroklammer und Tape eine Antenne zu bauen. Gabi fragt, ob du noch ganz dicht bist. Es funktioniert natürlich nicht.", m: 20, f: 0, a: 15, c: 5 }
+        ]
+    },
+    {
+        id: "call_sekretary_2b",
+        title: "Gabi sieht rot (und schwarz)",
+        reqStory: "call_sekretary_rage",
+        text: "Gabi hat genug von deinem Vortrag. 'Ich zeig dir mal, was kaputt ist!' Sie reißt die Toner-Kartusche raus und schüttelt sie wild. Eine schwarze Staubwolke explodiert im Raum. Du siehst aus wie ein Schornsteinfeger.",
+        opts: [
+            { t: "Wegrennen", r: "Du fliehst hustend. Gabi wirft dir den leeren Toner hinterher. Du hinterlässt schwarze Fußabdrücke im Flur.", m: 5, f: 0, a: 20, c: 10 },
+            { t: "Putzen helfen", r: "Du versuchst, den Toner wegzuwischen. Er schmiert nur noch mehr. Nach einer Stunde sehen ihr beide aus wie Bergarbeiter. Aber das schweißt zusammen.", m: 60, f: -20, a: -5, c: 0 },
+            { t: "Erklären, dass Toner giftig ist", r: "Gabi fängt an zu weinen. Dann zu schreien. Der Sicherheitsdienst begleitet dich raus.", m: 10, f: 0, a: 50, c: 20 }
+        ]
+    },
         {
             id: "call_egon",
             title: "Hausmeister Egon",
@@ -3825,28 +3847,36 @@ const DB = {
             ]
         },
         {
-            id: "srv_rat",
-            title: "Das seltsame Geräusch",
-            text: "Aus Rack 4 kommt ein kratzendes Geräusch. Es klingt nicht wie ein Lüfter. Eher wie... scharfe Zähne auf teurem Glasfaserkabel.",
-            opts: [
-                { 
-                    t: "Mutig die Tür aufreißen und nachsehen", 
-                    m: 30, f: -10, a: 20, c: 0, 
-                    r: "Es war eine riesige Ratte! Sie springt dich fauchend an. Du fliehst panisch aus dem Raum, hast aber immerhin das angeknabberte Kabel vorher noch isoliert." 
-                },
-                { 
-                    t: "Einfach kräftig gegen das Blech treten", 
-                    m: 5, f: 5, a: -5, c: 5, 
-                    r: "DONG! Das Geräusch hört sofort auf. Das Tier ist entweder tot oder beleidigt abgezogen. Problem 'gelöst'." 
-                },
-                { 
-                    t: "Vorsichtig hinter den Schrank leuchten", 
-                    loot: "energy", 
-                    m: 10, f: 0, a: 0, c: 0, 
-                    r: "Die Ratte ist weg, aber beim Wühlen im Kabel-Salat findest du eine noch volle Dose Energy Drink, die du mal vor Monaten versteckt hattest. Ein Gewinn auf ganzer Linie!" 
-                }
-            ]
-        },
+        id: "srv_rat_1",
+        title: "Das seltsame Geräusch",
+        text: "Aus Rack 4 kommt ein kratzendes Geräusch. Es klingt nicht wie ein Lüfter. Eher wie... scharfe Zähne auf teurem Glasfaserkabel. Etwas Lebendiges nistet sich in der Firewall ein.",
+        opts: [
+            { t: "Dagegen treten", next: "srv_rat_damage", r: "BAM! Du trittst gegen den Serverschrank. Es quiekt panisch, dann hörst du ein lautes 'ZAPP' und Stille. Das Geräusch ist weg. Das Internet aber auch.", m: 5, f: 0, a: 10, c: 5 },
+            { t: "Donut als Köder", req: "donut", next: "srv_rat_tamed", r: "Du legst ein Stück alten Donut vor das Rack. Ein Augenpaar leuchtet im Dunkeln auf. Schnuppergeräusche.", m: 10, f: 5, a: -10, c: 0 },
+            { t: "Kammerjäger rufen", r: "Der Kammerjäger kommt in 3 Wochen. Bis dahin hat die Ratte das Rechenzentrum in ein Nest verwandelt.", m: 0, f: 10, a: 0, c: 10 }
+        ]
+    },
+    {
+        id: "srv_rat_2a",
+        title: "Kollateralschaden",
+        reqStory: "srv_rat_damage",
+        text: "Du öffnest die Tür. Die Ratte ist geflohen, aber sie hat Rache genommen: Der Main-Uplink zum Backbone ist komplett durchgenagt. Funken sprühen. Das ganze Netzwerk ist tot.",
+        opts: [
+            { t: "Kabel tauschen", req: "cable", r: "Du ziehst den verschmorten Stummel raus und klickst dein Ersatzkabel rein. Link-LED wird grün. Sauberer Job.", m: 5, f: -5, a: -5, c: -10 },
+            { t: "Flicken mit Tape", req: "tape", r: "Du verdrillst die Kupferadern und wickelst Tape drum. Es gibt Paketverlust (30%), aber es läuft. Hoffentlich guckt keiner rein.", m: 10, f: 0, a: 5, c: 5 },
+            { t: "WLAN-Bridge bauen", r: "Du versuchst, das Rechenzentrum über dein Handy-Hotspot zu routen. Der Datentarif ist nach 3 Sekunden leer.", m: 20, f: 5, a: 20, c: 15 }
+        ]
+    },
+    {
+        id: "srv_rat_2b",
+        title: "Ein neuer Freund",
+        reqStory: "srv_rat_tamed",
+        text: "Eine fette Kanalratte kriecht heraus und frisst den Donut. Sie sieht dich dankbar an und klettert auf deine Schulter. Sie scheint IT-Affinität zu haben.",
+        opts: [
+            { t: "Als 'Junior Admin' behalten", r: "Du nennst sie 'Splinter'. Sie wohnt jetzt im warmen Server-Rack und hält Ungeziefer fern.", m: 5, f: 10, a: -5, c: 0 },
+            { t: "Hausmeister rufen", r: "Egon kommt mit einem großen Sack. Das Ende der Geschichte willst du nicht wissen.", m: 10, f: 0, a: 0, c: 0 }
+        ]
+    },
         {
             id: "srv_cold",
             title: "Die Kälte-Falle",
@@ -3857,7 +3887,7 @@ const DB = {
                 { t: "An den Servern wärmen", m: 90, f: 20, a: 10, c: 0, r: "Du hast dich hinter die Abluft der CPU gekuschelt und geschlafen, bis jemand kam. Gemütlich." }
             ]
         },
-{
+        {
             id: "srv_red_1",
             title: "Die rote Flüssigkeit",
             text: "Unter Rack 7 bildet sich eine Pfütze. Sie ist tiefrot und klebrig. Es riecht süßlich. Ist das... Blut? Hydrauliköl? Oder Sirup? Über dir verläuft eigentlich keine Leitung.",

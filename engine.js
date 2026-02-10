@@ -49,7 +49,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v1.3.0 geladen. Warte auf User...");
+        this.log("System v1.3.1 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -2076,9 +2076,10 @@ closeInventory: function() {
             }
 
             // HTML zusammenbauen
-            // WICHTIG: line-clamp-3 und truncate wurden entfernt!
             card.innerHTML = `
-                <div class="shrink-0 bg-slate-900 w-16 h-16 flex items-center justify-center rounded-full border border-slate-600 overflow-hidden text-4xl shadow-inner">
+                <div class="shrink-0 bg-slate-900 w-16 h-16 flex items-center justify-center rounded-full border border-slate-600 overflow-hidden text-4xl shadow-inner
+                            relative z-0 transition-transform duration-300 ease-out origin-center cursor-help
+                            md:hover:scale-[2.25] md:hover:z-50 md:hover:shadow-2xl md:hover:border-white">
                     ${avatarHTML}
                 </div>
                 

@@ -1,3 +1,7 @@
+\[1.3.1 - 2026-02-10
+* Die Personen im Kollegium / Team haben ein Zoom im Desktop Modus
+* Zwei bestehende Events wurden aufgebohrt, um das Item Cable mehr ins Spiel zu bringen
+
 \[1.3.0 - 2026-02-09
 * Das Kollegium / Team hat nun Bilder für die jeweilige Person
 * Gegenstände haben nun ein richtiges Bild für das Inventar und Archiv
