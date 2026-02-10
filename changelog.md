@@ -1,3 +1,10 @@
+\[1.3.0 - 2026-02-09
+* Das Kollegium / Team hat nun Bilder für die jeweilige Person
+* Gegenstände haben nun ein richtiges Bild für das Inventar und Archiv
+* Questreihen der jeweiligen Character haben nun ein Buch als Icon
+* Fehlerkorrekturen für Phone-Events, wo sich die Statuswerte nicht aktualisiert haben
+* Einige Events hatten wifi_note als Anforderung, was nun entfernt wurde
+
 \[1.2.0 - 2026-02-07
 * Melden Funktion eingebaut, um Kontakt mit mir aufzunehmen (Fehler, Feedbacks, Allgemeines)
 * Kleine Korrekturen bei verschiedenen Events, um das Balancing anzupassen.

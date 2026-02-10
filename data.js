@@ -2,38 +2,38 @@ const DB = {
     // === ITEMS (Loot & Werkzeuge) ===
     items: {
         // VERBRAUCHSGEGENSTÄNDE (Einmalig)
-        "wifi_note": { icon: "🏷️", name: "WLAN-Zettel" },
-        "donut": { icon: "🍩", name: "Alter Donut" },
-        "energy": { icon: "⚡", name: "Energy Drink" },
-        "secret_list": { icon: "📁", name: "Schwarze Liste" },
-		"arg_list_1": { icon: "📋", name: "Argumente (Ich)" }, 
-        "arg_list_2": { icon: "📑", name: "Argumente (Kevin)" },
-        "bubble_wrap": { icon: "🫧", name: "Luftpolsterfolie" },
+        "wifi_note": { icon: "🏷️", name: "WLAN-Zettel", img: "assets/items/wifi_note.webp"  },
+        "donut": { icon: "🍩", name: "Alter Donut", img: "assets/items/donut.webp" },
+        "energy": { icon: "⚡", name: "Energy Drink", img: "assets/items/energy.webp" },
+        "secret_list": { icon: "📁", name: "Schwarze Liste", img: "assets/items/secret_list.webp"  },
+		"arg_list_1": { icon: "📋", name: "Argumente (Ich)", img: "assets/items/arg_list_1.webp" }, 
+        "arg_list_2": { icon: "📑", name: "Argumente (Kevin)", img: "assets/items/arg_list_2.webp" },
+        "bubble_wrap": { icon: "🫧", name: "Luftpolsterfolie", img: "assets/items/bubble_wrap.webp" },
         
         // WERKZEUGE (Dauerhaft -> keep: true)
-        "admin_pw": { icon: "🔑", name: "Root-Passwort", keep: true },
-        "kabel": { icon: "〰️", name: "LAN-Kabel", keep: true },
-        "tape": { icon: "🩹", name: "Panzertape", keep: true },
-        "screw": { icon: "🪛", name: "Schraubendreher", keep: true },
-        "stressball": { icon: "🔴", name: "Anti-Stressball", keep: true },
-        "manual": { icon: "📖", name: "Win95 Handbuch", keep: true },
-        "usb_stick": { icon: "💾", name: "Boot-Stick", keep: true },
-        "fire_ext": { icon: "🧯", name: "Feuerlöscher", keep: true },
-        "hammer": { icon: "🔨", name: "Hammer", keep: true },
-        "zip_ties": { icon: "➰", name: "Kabelbinder", keep: true },
-        "headphones": { icon: "🎧", name: "NC-Kopfhörer", keep: true },
-        "black_card": { icon: "💳", name: "Schwarze Amex", keep: true },
+        "admin_pw": { icon: "🔑", name: "Root-Passwort", keep: true, img: "assets/items/admin_pw.webp"  },
+        "cable": { icon: "〰️", name: "LAN-Kabel", keep: true, img: "assets/items/cable.webp" },
+        "tape": { icon: "🩹", name: "Panzertape", keep: true, img: "assets/items/tape.webp" },
+        "screw": { icon: "🪛", name: "Schraubendreher", keep: true, img: "assets/items/screw.webp" },
+        "stressball": { icon: "🔴", name: "Anti-Stressball", keep: true, img: "assets/items/stressball.webp" },
+        "manual": { icon: "📖", name: "Win95 Handbuch", keep: true, img: "assets/items/manual.webp"  },
+        "usb_stick": { icon: "💾", name: "Boot-Stick", keep: true, img: "assets/items/usb_stick.webp" },
+        "fire_ext": { icon: "🧯", name: "Feuerlöscher", keep: true, img: "assets/items/fire_ext.webp" },
+        "hammer": { icon: "🔨", name: "Hammer", keep: true, img: "assets/items/hammer.webp" },
+        "zip_ties": { icon: "➰", name: "Kabelbinder", keep: true, img: "assets/items/zip_ties.webp" },
+        "headphones": { icon: "🎧", name: "NC-Kopfhörer", keep: true, img: "assets/items/headphones.webp" },
+        "black_card": { icon: "💳", name: "Schwarze Amex", keep: true, img: "assets/items/black_card.webp" },
 
         // QUEST ITEMS
-        "kevin_ram": { icon: "📟", name: "Kevins Glücks-RAM", keep: true, quest: true },
-        "golden_stapler": { icon: "✨", name: "Goldener Tacker", keep: true, quest: true },
-        "mixtape": { icon: "🤘", name: "Death Metal Tape", keep: true, quest: true },
-        "cat_pic": { icon: "🐱", name: "Foto von Rüdiger", keep: true, quest: true },
-        "master_key": { icon: "🗝️", name: "Generalschlüssel", keep: true, quest: true },
-        "scotch_bottle": { icon: "🥃", name: "30-jähriger Scotch", keep: true, quest: true },
-        "contract": { icon: "📜", name: "Neuer Arbeitsvertrag", keep: true, quest: true },
-        "corp_chronicles": { icon: "📕", name: "Die Firmenchronik", keep: true, quest: true },
-        "prince_letter": { icon: "💌", name: "Brief vom Prinzen", keep: true, quest: true },
+        "kevin_ram": { icon: "📟", name: "Kevins Glücks-RAM", keep: true, quest: true, img: "assets/items/kevin_ram.webp" },
+        "golden_stapler": { icon: "✨", name: "Goldener Tacker", keep: true, quest: true, img: "assets/items/golden_stapler.webp" },
+        "mixtape": { icon: "🤘", name: "Death Metal Tape", keep: true, quest: true, img: "assets/items/mixtape.webp" },
+        "cat_pic": { icon: "🐱", name: "Foto von Rüdiger", keep: true, quest: true, img: "assets/items/cat_pic.webp" },
+        "master_key": { icon: "🗝️", name: "Generalschlüssel", keep: true, quest: true, img: "assets/items/master_key.webp" },
+        "scotch_bottle": { icon: "🥃", name: "30-jähriger Scotch", keep: true, quest: true, img: "assets/items/scotch_bottle.webp" },
+        "contract": { icon: "📜", name: "Neuer Arbeitsvertrag", keep: true, quest: true, img: "assets/items/contract.webp" },
+        "corp_chronicles": { icon: "📕", name: "Die Firmenchronik", keep: true, quest: true, img: "assets/items/corp_chronicles.webp" },
+        "prince_letter": { icon: "💌", name: "Brief vom Prinzen", keep: true, quest: true,img: "assets/items/prince_letter.webp" },
     },
 	
     // E-MAILS (Für das Popup System)
@@ -2050,7 +2050,7 @@ const DB = {
             opts: [
                 { 
                     t: "Netzwerkbrücke bauen", 
-                    req: "kabel",
+                    req: "cable",
                     m: 10, f: -10, a: 10, c: 0, 
                     r: "Du stöpselst wild Kabel um und leitest den Traffic auf den Test-Server. Die Löschung läuft ins Leere. Kevin starrt dich bewundernd an." 
                 },
@@ -2626,13 +2626,13 @@ const DB = {
             }
         },
         results: {
-            restart: { txt: "Sie startet neu. Du wartest am Telefon... wartest... wartest...", m: 45, f: -5, a: -5, c: 0 },
+            restart: { txt: "Sie startet neu. Du wartest am Telefon... wartest... wartest...", m: 45, f: -10, a: 15, c: 0 },
             pull_plug: { 
                 txt: "Oma zieht den Stecker. Plötzlich geht in DEINEM Büro das Licht aus.", 
                 m: 5, f: 0, a: 20, c: 0,
                 next: "grandma_darkness"
             },
-            res_bad_grandson: { txt: "Du fühlst dich schlecht. Oma weint.", m: 2, f: 0, a: 5, c: 0 }
+            res_bad_grandson: { txt: "Du fühlst dich schlecht. Oma weint.", m: 2, f: 5, a: 5, c: 10 }
         }
     },
     {
@@ -4237,7 +4237,7 @@ const DB = {
             opts: [
                 { 
                     t: "Sofort ein neues Kabel patchen", 
-                    req: "kabel", 
+                    req: "cable", 
                     m: 10, f: -5, a: 0, c: -5, 
                     r: "Zack, neues Kabel rein, Buchse provisorisch in den Putz gedrückt. Die Link-Lampe leuchtet grün. Du hast den Umsatz (und Markus' Blutdruck) gerettet." 
                 },
@@ -4712,7 +4712,7 @@ const DB = {
         {
             id: "cof_note",
             title: "Fundstück am Automaten",
-            text: "Jemand hat hier einen gelben Notizzettel liegen lassen. Darauf steht 'WLAN-PW: 1234Secure'. Das ist Schmidts Handschrift.",
+            text: "Jemand hat hier einen gelben Notizzettel liegen lassen. Darauf steht 'WLAN-PW: 1234abcd'. Das ist Schmidts Handschrift.",
             opts: [
                 { t: "Zettel einstecken", loot: "wifi_note", m: 5, f: 5, a: 0, c: 0, r: "Das könnte noch nützlich werden. Wissen ist Macht." },
                 { t: "Wegwerfen", m: 5, f: 0, a: 0, c: 0, r: "Sicherheitsrisiko beseitigt." }
@@ -5167,7 +5167,6 @@ const DB = {
                 },
                 { 
                     t: "Schild 'DEFEKT' drankleben & verschwinden", 
-                    req: "wifi_note", 
                     m: 2, f: 5, a: -5, c: 0, 
                     r: "Du klebst einen Zettel über das Display und machst dich schnell aus dem Staub. Die Kollegen seufzen enttäuscht und schlurfen zurück an die Arbeit. Du hast das Problem zwar nicht gelöst, aber erfolgreich delegiert." 
                 },
@@ -5190,7 +5189,6 @@ const DB = {
                 },
                 { 
                     t: "Warnschild basteln & aufstellen", 
-                    req: "wifi_note", 
                     m: 2, f: 5, a: 0, c: 0, 
                     r: "Du kritzelst 'VORSICHT: RUTSCHGEFAHR' auf einen Zettel, stellst ihn auf und gehst. Kurz darauf hörst du hinter dir ein lautes Schlittern, gefolgt von Fluchen. Tja, wer lesen kann, ist klar im Vorteil." 
                 },
@@ -5907,7 +5905,7 @@ const DB = {
             text: "Im Flur liegt ein LAN-Kabel quer über dem Weg. Der Chef kommt gleich hier lang.",
             opts: [
                 { t: "Festkleben", req: "tape", m: 5, f: -5, a: 0, c: -5, r: "Gefahr gebannt. Chef stolpert nicht. Du bist der unsichtbare Held." },
-                { t: "Kabel mitnehmen", loot: "kabel", m: 5, f: 5, a: 0, c: 10, r: "Du nimmst das Kabel einfach mit. Jetzt stolpert keiner, aber jemand hat kein Netz mehr. Inventar +1." },
+                { t: "Kabel mitnehmen", loot: "cable", m: 5, f: 5, a: 0, c: 10, r: "Du nimmst das Kabel einfach mit. Jetzt stolpert keiner, aber jemand hat kein Netz mehr. Inventar +1." },
                 { t: "Liegen lassen", m: 0, f: 10, a: 0, c: 0, r: "Mal sehen, was passiert..." }
             ]
         },
@@ -5954,7 +5952,6 @@ const DB = {
                 },
                 { 
                     t: "Haftungsausschluss: Warnzettel kleben", 
-                    req: "wifi_note", 
                     m: 5, f: 5, a: 0, c: 0, 
                     r: "Du kritzelst 'VORSICHT! EINSTURZGEFAHR!' auf ein Post-It, pappst es an den Holm und gehst zufrieden Mittagessen. Juristisch bist du damit aus dem Schneider." 
                 }
@@ -5984,7 +5981,7 @@ const DB = {
                 },
                 { 
                     t: "Mutig in den Kabelsalat greifen", 
-                    loot: "kabel", 
+                    loot: "cable", 
                     m: 10, f: 5, a: 0, c: 0, 
                     r: "Du kämpfst mit dem Knoten und gewinnst! Ein langes, graues LAN-Kabel gehört jetzt dir. Inventar +1." 
                 },
@@ -7814,15 +7811,15 @@ const DB = {
         results: {
             "ignore": { 
                 txt: "Du ignorierst den Chat. Chantal schreibt später: 'Langweiler'. Aber du hast gearbeitet.", 
-                m: 2, f: -5, a: 5, c: -5
+                m: 2, fl: -5, al: 5, cr: -5
             },
             "warn": { 
                 txt: "Kevin: 'Uuuh, Herr Wichtig hat Angst.' Sie lästern jetzt über dich, aber der Chef kriegt nichts mit.", 
-                m: 2, f: 0, a: 5, c: 0 
+                m: 2, fl: 0, al: 5, cr: 0 
             },
             "meme_like": { 
                 txt: "Du kicherst laut am Platz. Dummerweise steht der Chef gerade hinter dir. Er sieht nichts, aber er merkt, dass du Spaß hast. Das macht ihn misstrauisch.", 
-                m: 10, f: 10, a: -10, c: 15,
+                m: 10, fl: 10, al: -10, cr: 15,
                 next: "team_gossip_2"
             }
         }
@@ -7846,11 +7843,11 @@ const DB = {
         results: {
             "lie": { 
                 txt: "'Soso. Ein lustiger Bug. Zeigen Sie mir den doch mal.' Du stammelst. Er weiß Bescheid. 'Handy weg, Müller.'", 
-                m: 5, f: 0, a: 10, c: 10
+                m: 5, fl: 0, al: 10, cr: 10
             },
             "sorry": { 
                 txt: "'Besser ist das.' Er beobachtet dich jetzt genau.", 
-                m: 2, f: -5, a: 5, c: 0 
+                m: 2, fl: -5, al: 5, cr: 0 
             }
         }
     },
@@ -7873,15 +7870,15 @@ const DB = {
         results: {
             "bet_placed": { 
                 txt: "Du bist drin. Jetzt checkst du alle 5 Minuten den Ticker auf dem Handy. Du arbeitest quasi gar nicht mehr.", 
-                m: 30, f: 15, a: -5, c: 10
+                m: 30, fl: 15, al: -5, cr: 10
             },
             "bet_chat": { 
                 txt: "Jürgen: 'Ohne Moos nix los, aber ich trag dich ein.' Ihr diskutiert 15 Minuten über Abseitsregeln.", 
-                m: 15, f: 10, a: -5, c: 5 
+                m: 15, fl: 10, al: -5, cr: 5 
             },
             "snitch": { 
                 txt: "Du petzt beim Betriebsrat. Die Gruppe wird geschlossen. Jürgen wirft dir böse Blicke zu. Du bist der Alman des Monats.", 
-                m: 5, f: -10, a: 10, c: -5
+                m: 5, fl: -10, al: 10, cr: -5
             }
         }
     },
@@ -7904,15 +7901,15 @@ const DB = {
         results: {
             "encourage": { 
                 txt: "Sie postet es. 1 Stunde später hörst du den Chef brüllen: 'WO IST FRAU MEIER?!'. Er hat wohl doch einen Fake-Account. Ups.", 
-                m: 5, f: 5, a: 5, c: 10,
+                m: 5, fl: 5, al: 5, cr: 10,
             },
             "warn": { 
                 txt: "Gabi: 'Hast recht. Danke Bro! 😘'. Sie löscht es. Du hast ihr den Job gerettet.", 
-                m: 2, f: -5, a: -5, c: 0 
+                m: 2, fl: -5, al: -5, cr: 0 
             },
             "blackmail": { 
                 txt: "Gabi: 'Arschloch. 🖕'. Aber sie postet es nicht. Du hast einen Feind mehr, aber Ruhe.", 
-                m: 2, f: -5, a: 5, c: 0 
+                m: 2, fl: -5, al: 10, cr: 0 
             }
         }
     }
@@ -7923,48 +7920,56 @@ const DB = {
         { 
             name: "Kevin", 
             role: "Der Azubi", 
+            img: "assets/chars/kevin.webp",
             icon: "🧢", 
             desc: "Sein 'Ups' kostet die Firma jährlich ca. 50.000€. Denkt, die 'Cloud' hat was mit dem Wetterbericht zu tun. Versucht ständig, Minecraft auf dem Server zu installieren." 
         },
         { 
             name: "Chantal", 
             role: "Marketing & Feel Good", 
+            img: "assets/chars/chantal.webp",
             icon: "💅", 
             desc: "Nutzt Wörter wie 'Synergie' und 'Mindset', hat aber keine Ahnung, wie man eine PDF öffnet. Fordert täglich neue Apple-Produkte, weil die Farbe 'Holo-Pink' ihre Kreativität fördert." 
         },
         { 
             name: "Egon", 
             role: "Hausmeister", 
+            img: "assets/chars/egon.webp",
             icon: "🔧", 
             desc: "Der wahre Herrscher des Gebäudes. Hasst Technik, liebt seine Schlüssel. Wenn du ihn fragst, war früher (1980) alles besser, besonders die Kabel." 
         },
         { 
             name: "Dr. Wichtig", 
             role: "Der CEO", 
+            img: "assets/chars/wichtig.webp",
             icon: "👔", 
             desc: "Hat Visionen, die physikalisch unmöglich sind. Ruft gerne aus Tunneln an, um sich über schlechten Empfang zu beschweren. Denkt, KI kann Kaffee kochen." 
         },
         { 
             name: "Frau Elster", 
             role: "Buchhaltung", 
+            img: "assets/chars/elster.webp",
             icon: "🦉", 
             desc: "Wächterin über Excel und den Kühlschrank. Hat Augen wie ein Luchs, wenn es um fehlende Belege oder falsche Mülltrennung geht. Ihr Kater 'Rüdiger' ist ihr einziger Freund." 
         },
         { 
             name: "Markus", 
             role: "Vertriebsleiter", 
+            img: "assets/chars/markus.webp",
             icon: "💪", 
             desc: "Verkauft dem Kunden Dinge, die wir gar nicht haben. Brüllt gerne 'Zeit ist Geld!', während er Solitär spielt. Sein Drucker ist sein persönlicher Erzfeind." 
         },
         { 
             name: "Gabi", 
             role: "Empfang", 
+            img: "assets/chars/gabi.webp",
             icon: "☎️", 
             desc: "Die Nachrichtenzentrale. Weiß alles über jeden, bevor es passiert. Ruft die IT, wenn die Maus leer ist (oder der Kaffee)." 
         },
         { 
             name: "Du (Müller)", 
             role: "SysAdmin", 
+            img: "assets/chars/mueller.webp",
             icon: "💀", 
             desc: "Mädchen für alles. Brandlöscher. Seelsorger. Eigentlich wolltest du nur Computer reparieren, jetzt reparierst du Menschen. Dein Kaffee-Konsum ist medizinisch bedenklich." 
         }

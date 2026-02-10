@@ -49,7 +49,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v1.2.0 geladen. Warte auf User...");
+        this.log("System v1.3.0 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -118,15 +118,23 @@ const engine = {
         normalItems.forEach(({id, item}) => {
             const unlocked = this.state.archive.items.includes(id);
             
-            // Design: Identisch zu Erfolgen (1px Border, dashed bei leer)
             let borderClass = unlocked 
                 ? 'border-slate-500/50 text-slate-200 bg-slate-800' 
                 : 'border-slate-700 opacity-50 text-slate-600 bg-slate-900 border-dashed'; 
             
-            // WICHTIG: Hier stand vorher "border-2". Jetzt nur noch "border" für feine Linien.
+            // --- BILD CHECK ---
+            let contentContent = '?';
+            if (unlocked) {
+                if (item.img) {
+                    contentContent = `<img src="${item.img}" class="w-full h-full object-contain p-1 pointer-events-none" alt="${item.name}">`;
+                } else {
+                    contentContent = item.icon;
+                }
+            }
+
             html += `
                 <div class="aspect-square rounded border ${borderClass} flex items-center justify-center text-xl cursor-help transition-all relative group" title="${unlocked ? item.name : 'Unbekannt' }">
-                    ${unlocked ? item.icon : '?'}
+                    ${contentContent}
                 </div>`;
         });
         html += `</div></div>`;
@@ -143,10 +151,19 @@ const engine = {
                     ? 'border-amber-500/50 text-amber-100 bg-amber-900/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]' 
                     : 'border-slate-700 opacity-50 text-slate-600 bg-slate-900 border-dashed';
 
-                // Auch hier: "border" statt "border-2"
+                // --- BILD CHECK ---
+                let contentContent = '?';
+                if (unlocked) {
+                    if (item.img) {
+                        contentContent = `<img src="${item.img}" class="w-full h-full object-contain p-1 pointer-events-none" alt="${item.name}">`;
+                    } else {
+                        contentContent = item.icon;
+                    }
+                }
+
                 html += `
                     <div class="aspect-square rounded border ${borderClass} flex items-center justify-center text-xl cursor-help transition-all relative group" title="${unlocked ? item.name : '???' }">
-                        ${unlocked ? item.icon : '?'}
+                        ${contentContent}
                     </div>`;
             });
             html += `</div></div>`;
@@ -384,7 +401,7 @@ const engine = {
         let initial = email.sender.charAt(0).toUpperCase();
         document.getElementById('email-avatar').innerText = initial;
 
-        // --- NEU: Dynamisches CC (Humor) ---
+        // --- Dynamisches CC (Humor) ---
         let ccText = "IT-Verteiler"; // Standard
         const s = email.sender.toLowerCase();
         
@@ -550,7 +567,16 @@ updateUI: function() {
             if(itemData) {
                 let dbItem = DB.items[itemData.id];
                 slot.className = 'inv-slot relative group'; 
-                slot.innerText = dbItem ? dbItem.icon : '?';
+                
+                // --- BILD CHECK ---
+                if (dbItem && dbItem.img) {
+                    // Falls ein Bild existiert: Bild anzeigen (mit etwas Padding, damit es nicht klebt)
+                    slot.innerHTML = `<img src="${dbItem.img}" class="w-full h-full object-contain p-1 pointer-events-none" alt="${dbItem.name}">`;
+                } else {
+                    // Fallback: Altes Icon nutzen
+                    slot.innerText = dbItem ? dbItem.icon : '?';
+                }
+                
                 slot.title = dbItem ? dbItem.name : 'Unbekannt';
 
                 // --- SPEZIAL LOGIK ---
@@ -1008,6 +1034,14 @@ trigger: function(type) {
                 break;
         }
 
+        // --- STORY CHECK ---
+        // Prüft, ob die ID "story" enthält (z.B. "sq_story_kevin_2" oder "cof_story_chantal_1")
+        if (this.state.currentEventId && this.state.currentEventId.includes('_story_')) {
+            // color = 'text-yellow-400';
+            // borderColor = 'border-yellow-500';            
+            icon = '📖'; // Buch-Icon für Story-Quests
+        }
+
         let html = `
             <div class="w-full max-w-2xl text-left fade-in bg-slate-900 border border-slate-700 p-4 md:p-6 rounded-xl shadow-2xl mx-auto">
                 
@@ -1106,7 +1140,7 @@ trigger: function(type) {
         return html;
     },
 
-    // NEU: Logik für die Auswahl in Call-Ketten
+    // Logik für die Auswahl in Call-Ketten
     handleChainChoice: function(nextId) {
         const ev = this.state.currentChainEvent;
 
@@ -1555,8 +1589,6 @@ checkEndConditions: function() {
 
         // A. RAGE QUIT (Aggro >= 100)
         if(this.state.al >= 100) {
-            // ALT: this.showEnd("RAGE QUIT", "Du hast den Monitor aus dem Fenster geworfen...", false);
-            // NEU:
             this.state.pendingEnd = { 
                 title: "RAGE QUIT", 
                 text: "Du hast den Monitor aus dem Fenster geworfen. Es hat sich gut angefühlt.<br>" + fullReport, 
@@ -1705,10 +1737,28 @@ checkEndConditions: function() {
             }
 
             slot.className = baseClass;
-            slot.innerText = dbItem ? dbItem.icon : '?';
             slot.title = dbItem ? dbItem.name : 'Unbekannt';
-            slot.innerHTML += `<div class="absolute -bottom-6 w-full text-center text-[8px] text-slate-400 truncate">${dbItem ? dbItem.name : '???'}</div>`;
             slot.style.marginBottom = "15px"; 
+
+            // --- BILD VS ICON LOGIK (NEU) ---
+            let mainContent = '?';
+            
+            if (dbItem) {
+                if (dbItem.img) {
+                    // Falls Bild vorhanden: IMG Tag einfügen
+                    mainContent = `<img src="${dbItem.img}" class="w-full h-full object-contain p-1 pointer-events-none" alt="${dbItem.name}">`;
+                } else {
+                    // Sonst: Emoji Icon
+                    mainContent = dbItem.icon;
+                }
+            }
+
+            // Label unten
+            let labelHtml = `<div class="absolute -bottom-6 w-full text-center text-[8px] text-slate-400 truncate">${dbItem ? dbItem.name : '???'}</div>`;
+
+            // Inhalt setzen
+            slot.innerHTML = mainContent + labelHtml;
+            // -------------------------------
 
             // --- KLICK LOGIK ---
             
@@ -1723,6 +1773,7 @@ checkEndConditions: function() {
                     } else {
                         slot.className += ' cursor-not-allowed'; 
                         let wait = 60 - (this.state.time - this.state.lastStressballTime);
+                        // Overlay für Cooldown (wird einfach angehängt)
                         slot.innerHTML += `<div class="absolute inset-0 bg-slate-900/70 rounded flex items-center justify-center z-10 backdrop-blur-[1px]"><span class="font-black text-white text-xl">${wait}</span></div>`;
                         slot.onclick = () => this.log(`Der Ball ist noch völlig plattgedrückt. Gib ihm Zeit, sich zu entfalten. (${wait} Min)`, "text-slate-500");
                     }
@@ -1735,10 +1786,8 @@ checkEndConditions: function() {
             // 2. Quest Items (Unten)
             else {
                 if (itemData.id === 'corp_chronicles') {
-                    // HIER IST DER FIX: Das Buch öffnet die Lore!
                     slot.onclick = () => this.showLoreModal();
                 } else {
-                    // Alle anderen Quest-Items (Tacker, Tape etc.) machen nur Text
                     slot.onclick = () => this.log(`Erinnerung: ${dbItem.name}`, "text-amber-400");
                 }
             }
@@ -1746,11 +1795,10 @@ checkEndConditions: function() {
         };
 
         // --- SEKTION 1: RUCKSACK (Normale Items) ---
-        // Limit jetzt auf 10 gesetzt
         let sectionNormal = document.createElement('div');
         sectionNormal.innerHTML = `<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">🎒 Rucksack (${normalItems.length}/10)</h3>`;
         let gridNormal = document.createElement('div');
-        gridNormal.className = "grid grid-cols-5 gap-4"; // 5 pro Reihe
+        gridNormal.className = "grid grid-cols-5 gap-4"; 
 
         normalItems.forEach(item => {
             gridNormal.appendChild(renderSlot(item, false));
@@ -1771,7 +1819,7 @@ checkEndConditions: function() {
             let sectionQuest = document.createElement('div');
             sectionQuest.innerHTML = `<h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1 mt-4">🏆 Sammlung & Trophäen</h3>`;
             let gridQuest = document.createElement('div');
-            gridQuest.className = "grid grid-cols-5 gap-4"; // Jetzt auch 5 pro Reihe (Einheitlich!)
+            gridQuest.className = "grid grid-cols-5 gap-4"; 
 
             questItems.forEach(item => {
                 gridQuest.appendChild(renderSlot(item, true));
@@ -2004,28 +2052,42 @@ closeInventory: function() {
         document.body.insertAdjacentHTML('beforeend', html);
     },
 
-	// --- TEAM / CHARAKTERE ---
+    // --- TEAM / CHARAKTERE ---
     openTeam: function() {
         const modal = document.getElementById('team-modal');
         const grid = document.getElementById('team-grid');
         grid.innerHTML = '';
 
         DB.chars.forEach(char => {
-            // Hover ist jetzt weiß (hover:border-white)
             const card = document.createElement('div');
+            // Design der Karte (wie vorher)
             card.className = "bg-slate-800 p-4 rounded-lg border border-slate-700 flex gap-4 hover:border-white transition-colors";
             
-            // Rolle ist jetzt hellgrau/weiß (text-slate-300)
+            // --- LOGIK: BILD ODER EMOJI? ---
+            let avatarHTML;
+            
+            if (char.img) {
+                // FALL A: Es gibt ein Bild -> Bild anzeigen
+                // 'object-cover' sorgt dafür, dass das Bild den Kreis füllt
+                avatarHTML = `<img src="${char.img}" class="w-full h-full object-cover" alt="${char.name}">`;
+            } else {
+                // FALL B: Kein Bild -> Emoji anzeigen
+                avatarHTML = char.icon;
+            }
+
+            // HTML zusammenbauen
+            // WICHTIG: line-clamp-3 und truncate wurden entfernt!
             card.innerHTML = `
-                <div class="text-4xl shrink-0 bg-slate-900 w-16 h-16 flex items-center justify-center rounded-full border border-slate-600">
-                    ${char.icon}
+                <div class="shrink-0 bg-slate-900 w-16 h-16 flex items-center justify-center rounded-full border border-slate-600 overflow-hidden text-4xl shadow-inner">
+                    ${avatarHTML}
                 </div>
-                <div>
+                
+                <div> 
                     <div class="flex items-baseline gap-2 mb-1">
                         <h3 class="font-bold text-white text-lg">${char.name}</h3>
                         <span class="text-[10px] text-slate-300 uppercase tracking-widest">${char.role}</span>
                     </div>
-                    <p class="text-xs text-slate-400 italic leading-relaxed">"${char.desc}"</p>
+                    <p class="text-xs text-slate-400 italic leading-relaxed">${char.desc}</p>
                 </div>
             `;
             grid.appendChild(card);
