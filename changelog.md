@@ -1,3 +1,10 @@
+\[2.1.0] - 2026-02-14
+
+* Das Sammelbuch (Archiv) lässt sich nun über das Start-Modal exportieren und importieren
+* Manche Optionen waren in den verschiedenen Events nicht auswählbar, was nun korrigiert wurde
+* Kleine Rechtschreibfehler bei verschiedenene Events wurden korrigiert
+* Kleine Optische Anpassungen am Start Modal, um es optisch etwas aufzuwerten
+
 \[2.0.0] - 2026-02-13
 
 * Server, Coffee und Side-Quests haben jetzt bei beinahe allen Events Folge-Events. Jede Entscheidung wird neue Events erzeugen!

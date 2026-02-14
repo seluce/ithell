@@ -49,7 +49,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v2.0 geladen. Warte auf User...");
+        this.log("System v2.1.0 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -1106,7 +1106,7 @@ trigger: function(type) {
                     if (isChain) {
                         clickAction = `onclick="engine.handleChainChoice('${opt.next}')"`;
                     } else {
-                        let safeRes = opt.r ? opt.r.replace(/'/g, "\\'") : '';
+                        let safeRes = opt.r ? opt.r.replace(/'/g, "\\'").replace(/\n/g, "<br>") : '';
                         clickAction = `onclick="engine.resolveTerminal('${safeRes}', ${opt.m||0}, ${opt.f||0}, ${opt.a||0}, ${opt.c||0}, '${opt.loot||''}', '${opt.req||''}', '${type}', '${opt.next||''}', '${opt.rem||''}')"`;
                     }
                 }
@@ -2375,6 +2375,257 @@ closeInventory: function() {
         const modal = document.getElementById('board-modal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+    },
+     
+    // --- SPEICHERSTAND EXPORT / IMPORT SYSTEM ---
+
+    // Hilfsfunktion: Prüfsumme berechnen (gegen Tippfehler)
+    calculateChecksum: function(str) {
+        let a = 1, b = 0;
+        for (let i = 0; i < str.length; i++) {
+            a = (a + str.charCodeAt(i)) % 65521;
+            b = (b + a) % 65521;
+        }
+        return (b << 16 | a).toString(16);
+    },
+
+    // EXPORT: Generiert den Code
+    exportSaveGame: function() {
+        // 1. Daten sammeln
+        // Wir holen das aktuelle Archiv aus dem State UND den Tutorial-Status aus dem LocalStorage
+        const data = {
+            arc: this.state.archive, // Dein Sammelalbum
+            // Falls du 'tutorialSeen' oder 'layer8_tutorial' nutzt (bitte Key prüfen!)
+            tut: localStorage.getItem('tutorialSeen') || "false", 
+            salt: Math.floor(Math.random() * 999999) // Macht den Code einzigartig
+        };
+
+        try {
+            // 2. JSON Stringify
+            const jsonString = JSON.stringify(data);
+
+            // 3. Base64 Encoding (UTF-8 Safe für Emojis 🏆)
+            const base64 = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g,
+                function toSolidBytes(match, p1) {
+                    return String.fromCharCode('0x' + p1);
+            }));
+
+            // 4. Prüfziffer berechnen
+            const checksum = this.calculateChecksum(base64);
+
+            // 5. Code zurückgeben: "BASE64-CHECKSUM"
+            return `${base64}-${checksum}`;
+
+        } catch (e) {
+            console.error("Export Error:", e);
+            return null;
+        }
+    },
+
+    // IMPORT: Liest den Code und überschreibt Daten
+    importSaveGame: function() {
+        // Promt für Code-Eingabe
+        const codeString = prompt("Bitte den Speicher-Code hier einfügen:");
+        if (!codeString) return;
+
+        try {
+            // 1. Format prüfen
+            const parts = codeString.trim().split("-");
+            if (parts.length !== 2) throw new Error("Format ungültig.");
+
+            const base64 = parts[0];
+            const checksum = parts[1];
+
+            // 2. Prüfziffer validieren
+            if (this.calculateChecksum(base64) !== checksum) {
+                throw new Error("Code ist beschädigt oder falsch kopiert.");
+            }
+
+            // 3. Decoding
+            const jsonString = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            const data = JSON.parse(jsonString);
+
+            // 4. Validierung: Ist das Archiv vorhanden?
+            if (!data.arc || !Array.isArray(data.arc.items)) {
+                throw new Error("Keine gültigen Archiv-Daten gefunden.");
+            }
+
+            // 5. Wiederherstellen
+            // A) Archiv in LocalStorage schreiben
+            localStorage.setItem('layer8_archive', JSON.stringify(data.arc));
+            
+            // B) Tutorial Status wiederherstellen (falls vorhanden)
+            if (data.tut) {
+                localStorage.setItem('tutorialSeen', data.tut);
+            }
+
+            alert("✅ Import erfolgreich! Die Seite wird neu geladen.");
+            location.reload(); // Wichtig: Neustart erzwingen, damit init() die neuen Daten lädt
+
+        } catch (e) {
+            console.error(e);
+            alert("❌ Fehler: " + e.message);
+        }
+    },
+    
+    // UI-Helper für den Export-Button (Kopieren in Zwischenablage)
+    triggerExportUI: function() {
+        const code = this.exportSaveGame();
+        if(code) {
+            // Versuch, es direkt in die Zwischenablage zu kopieren
+            navigator.clipboard.writeText(code).then(() => {
+                alert("💾 Code in die Zwischenablage kopiert!\n(Bewahre ihn sicher auf)");
+            }).catch(() => {
+                // Fallback, falls Clipboard blockiert ist
+                prompt("Dein Speicher-Code (bitte kopieren):", code);
+            });
+        } else {
+            alert("Fehler beim Erstellen des Backups.");
+        }
+    },
+
+// Hilfsfunktion: Prüfsumme berechnen (Robuster Fix mit >>> 0)
+    calculateChecksum: function(str) {
+        let a = 1, b = 0;
+        for (let i = 0; i < str.length; i++) {
+            a = (a + str.charCodeAt(i)) % 65521;
+            b = (b + a) % 65521;
+        }
+        // >>> 0 erzwingt eine vorzeichenlose 32-Bit-Ganzzahl (wichtig für Hex-Vergleich!)
+        return ((b << 16 | a) >>> 0).toString(16);
+    },
+
+    // --- UI HELPER FÜR SAVEGAME ---
+    ui: {
+        // Öffnet das Export Fenster
+        openExportModal: function() {
+            const modal = document.getElementById('save-export-modal');
+            const area = document.getElementById('export-area');
+            const msg = document.getElementById('export-msg');
+            
+            // Code generieren
+            const code = engine.exportSaveGame();
+            area.value = code || "Fehler beim Erstellen.";
+            msg.style.opacity = '0'; // Reset Message
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        },
+
+        // Öffnet das Import Fenster
+        openImportModal: function() {
+            const modal = document.getElementById('save-import-modal');
+            const area = document.getElementById('import-area');
+            const msg = document.getElementById('import-msg');
+
+            area.value = ""; // Leeren
+            msg.style.opacity = '0'; 
+            msg.innerText = "";
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        },
+
+        // Schließt beide Fenster
+        closeModals: function() {
+            document.getElementById('save-export-modal').classList.add('hidden');
+            document.getElementById('save-export-modal').classList.remove('flex');
+            document.getElementById('save-import-modal').classList.add('hidden');
+            document.getElementById('save-import-modal').classList.remove('flex');
+        },
+
+        // Kopier-Funktion
+        copyToClipboard: function() {
+            const area = document.getElementById('export-area');
+            const msg = document.getElementById('export-msg');
+
+            area.select();
+            area.setSelectionRange(0, 99999); 
+
+            navigator.clipboard.writeText(area.value).then(() => {
+                msg.innerText = "Code kopiert!";
+                msg.className = "text-xs text-green-500 font-bold transition-opacity";
+                msg.style.opacity = '1';
+                setTimeout(() => { msg.style.opacity = '0'; }, 2000);
+            }).catch(err => {
+                msg.innerText = "Fehler beim Kopieren.";
+                msg.className = "text-xs text-red-500 font-bold transition-opacity";
+                msg.style.opacity = '1';
+            });
+        },
+
+        // Import-Funktion (ROBUST & GEFIXT)
+        performImport: function() {
+            const area = document.getElementById('import-area');
+            const msg = document.getElementById('import-msg');
+            
+            // 1. Säubern: Leerzeichen vorne/hinten und unsichtbare Zeichen entfernen
+            let code = area.value.trim().replace(/[\u200B-\u200D\uFEFF]/g, '');
+
+            if (!code) {
+                msg.innerText = "Bitte Code eingeben!";
+                msg.className = "text-xs text-red-500 font-bold transition-opacity";
+                msg.style.opacity = '1';
+                return;
+            }
+
+            try {
+                let base64, checksum;
+
+                // 2. STRATEGIE: Trennen am '--' (Neues Format)
+                if (code.includes('--')) {
+                    const parts = code.split('--');
+                    base64 = parts[0];
+                    checksum = parts[1];
+                } 
+                // 3. FALLBACK: Trennen am letzten '-' (Altes Format oder manuell bearbeitet)
+                else if (code.includes('-')) {
+                    const lastDash = code.lastIndexOf('-');
+                    base64 = code.substring(0, lastDash);
+                    checksum = code.substring(lastDash + 1);
+                } else {
+                    throw new Error("Format ungültig (Kein Trennzeichen gefunden).");
+                }
+
+                // Checksumme prüfen
+                const calcedSum = engine.calculateChecksum(base64);
+                if (calcedSum !== checksum) {
+                    console.error("Checksum Mismatch:", calcedSum, "vs", checksum);
+                    throw new Error("Code beschädigt (Prüfsumme falsch).");
+                }
+
+                // Decoding
+                const jsonString = decodeURIComponent(atob(base64).split('').map(c => 
+                    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                ).join(''));
+
+                const data = JSON.parse(jsonString);
+
+                // Validierung
+                if (!data.arc || !Array.isArray(data.arc.items)) {
+                    throw new Error("Datenstruktur fehlerhaft.");
+                }
+
+                // Speichern
+                localStorage.setItem('layer8_archive', JSON.stringify(data.arc));
+                if (data.tut) localStorage.setItem('tutorialSeen', data.tut);
+
+                msg.innerText = "Erfolg! Neustart...";
+                msg.className = "text-xs text-green-500 font-bold transition-opacity";
+                msg.style.opacity = '1';
+
+                setTimeout(() => location.reload(), 800);
+
+            } catch (e) {
+                console.error(e);
+                msg.innerText = "Ungültiger Code!";
+                msg.className = "text-xs text-red-500 font-bold transition-opacity";
+                msg.style.opacity = '1';
+            }
+        }
     },
 
 // --- REPORT SYSTEM ---

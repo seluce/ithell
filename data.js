@@ -10231,7 +10231,7 @@ const DB = {
         id: "sq_loot_crate_1",
         kind: "text",
         title: "Die 'Zu Verschenken' Kiste",
-        text: "Jemand hat eine Kiste mit der Aufschrift 'ZU VERSCHENKEN' in den Flur gestellt. Ein Biotop aus Staub, alten Kabeln und vergessenen Bürotäumen.",
+        text: "Jemand hat eine Kiste mit der Aufschrift 'ZU VERSCHENKEN' in den Flur gestellt. Ein Biotop aus Staub, alten Kabeln und vergessenen Büroträumen.",
         opts: [
             { 
                 t: "Das schwere 'Buch' bergen", 

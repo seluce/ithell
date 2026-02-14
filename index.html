@@ -139,63 +139,77 @@
     
     <div id="achievement-container"></div>
 
-<div id="intro-modal" class="fixed inset-0 bg-black/95 z-[999] flex items-center justify-center p-4">
-        <div class="neon-box border-blue bg-slate-900 max-w-4xl w-full p-8 shadow-2xl relative overflow-hidden flex flex-col md:flex-row gap-8 max-h-[90vh] overflow-y-auto">
-            
-            <div class="flex-1 flex flex-col">
-                <h1 class="text-3xl md:text-5xl font-black text-white mb-4 tracking-tighter">Layer8Problem</h1>
-                <p class="text-slate-300 text-sm leading-relaxed mb-8 flex-1">
-                    Willkommen bei <strong>GlobalCorp</strong>. Du bist der SysAdmin. <br><br>
-                    Du bist gefangen in der Support-Hölle. Jeden Morgen wachst du auf und hoffst, dass der Serverraum abgebrannt ist – aber nein, die Lichter blinken noch.
-                    <br><br>
-                    Dein Chef hält IT für Vodoo-Zauber, der nichts kosten darf. Deine Kollegen denken, das Internet ist "dieses blaue E". Und du? Du bist der Hausmeister für digitalen Müll.
-                    <br><br>
-                    <strong>DEIN ZIEL:</strong> Überlebe bis <strong>16:30 Uhr</strong>. Lass dich nicht feuern. Raste nicht aus. Und lass dich nicht von der <strong>Ticket-Lawine</strong> begraben.
-                </p>
-                
-                <div class="space-y-3 mt-auto">
-                    <button onclick="engine.start()" 
-                        class="bg-blue-600 hover:bg-blue-500 text-white text-lg font-bold py-4 px-8 rounded-xl w-full transition-all shadow-lg hover:shadow-blue-500/20 hover:scale-[1.02]">
-                        AN DIE ARBEIT
-                    </button>
-                    
-                    <button onclick="engine.openArchive()" 
-                        class="border border-slate-700 hover:border-purple-500 hover:bg-slate-800 text-slate-400 hover:text-purple-400 py-3 rounded-xl w-full font-bold uppercase transition-all text-xs tracking-widest flex items-center justify-center gap-2">
-                        <span>🏆</span> Karriere & Sammlung
-                    </button>
-                </div>
-            </div>
-            
-            <div class="flex-1 bg-black/30 p-6 rounded-xl border border-slate-700 text-xs font-mono space-y-5 h-fit">
-                <h3 class="text-white font-bold border-b border-slate-700 pb-2 mb-2">STATUS WERTE</h3>
-                
-                <div class="flex gap-4 items-start">
-                    <div class="text-2xl bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">📩</div>
-                    <div><strong class="text-purple-400 block mb-1">TICKETS</strong>Alle 30 Min kommt eins. Ab 10 ist Game Over!</div>
-                </div>
-                
-                <div class="flex gap-4 items-start">
-                    <div class="text-2xl bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">⚡</div>
-                    <div><strong class="text-emerald-400 block mb-1">FAULHEIT</strong>Zu hoch? Der Chef wird misstrauisch und bestraft Fehler härter.</div>
-                </div>
-                
-                <div class="flex gap-4 items-start">
-                    <div class="text-2xl bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">😡</div>
-                    <div><strong class="text-orange-400 block mb-1">AGGRO</strong>Bei 100% wirfst du den Monitor aus dem Fenster. Game Over.</div>
-                </div>
-                
-                <div class="flex gap-4 items-start">
-                    <div class="text-2xl bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">👁️</div>
-                    <div><strong class="text-red-500 block mb-1">CHEF-RADAR</strong>Bei 100% gibt es eine Abmahnung. Dann Rauswurf.</div>
-                </div>
-                
-                <div class="flex gap-4 items-start">
-                    <div class="text-2xl bg-slate-800 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">🎒</div>
-                    <div><strong class="text-amber-400 block mb-1">LOOT</strong>Finde Items, um Probleme kreativ zu lösen.</div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div id="intro-modal" class="fixed inset-0 bg-black/95 z-[999] flex items-center justify-center p-4">
+		<div class="neon-box border-blue bg-slate-900 max-w-4xl w-full p-8 shadow-2xl relative overflow-hidden flex flex-col md:flex-row gap-8 max-h-[90vh] overflow-y-auto">
+			
+			<div class="flex-1 flex flex-col">
+				<h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-200 to-white mb-4 tracking-tighter">Layer8Problem</h1>
+				
+				<p class="text-slate-300 text-sm leading-relaxed mb-8 flex-1">
+					Willkommen bei <strong>GlobalCorp</strong>. Du bist der SysAdmin. <br><br>
+					Du bist gefangen in der Support-Hölle. Jeden Morgen wachst du auf und hoffst, dass der Serverraum abgebrannt ist – aber nein, die Lichter blinken noch.
+					<br><br>
+					Dein Chef hält IT für Vodoo-Zauber, der nichts kosten darf. Deine Kollegen denken, das Internet ist "dieses blaue E". Und du? Du bist der Hausmeister für digitalen Müll.
+					<br><br>
+					<strong>DEIN ZIEL:</strong> Überlebe bis <strong>16:30 Uhr</strong>. Lass dich nicht feuern. Raste nicht aus. Und lass dich nicht von der <strong>Ticket-Lawine</strong> begraben.
+				</p>
+				
+				<div class="space-y-3 mt-auto">
+					<button onclick="engine.start()" 
+						class="bg-blue-600 hover:bg-blue-500 text-white text-lg font-bold py-4 px-8 rounded-xl w-full transition-all shadow-lg hover:shadow-blue-500/20 hover:scale-[1.02]">
+						AN DIE ARBEIT
+					</button>
+					
+					<button onclick="engine.openArchive()" 
+						class="border border-slate-700 hover:border-purple-500 hover:bg-slate-800 text-slate-400 hover:text-purple-400 py-3 rounded-xl w-full font-bold uppercase transition-all text-xs tracking-widest flex items-center justify-center gap-2">
+						<span>🏆</span> Karriere & Sammlung
+					</button>
+				</div>
+			</div>
+			
+			<div class="flex-1 flex flex-col h-fit">
+				
+				<div class="bg-black/30 p-6 rounded-xl border border-slate-700 text-xs font-mono space-y-5 h-fit">
+					<h3 class="text-white font-bold border-b border-slate-700 pb-2 mb-2">STATUS WERTE</h3>
+					
+					<div class="flex gap-4 items-start">
+						<div class="text-2xl bg-purple-500/10 text-purple-300 border border-purple-500/20 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">📩</div>
+						<div><strong class="text-purple-400 block mb-1">TICKETS</strong>Alle 30 Min kommt eins. Ab 10 ist Game Over!</div>
+					</div>
+					
+					<div class="flex gap-4 items-start">
+						<div class="text-2xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">⚡</div>
+						<div><strong class="text-emerald-400 block mb-1">FAULHEIT</strong>Zu hoch? Der Chef wird misstrauisch und bestraft Fehler härter.</div>
+					</div>
+					
+					<div class="flex gap-4 items-start">
+						<div class="text-2xl bg-orange-500/10 text-orange-300 border border-orange-500/20 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">😡</div>
+						<div><strong class="text-orange-400 block mb-1">AGGRO</strong>Bei 100% wirfst du den Monitor aus dem Fenster. Game Over.</div>
+					</div>
+					
+					<div class="flex gap-4 items-start">
+						<div class="text-2xl bg-red-500/10 text-red-300 border border-red-500/20 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">👁️</div>
+						<div><strong class="text-red-500 block mb-1">CHEF-RADAR</strong>Bei 100% gibt es eine Abmahnung. Dann Rauswurf.</div>
+					</div>
+					
+					<div class="flex gap-4 items-start">
+						<div class="text-2xl bg-amber-500/10 text-amber-300 border border-amber-500/20 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">🎒</div>
+						<div><strong class="text-amber-400 block mb-1">LOOT</strong>Finde Items, um Probleme kreativ zu lösen.</div>
+					</div>
+				</div>
+
+				<div class="mt-4 pt-4 border-t border-slate-700 grid grid-cols-2 gap-3">
+					<button onclick="engine.ui.openExportModal()" class="text-xs font-bold uppercase tracking-widest bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-600 hover:border-slate-500 py-3 rounded transition-all flex items-center justify-center gap-2">
+						<span>💾</span> Export
+					</button>
+					<button onclick="engine.ui.openImportModal()" class="text-xs font-bold uppercase tracking-widest bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-600 hover:border-slate-500 py-3 rounded transition-all flex items-center justify-center gap-2">
+						<span>📂</span> Import
+					</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
 	
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-2 lg:gap-4 h-auto lg:h-24 mb-4 shrink-0">
         <div id="clock-container" class="neon-box border-blue flex flex-col justify-center items-center col-span-2 lg:col-span-1 p-2">
@@ -226,7 +240,7 @@
     <div class="flex-1 flex flex-col lg:flex-row gap-4 min-h-0 mb-4 overflow-hidden">
 
         <div id="terminal" class="flex-[2] neon-box p-4 md:p-6 overflow-y-auto flex flex-col relative min-h-[300px] shrink-0">
-            <div class="absolute top-2 right-4 text-[10px] text-slate-600">TicketSystem v2.0</div>
+            <div class="absolute top-2 right-4 text-[10px] text-slate-600">TicketSystem v2.1.0</div>
             
             <div id="boss-timer-container">
                 <div id="boss-timer-bar"></div>
@@ -733,6 +747,46 @@
     </div>
 </div>
 <!-- SCHWARZES BRETT MODAL END-->
+
+<!-- EXPORT IMPORT MODAL START -->
+
+<div id="save-export-modal" class="fixed inset-0 bg-black/95 z-[1200] hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="neon-box border-blue bg-slate-900 max-w-lg w-full p-6 shadow-2xl relative">
+        <button onclick="engine.ui.closeModals()" class="absolute top-2 right-4 text-slate-400 hover:text-white text-xl">✕</button>
+        
+        <h2 class="text-xl font-black text-blue-400 mb-2 flex items-center gap-2">💾 SPIELSTAND SICHERN</h2>
+        <p class="text-xs text-slate-400 mb-4">Kopiere diesen Code, um deinen Fortschritt auf einem anderen Gerät wiederherzustellen.</p>
+
+        <textarea id="export-area" class="w-full h-32 bg-slate-950 border border-slate-700 rounded p-3 text-xs font-mono text-slate-300 focus:outline-none resize-none custom-scrollbar break-all mb-4 selection:bg-blue-500/30" readonly></textarea>
+        
+        <div class="flex flex-col gap-2">
+            <button onclick="engine.ui.copyToClipboard()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded text-xs font-bold uppercase flex items-center justify-center gap-2 shadow-lg transition-transform hover:scale-[1.02]">
+                <span>📋</span> In Zwischenablage kopieren
+            </button>
+            <div id="export-msg" class="text-xs text-center text-green-500 font-bold opacity-0 transition-opacity h-4">Code kopiert!</div>
+        </div>
+    </div>
+</div>
+
+<div id="save-import-modal" class="fixed inset-0 bg-black/95 z-[1200] hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="neon-box border-red bg-slate-900 max-w-lg w-full p-6 shadow-2xl relative">
+        <button onclick="engine.ui.closeModals()" class="absolute top-2 right-4 text-slate-400 hover:text-white text-xl">✕</button>
+        
+        <h2 class="text-xl font-black text-red-400 mb-2 flex items-center gap-2">📂 SPIELSTAND LADEN</h2>
+        <p class="text-xs text-slate-400 mb-4">Füge hier deinen Speicher-Code ein. <strong class="text-red-500">Achtung: Dein aktueller Fortschritt wird überschrieben!</strong></p>
+
+        <textarea id="import-area" class="w-full h-32 bg-slate-950 border border-slate-700 rounded p-3 text-xs font-mono text-slate-300 focus:outline-none focus:border-red-500 resize-none custom-scrollbar break-all mb-4 selection:bg-red-500/30" placeholder="Code hier einfügen..."></textarea>
+        
+        <div class="flex flex-col gap-2">
+            <button onclick="engine.ui.performImport()" class="w-full bg-red-600 hover:bg-red-500 text-white py-3 rounded text-xs font-bold uppercase shadow-lg transition-transform hover:scale-[1.02]">
+                SPIELSTAND LADEN
+            </button>
+            <div id="import-msg" class="text-xs text-center text-red-500 font-bold opacity-0 transition-opacity h-4">Fehler!</div>
+        </div>
+    </div>
+</div>
+
+<!-- EXPORT IMPORT MODAL END -->
 
 <!-- REPORT MODAL START -->
 <div id="report-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[60] backdrop-blur-sm">
