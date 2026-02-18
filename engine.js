@@ -18,9 +18,11 @@ const engine = {
         // Stats & System
         achievements: [],
         achievedTitles: [],
+		reputation: {},
         coffeeConsumed: 0,
 		spamClicked: 0,
 		emailsIgnored: 0,
+		drunkEndTime: 0,
 
         // E-Mail System
 		emailTimer: null,
@@ -41,7 +43,19 @@ const engine = {
         archive: {
             items: [],
             achievements: [],
-            achievementDiffs: {}
+            achievementDiffs: {},
+            reputation: {}
+        },
+      
+        // Ruf-System (-100 bis +100)
+        reputation: {
+            "Kevin": 0,
+            "Chantal": 0,
+            "Egon": 0,
+            "Dr. Wichtig": 0,
+            "Gabi": 0,
+            "Frau Elster": 0,
+            "Markus": 0
         }
     },
 
@@ -49,23 +63,44 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v2.1.0 geladen. Warte auf User...");
+        this.log("System v2.3.0 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
     loadSystem: function() {
         const data = localStorage.getItem('layer8_archive');
+        
+        // Default-Werte für alle Charaktere setzen (Startwert 0)
+        // Das stellt sicher, dass 'this.state.reputation' immer definiert ist, auch ohne Savegame
+        DB.chars.forEach(char => {
+            this.state.reputation[char.name] = 0;
+        });
+
         if(data) {
             try {
+                // 1. Archiv laden
                 this.state.archive = JSON.parse(data);
-                // Fallback falls Struktur leer war
+                
+                // 2. Fallbacks für Datenstruktur (falls Savegame alt ist)
                 if(!this.state.archive.items) this.state.archive.items = [];
                 if(!this.state.archive.achievements) this.state.archive.achievements = [];
+                if(!this.state.archive.reputation) this.state.archive.reputation = {};
+
+                // 3. WICHTIG: Ruf aus dem Archiv in das aktive Spiel übertragen!
+                // Wir überschreiben die Nullen mit den gespeicherten Werten
+                for (let [name, val] of Object.entries(this.state.archive.reputation)) {
+                    this.state.reputation[name] = val;
+                }
+
             } catch(e) { console.error("Savegame Error", e); }
         }
     },
 
     saveSystem: function() {
+        // WICHTIG: Vor dem Speichern den aktuellen Ruf ins Archiv kopieren
+        this.state.archive.reputation = { ...this.state.reputation };
+        
+        // Dann ab in den LocalStorage
         localStorage.setItem('layer8_archive', JSON.stringify(this.state.archive));
     },
 
@@ -559,6 +594,30 @@ updateUI: function() {
         const tEl = document.getElementById('ticket-count');
         tEl.innerText = this.state.tickets;
         tEl.className = this.state.tickets > 7 ? "text-4xl font-black text-white ticket-counter ticket-pulse" : "text-4xl font-black text-white ticket-counter";
+		
+		// --- DRUNK EFFECT RENDERING ---
+        let blurVal = 0;
+        
+        if (this.state.drunkEndTime > this.state.time) {
+            const remaining = this.state.drunkEndTime - this.state.time;
+            // Skaliert von 6px runter auf 0px über 60 Minuten
+            blurVal = Math.max(0, (remaining / 60) * 3);
+        }
+
+        // Liste der Elemente, die unscharf werden sollen
+        const blurTargets = ['terminal', 'smartphone', 'email-modal'];
+
+        blurTargets.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (blurVal > 0.1) { // Kleine Toleranz, damit es nicht unnötig rechnet
+                    el.style.filter = `blur(${blurVal}px)`;
+                    el.style.transition = "filter 1s ease";
+                } else {
+                    el.style.filter = 'none';
+                }
+            }
+        });
 
         // --- INVENTAR UPDATE (Hauptansicht / Mini-Slots) ---
         const invGrid = document.getElementById('inventory-grid');
@@ -862,63 +921,136 @@ unlockAchievement: function(id, title, text) {
     },
 
 trigger: function(type) {
+        // Blockieren, wenn schon ein Event offen ist
         if(this.state.activeEvent) return;
-        if (type === 'sidequest') { this.handleSideQuest(); return; }
-        // ... (Boss Logik bleibt) ...
 
-        // NEUE FILTER LOGIK:
+        // ---------------------------------------------------------
+        // 1. BOSS CHECK (Die "Katastrophe")
+        // ---------------------------------------------------------
+        // Chance: 5%. Gilt für ALLE Buttons (auch Calls & Sidequests).
+        // Wenn der Boss kommt, ist alles andere egal.
+        let bossPool = DB.bossfights.filter(ev => !this.state.usedIDs.has(ev.id));
+        
+        if (bossPool.length > 0 && Math.random() < 0.05) {
+             this.triggerBossFight();
+             return; // Unterbricht die eigentliche Aktion
+        }
+
+        // ---------------------------------------------------------
+        // 2. INTERVENTION CHECK (Ruf-System)
+        // ---------------------------------------------------------
+        // Chance: 10%. Gilt ebenfalls für ALLE Buttons. Ein Charakter fängt dich ab.
+        if (DB.reputation) {
+            
+            // A. Sammle alle Events, für die der Spieler die Ruf-Voraussetzung erfüllt
+            let possibleInterventions = DB.reputation.filter(ev => {
+                if (this.state.usedIDs.has(ev.id)) return false; 
+                
+                if (ev.reqRep) {
+                    for (let [char, threshold] of Object.entries(ev.reqRep)) {
+                        let currentRep = this.state.reputation[char] || 0;
+                        // Logik: Positiv = Mindestens X / Negativ = Höchstens X
+                        if (threshold > 0 && currentRep < threshold) return false;
+                        if (threshold < 0 && currentRep > threshold) return false;
+                    }
+                    return true;
+                }
+                return false;
+            });
+
+            // B. Würfeln: 10% Chance
+            if (possibleInterventions.length > 0 && Math.random() < 0.10) {
+                let intervention = possibleInterventions[Math.floor(Math.random() * possibleInterventions.length)];
+                
+                this.log(`⚠️ BEGEGNUNG: ${intervention.title}`, "text-yellow-400 font-bold");
+                
+                // Wir rendern es mit dem Typ 'rep' für das goldene Design
+                this.renderTerminal(intervention, 'rep'); 
+                return; // Unterbricht die eigentliche Aktion
+            }
+        }
+
+        // ---------------------------------------------------------
+        // 3. EIGENTLICHE AKTION (Wenn keine Unterbrechung kam)
+        // ---------------------------------------------------------
+        
+        // Sonderfall: Handy/Sidequest Logik
+        if (type === 'sidequest') { 
+            this.handleSideQuest(); 
+            return; 
+        }
+
+        // Standard: Zufälliges Event aus dem gewählten Pool (coffee, server, calls)
         let pool = DB[type].filter(ev => {
-            // 1. Wurde Event schon benutzt?
             if (this.state.usedIDs.has(ev.id)) return false;
-            
-            // 2. Hat das Event eine Story-Voraussetzung?
             if (ev.reqStory && !this.state.storyFlags[ev.reqStory]) return false;
-            
             return true;
         });
 
-        if (pool.length === 0) { this.renderTerminal(DB.special.empty_pool, type); return; }
+        // Fallback, wenn Pool leer ist
+        if (pool.length === 0) { 
+            this.renderTerminal(DB.special.empty_pool, type); 
+            return; 
+        }
         
+        // Event starten
         let ev = pool[Math.floor(Math.random() * pool.length)];
         this.renderTerminal(ev, type);
     },
 
     triggerBossFight: function() {
-        // Filtere alle Bosse, die noch nicht dran waren
         let pool = DB.bossfights.filter(ev => !this.state.usedIDs.has(ev.id));
         
-        // Wenn alle Bosse besiegt sind, passiert nichts (oder man könnte pool = DB.bossfights machen für Reset)
         if(pool.length === 0) return; 
      
-        // Zufälligen Boss aus dem verbleibenden Pool wählen
         let boss = pool[Math.floor(Math.random() * pool.length)]; 
-        // ---------------------------
 
         this.state.activeEvent = true;
         this.state.usedIDs.add(boss.id);
         this.disableButtons(true);
 
         const term = document.getElementById('terminal-content');
-        document.getElementById('boss-timer-container').style.display = 'block';
-        document.getElementById('boss-timer-bar').style.width = '100%';
+        
+        // FIX 1: OPACITY ENTFERNEN!
+        // Wir setzen die Klasse genau so wie bei 'renderTerminal', damit es hell wird.
+        term.className = "flex-1 flex flex-col justify-center items-center py-3 w-full h-full";
+
+        // Event rendern
         this.renderEventHTML(boss, 'boss', term);
 
-        let timeLeft = boss.timer;
+        // Wir rechnen in Millisekunden, damit der Balken flüssig läuft
+        let totalTimeMs = boss.timer * 1000;
+        let currentTimeMs = totalTimeMs;
+        const updateInterval = 50; // Update alle 50ms für flüssige Animation
+
         this.state.bossTimer = setInterval(() => {
-            timeLeft--;
-            const bar = document.getElementById('boss-timer-bar');
-            if(bar) bar.style.width = (timeLeft / boss.timer * 100) + "%";
+            currentTimeMs -= updateInterval;
             
-            if(timeLeft <= 0) {
+            const bar = document.getElementById('integrated-boss-bar');
+            
+            if(bar) {
+                // Prozent berechnen
+                let percent = (currentTimeMs / totalTimeMs * 100);
+                bar.style.width = percent + "%";
+                
+                // Pulsieren, wenn es knapp wird (unter 30%)
+                if(percent < 30) {
+                    bar.classList.add('animate-pulse');
+                    // Optional: Farbe intensivieren
+                    bar.classList.remove('from-red-600', 'to-red-500');
+                    bar.classList.add('bg-red-600'); 
+                }
+            }
+            
+            if(currentTimeMs <= 0) {
                 clearInterval(this.state.bossTimer);
                 this.resolveBossFail(boss.fail);
             }
-        }, 1000);
+        }, updateInterval);
     },
 
     resolveBossFail: function(failData) {
         this.resolveTerminal(failData.r, failData.m, failData.f, failData.a, failData.c, null, null, 'boss');
-        document.getElementById('boss-timer-container').style.display = 'none';
     },
 
     handleSideQuest: function() {
@@ -949,7 +1081,7 @@ trigger: function(type) {
         }
     },
 
-// --- TERMINAL & CALL SYSTEM (FINAL FIX) ---
+// --- TERMINAL & CALL SYSTEM ---
 
     renderTerminal: function(ev, type) {
 		// --- Event-Status für E-Mail-System speichern ---
@@ -1012,6 +1144,7 @@ trigger: function(type) {
         // --- STYLE KONFIGURATION ---
         let color = 'text-amber-400';       
         let borderColor = 'border-amber-500';
+		let bgClass = 'bg-slate-900';
         let icon = '⚡'; 
 
         switch(type) {
@@ -1024,6 +1157,12 @@ trigger: function(type) {
                 color = 'text-red-500';
                 borderColor = 'border-red-500';
                 icon = '🚨';
+                break;
+			case 'rep':
+                color = 'text-yellow-300';
+                borderColor = 'border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]';
+                bgClass = "bg-gradient-to-b from-slate-900 to-slate-950";
+				icon = '💎';
                 break;
             case 'sidequest': 
                 color = 'text-purple-400';
@@ -1045,7 +1184,7 @@ trigger: function(type) {
         }
 
         let html = `
-            <div class="w-full max-w-2xl text-left fade-in bg-slate-900 border border-slate-700 p-4 md:p-6 rounded-xl shadow-2xl mx-auto">
+            <div class="w-full max-w-2xl text-left fade-in ${bgClass} border ${borderColor} p-4 md:p-6 rounded-xl shadow-2xl mx-auto relative overflow-hidden">
                 
                 <div class="flex items-center gap-3 mb-4 md:mb-6 border-b border-slate-600 pb-3 md:pb-4">
                     <span class="text-3xl">${icon}</span>
@@ -1054,7 +1193,22 @@ trigger: function(type) {
                         <h2 class="text-2xl font-bold text-slate-100">${title}</h2>
                     </div>
                 </div>
-                
+        `;
+
+        // === BOSS TIMER BALKEN (Integriert) ===
+        if (type === 'boss') {
+            // FIX 3: 'transition-all' und 'duration-1000' ENTFERNT!
+            // Da JS jetzt alle 50ms updatet, brauchen wir keine CSS-Transition mehr.
+            // Das verhindert das "Springen".
+            html += `
+            <div class="w-full h-4 bg-red-950/50 rounded-full mb-6 border border-red-500/30 overflow-hidden relative">
+                <div id="integrated-boss-bar" class="h-full bg-gradient-to-r from-red-600 to-red-500 shadow-red-500/50 shadow-md ease-linear" style="width: 100%"></div>
+            </div>
+            `;
+        }
+        // ==========================================
+        
+        html += `
                 <div class="bg-black/40 p-5 rounded-lg border-l-4 ${borderColor} mb-8">
                     <p class="italic text-slate-300 text-lg leading-relaxed font-serif">"${text}"</p>
                 </div>
@@ -1107,7 +1261,16 @@ trigger: function(type) {
                         clickAction = `onclick="engine.handleChainChoice('${opt.next}')"`;
                     } else {
                         let safeRes = opt.r ? opt.r.replace(/'/g, "\\'").replace(/\n/g, "<br>") : '';
-                        clickAction = `onclick="engine.resolveTerminal('${safeRes}', ${opt.m||0}, ${opt.f||0}, ${opt.a||0}, ${opt.c||0}, '${opt.loot||''}', '${opt.req||''}', '${type}', '${opt.next||''}', '${opt.rem||''}')"`;
+                        
+                        // NEU: Reputation Objekt sicher für HTML machen
+                        let safeRep = "null";
+                        if (opt.rep) {
+                            // Wir wandeln das Objekt in einen String um und ersetzen Anführungszeichen, damit das HTML nicht kaputt geht
+                            safeRep = JSON.stringify(opt.rep).replace(/"/g, "&quot;");
+                        }
+
+                        // Hier fügen wir 'safeRep' als letztes Argument hinzu
+                        clickAction = `onclick="engine.resolveTerminal('${safeRes}', ${opt.m||0}, ${opt.f||0}, ${opt.a||0}, ${opt.c||0}, '${opt.loot||''}', '${opt.req||''}', '${type}', '${opt.next||''}', '${opt.rem||''}', ${safeRep})"`;
                     }
                 }
 
@@ -1167,7 +1330,7 @@ trigger: function(type) {
         this.resolveTerminal("Verbindung unterbrochen.", 0, 0, 0, 0, null, null, "calls", null);
     },
 
-resolveTerminal: function(res, m, f, a, c, loot, usedItem, type, next, rem) { // <--- HIER: rem HINZUGEFÜGT
+resolveTerminal: function(res, m, f, a, c, loot, usedItem, type, next, rem, repData) { // <--- HIER: rem HINZUGEFÜGT
         // --- INTRANET TRIGGER  ---
         if (res === "CMD:OPEN_INTRANET") {
             res = "Du klickst hektisch auf das Lesezeichen. Das alte Intranet lädt ächzend...";
@@ -1182,6 +1345,12 @@ resolveTerminal: function(res, m, f, a, c, loot, usedItem, type, next, rem) { //
         // --------------------------------
 
         if(type === 'coffee') this.state.coffeeConsumed++;
+		
+		// Wenn man mit Bernd trinkt (ID aus data.js), startet der Effekt
+        if (next === 'path_bernd_drunk') {
+            this.state.drunkEndTime = this.state.time + m + 60; 
+            this.log("Alles dreht sich ein bisschen...", "text-purple-400 italic");
+        }
 
         // Zeit & Tickets
         let oldTimeChunk = Math.floor(this.state.time / 30);
@@ -1222,6 +1391,41 @@ resolveTerminal: function(res, m, f, a, c, loot, usedItem, type, next, rem) { //
         if (f !== 0) this.showFloatingText('val-fl', f);
         if (finalA !== 0) this.showFloatingText('val-al', finalA);
         if (finalC !== 0) this.showFloatingText('val-cr', finalC);
+        
+        // --- REPUTATION LOGIK  ---
+        if (repData) {
+            // Falls repData als String kommt (durch HTML Attribute), parsen
+            if (typeof repData === 'string') {
+                try { repData = JSON.parse(repData.replace(/'/g, '"')); } catch(e) { console.error("Rep Parse Error", e); }
+            }
+
+            if (typeof repData === 'object') {
+                let changed = false; // Wir merken uns, ob sich was geändert hat
+                
+                for (let [charName, val] of Object.entries(repData)) {
+                    // Sicherstellen, dass der Charakter im State existiert
+                    if (this.state.reputation[charName] === undefined) {
+                        this.state.reputation[charName] = 0;
+                    }
+                    
+                    // Wert addieren
+                    this.state.reputation[charName] += val;
+                    
+                    // Begrenzen auf -100 bis +100
+                    this.state.reputation[charName] = Math.max(-100, Math.min(100, this.state.reputation[charName]));
+                    
+                    // Optional: Floating Text Feedback (Nur wenn gewünscht)
+                    // if (val !== 0) this.showFloatingText('team-btn', val > 0 ? '💚' : '💔');
+
+                    changed = true;
+                }
+
+                // WENN sich der Ruf geändert hat: Sofort ins Archiv schreiben & speichern!
+                if (changed) {
+                    this.saveSystem(); 
+                }
+            }
+        }
 
         // Story Flag setzen
         if (next && next !== "") {
@@ -2118,44 +2322,101 @@ closeInventory: function() {
     },
 
     // --- TEAM / CHARAKTERE ---
-    openTeam: function() {
+openTeam: function() {
         const modal = document.getElementById('team-modal');
         const grid = document.getElementById('team-grid');
         grid.innerHTML = '';
-
+     
         DB.chars.forEach(char => {
             const card = document.createElement('div');
-            // Design der Karte (wie vorher)
-            card.className = "bg-slate-800 p-4 rounded-lg border border-slate-700 flex gap-4 hover:border-white transition-colors";
+            card.className = "bg-slate-800 p-4 rounded-lg border border-slate-700 flex flex-col gap-3 relative overflow-hidden group hover:border-slate-500 transition-colors overflow-visible"; 
             
-            // --- LOGIK: BILD ODER EMOJI? ---
-            let avatarHTML;
-            
-            if (char.img) {
-                // FALL A: Es gibt ein Bild -> Bild anzeigen
-                // 'object-cover' sorgt dafür, dass das Bild den Kreis füllt
-                avatarHTML = `<img src="${char.img}" class="w-full h-full object-cover" alt="${char.name}">`;
-            } else {
-                // FALL B: Kein Bild -> Emoji anzeigen
-                avatarHTML = char.icon;
+            // Prüfen, ob es der Spieler ist
+            const isPlayer = char.name.includes("Müller") || char.role === "SysAdmin";
+
+            // Ruf und Logik nur berechnen, wenn NICHT Spieler
+            let currentRep = 0;
+            let statusText = "NEUTRAL";
+            let barColor = "bg-slate-500";
+            let statusColor = "text-slate-400";
+            let fillPercent = 50;
+
+            if (!isPlayer) {
+                currentRep = this.state.reputation[char.name] || 0;
+                
+                if (currentRep >= 90) {
+                    statusText = "KOMPLIZE";
+                    barColor = "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.6)]";
+                    statusColor = "text-purple-400";
+                } else if (currentRep >= 60) {
+                    statusText = "VERBÜNDET";
+                    barColor = "bg-emerald-500";
+                    statusColor = "text-emerald-400";
+                } else if (currentRep >= 20) {
+                    statusText = "FREUNDLICH";
+                    barColor = "bg-green-600";
+                    statusColor = "text-green-500";
+                } else if (currentRep <= -90) {
+                    statusText = "HASST DICH";
+                    barColor = "bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.6)]";
+                    statusColor = "text-red-500";
+                } else if (currentRep <= -60) {
+                    statusText = "GENERVT";
+                    barColor = "bg-orange-600";
+                    statusColor = "text-orange-500";
+                } else if (currentRep <= -20) {
+                    statusText = "SKEPTISCH";
+                    barColor = "bg-yellow-600";
+                    statusColor = "text-yellow-600";
+                }
+                fillPercent = (currentRep + 100) / 2;
             }
 
-            // HTML zusammenbauen
+            // HTML Bausteine für Status & Balken (nur wenn nicht Müller)
+            const statusBadgeHTML = isPlayer ? '' : `
+                <span class="text-[10px] font-bold uppercase tracking-widest ${statusColor} border border-slate-700 bg-slate-900/50 px-2 py-0.5 rounded ml-2 shrink-0">
+                    ${statusText}
+                </span>`;
+
+            const progressBarHTML = isPlayer ? '' : `
+                <div class="w-full h-1.5 bg-slate-900 rounded-full border border-slate-700 relative overflow-hidden mb-2">
+                    <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-600/50 z-20"></div>
+                    <div class="h-full ${barColor} transition-all duration-1000 ease-out relative z-10" style="width: ${fillPercent}%"></div>
+                </div>`;
+
+            // Avatar
+            let avatarHTML = char.img ? 
+                `<img src="${char.img}" class="w-full h-full object-cover" alt="${char.name}">` : 
+                char.icon;
+
             card.innerHTML = `
-                <div class="shrink-0 bg-slate-900 w-16 h-16 flex items-center justify-center rounded-full border border-slate-600 overflow-hidden text-4xl shadow-inner
-                            relative z-0 transition-transform duration-300 ease-out origin-center cursor-help
-                            md:hover:scale-[2.25] md:hover:z-50 md:hover:shadow-2xl md:hover:border-white">
-                    ${avatarHTML}
-                </div>
-                
-                <div> 
-                    <div class="flex items-baseline gap-2 mb-1">
-                        <h3 class="font-bold text-white text-lg">${char.name}</h3>
-                        <span class="text-[10px] text-slate-300 uppercase tracking-widest">${char.role}</span>
+                <div class="flex gap-4 items-start z-10">
+                    <div class="shrink-0 bg-slate-900 w-16 h-16 flex items-center justify-center rounded-full border border-slate-600 overflow-hidden text-3xl shadow-inner 
+                                relative z-0 transition-transform duration-300 ease-out origin-center cursor-help 
+                                md:hover:scale-[2.25] md:hover:z-50 md:hover:shadow-2xl md:hover:border-white">
+                        ${avatarHTML}
                     </div>
-                    <p class="text-xs text-slate-400 italic leading-relaxed">${char.desc}</p>
+                    
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="flex flex-col">
+                                <div class="flex items-baseline gap-2">
+                                    <h3 class="font-bold text-white text-lg truncate">${char.name}</h3>
+                                    <span class="text-[10px] text-slate-400 uppercase tracking-wider hidden md:inline-block pt-1">${char.role}</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500 uppercase tracking-wider md:hidden">${char.role}</span>
+                            </div>
+                            
+                            ${statusBadgeHTML}
+                        </div>
+                        
+                        ${progressBarHTML}
+                        
+                        <p class="text-xs text-slate-400 leading-snug opacity-90 italic">${char.desc}</p>
+                    </div>
                 </div>
             `;
+            
             grid.appendChild(card);
         });
 
@@ -2394,7 +2655,7 @@ closeInventory: function() {
         // 1. Daten sammeln
         // Wir holen das aktuelle Archiv aus dem State UND den Tutorial-Status aus dem LocalStorage
         const data = {
-            arc: this.state.archive, // Dein Sammelalbum
+            arc: this.state.archive, // Enthält jetzt Items, Achievements UND Reputation
             // Falls du 'tutorialSeen' oder 'layer8_tutorial' nutzt (bitte Key prüfen!)
             tut: localStorage.getItem('tutorialSeen') || "false", 
             salt: Math.floor(Math.random() * 999999) // Macht den Code einzigartig
