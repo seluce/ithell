@@ -63,7 +63,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v2.3.2 geladen. Warte auf User...");
+        this.log("System v2.3.3 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -1031,7 +1031,7 @@ const engine = {
         
         // FIX 1: OPACITY ENTFERNEN!
         // Wir setzen die Klasse genau so wie bei 'renderTerminal', damit es hell wird.
-        term.className = "flex-1 flex flex-col justify-center items-center py-3 w-full h-full";
+        term.className = "flex-1 flex flex-col items-center py-3 w-full min-h-full";
 
         // Event rendern
         this.renderEventHTML(boss, 'boss', term);
@@ -1114,7 +1114,7 @@ const engine = {
         const term = document.getElementById('terminal-content');
         
         // WICHTIG: Container-Styling für Zentrierung
-        term.className = "flex-1 flex flex-col justify-center items-center py-3 w-full h-full";
+        term.className = "flex-1 flex flex-col items-center py-3 w-full min-h-full";
 
         // ENTSCHEIDUNG: Neu (Nodes) oder Alt (Opts)?
         if (ev.nodes && ev.startNode) {
@@ -1210,7 +1210,7 @@ const engine = {
         }
 
         let html = `
-            <div class="w-full max-w-2xl text-left fade-in ${bgClass} border ${borderColor} p-4 md:p-6 rounded-xl shadow-2xl mx-auto relative overflow-hidden">
+            <div class="w-full max-w-2xl text-left fade-in ${bgClass} border ${borderColor} p-4 md:p-6 rounded-xl shadow-2xl mx-auto my-auto shrink-0 relative overflow-hidden">
                 
                 <div class="flex items-center gap-3 mb-4 md:mb-6 border-b border-slate-600 pb-3 md:pb-4">
                     <span class="text-3xl">${icon}</span>
@@ -1515,7 +1515,7 @@ const engine = {
         let statSummaryHTML = this.buildStatSummary(m, f, finalA, finalC);
 
         term.innerHTML = `
-            <div class="w-full max-w-xl text-left fade-in flex flex-col h-full justify-center">
+            <div class="w-full max-w-xl text-left fade-in flex flex-col my-auto shrink-0">
                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-600 mb-8 shadow-xl">
                     <h3 class="font-bold text-white mb-2 uppercase text-xs tracking-widest text-emerald-500">Ergebnis</h3>
                     <p class="text-slate-300 italic text-lg leading-relaxed">"${res}"</p>
