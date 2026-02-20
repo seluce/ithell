@@ -63,7 +63,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v2.4.0 geladen. Warte auf User...");
+        this.log("System v2.4.1 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -1753,8 +1753,13 @@ const engine = {
                 this.saveSystem();
             }
         }
-        // ----------------------------------
-            
+        
+        // --- STORY FLAG FÜR PHONE SETZEN ---
+        if (res.next && res.next !== "") {
+            this.state.storyFlags[res.next] = true;
+        }
+        // -----------------------------------
+        
             // Simulation: Gegenüber tippt kurz, bevor er geht
             const loadingId = "typing-" + Date.now();
             content.innerHTML += `

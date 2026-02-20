@@ -1,3 +1,7 @@
+\[2.4.1] - 2026-02-20
+* Kritischer Bugfix für Phone Events, wodurch nun StoryFlags (Next/ReqStory) korrekt angewendet werden
+* Spenden-Event Link öffnet sich nun korrekt im neuen Fenster
+
 \[2.4.0] - 2026-02-20
 * Rep-Events (Begegnungen) haben nun auch Filler-Standalone-Events, damit sich jeder Charakter lebendiger anfühlt
 * Viele Phone-Events wurden vom Text her überarbeitet, damit es sich mehr wie ein richtiger Chat anfühlt

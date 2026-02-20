@@ -12442,7 +12442,7 @@ const DB = {
             { 
                 t: "Shut up and take my money! (Link kopieren)", 
                 m: 2, f: 5, a: 0, c: 10, 
-                r: "ZACK! Dr. Wichtig steht plötzlich hinter dir. 'Müller! Bezahle ich Sie fürs Spielen?!' Du klickst das Fenster panisch zu, hast dir den Link aber noch heimlich kopiert.<br><br>(Wer die Entwicklung wirklich freiwillig unterstützen will: <a href='DEIN_LINK_HIER' target='_blank' class='text-blue-400 underline hover:text-blue-300 transition-colors'>Hier geht's zum Spendenhut</a>. Wird natürlich brav dem Finanzamt gemeldet!)"
+                r: "ZACK! Dr. Wichtig steht plötzlich hinter dir. 'Müller! Bezahle ich Sie fürs Spielen?!' Du klickst das Fenster panisch zu, hast dir den Link aber noch heimlich kopiert.<br><br>(Wer die Entwicklung wirklich freiwillig unterstützen will: <a href='https://paypal.me/seluce' target='_blank' class='text-blue-400 underline hover:text-blue-300 transition-colors'>Hier geht's zum Spendenhut</a>. Wird natürlich brav dem Finanzamt gemeldet!)"
             },
             { 
                 t: "Ignorieren: 'Ich werde selbst mies bezahlt!'", 
