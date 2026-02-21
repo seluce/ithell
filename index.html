@@ -233,7 +233,7 @@
     <div class="flex-1 flex flex-col lg:flex-row gap-4 min-h-0 mb-4 overflow-hidden">
 
         <div id="terminal" class="flex-[2] neon-box p-4 md:p-6 overflow-y-auto flex flex-col relative min-h-[300px] shrink-0">
-            <div class="absolute top-2 right-4 text-[10px] text-slate-600">TicketSystem v2.4.1</div>
+            <div class="absolute top-2 right-4 text-[10px] text-slate-600">TicketSystem v2.5.0</div>
             
             <div id="terminal-content" class="flex-1 flex flex-col justify-center items-center text-center opacity-40">
                 <div class="text-4xl md:text-6xl mb-4">🖥️</div>
@@ -281,8 +281,8 @@
                             <span class="text-[10px] text-purple-400 font-bold">🏆 ARCHIV</span>
                         </div>
 
-                        <div onclick="engine.openReportModal()" class="cursor-pointer hover:bg-slate-800 rounded px-1 transition-colors flex items-center gap-2">
-                            <span class="text-[10px] text-red-400 font-bold">🐞 MELDEN</span>
+                        <div onclick="engine.openSettings()" class="cursor-pointer hover:bg-slate-800 rounded px-1 transition-colors flex items-center gap-1.5">
+                            <span class="text-[10px] text-slate-400 font-bold">⚙️ MENÜ</span>
                         </div>
                     </div>
 
@@ -736,6 +736,93 @@
     </div>
 </div>
 <!-- SCHWARZES BRETT MODAL END-->
+
+<!-- Systemsteuerung MODAL START -->
+<div id="settings-modal" class="fixed inset-0 bg-black/90 z-[9999] hidden flex-col items-center justify-center p-4 fade-in">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full shadow-2xl relative flex flex-col overflow-hidden">
+
+        <div class="bg-slate-950 p-5 border-b border-slate-800 flex justify-between items-center relative">
+            <div class="flex items-center gap-3">
+                <span class="text-xl text-slate-400">⚙️</span>
+                <h2 class="text-lg font-black text-slate-100 tracking-widest uppercase mt-0.5">MENÜ</h2>
+            </div>
+            <button onclick="engine.closeSettings()" class="text-slate-500 hover:text-white text-3xl font-light leading-none transition-colors px-2">&times;</button>
+        </div>
+
+        <div class="p-5 space-y-7 overflow-y-auto max-h-[85vh]">
+            
+            <div>
+                <h3 class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2 px-1">Spielsteuerung</h3>
+                <div class="flex flex-col gap-2">
+                    <button onclick="engine.softReset()" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-blue-500 rounded-lg transition-all text-slate-200 text-sm font-medium flex items-center gap-3 group shadow-sm">
+                        <span class="text-base grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all">🔄</span> 
+                        Tag neu starten (08:00 Uhr)
+                    </button>
+                    
+                    <div class="px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-200 text-sm flex justify-between items-center transition-colors focus-within:border-blue-500 shadow-sm group">
+                        <span class="font-medium flex items-center gap-3">
+                            <span class="text-base grayscale opacity-70 group-hover:opacity-100 group-hover:grayscale-0 transition-all">⏱️</span>
+                            Start-Modus:
+                        </span>
+                        <select id="setting-diff" onchange="engine.saveDefaultDifficulty(this.value)" class="bg-slate-900 border border-slate-600 text-white text-xs rounded px-2 py-1 focus:border-blue-500 focus:outline-none cursor-pointer outline-none shadow-inner">
+                            <option value="ask">Jeden Tag fragen</option>
+                            <option value="easy">Freitag (Leicht)</option>
+                            <option value="normal">Mittwoch (Normal)</option>
+                            <option value="hard">Montag (Schwer)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mb-2 px-1">Globale Statistik</h3>
+                <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800 text-sm text-slate-300 grid grid-cols-3 gap-2 text-center shadow-inner" id="global-stats-container">
+                    </div>
+            </div>
+
+            <div>
+                <h3 class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-2 px-1">Sicherheit & Backups</h3>
+                <div class="flex flex-col gap-2">
+                    <button onclick="engine.closeSettings(); engine.ui.openExportModal()" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-emerald-500 rounded-lg transition-all text-slate-200 text-sm font-medium flex items-center gap-3 group shadow-sm">
+                        <span class="text-base grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all">📤</span> 
+                        Spielstand exportieren
+                    </button>
+                    <button onclick="engine.closeSettings(); engine.ui.openImportModal()" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-emerald-500 rounded-lg transition-all text-slate-200 text-sm font-medium flex items-center gap-3 group shadow-sm">
+                        <span class="text-base grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all">📥</span> 
+                        Spielstand importieren
+                    </button>
+                    
+                    <button id="btn-hard-reset" onclick="engine.triggerHardReset(this)" data-armed="false" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-red-500 rounded-lg transition-all text-red-400 text-sm font-medium flex items-center gap-3 group shadow-sm">
+                        <span id="icon-hard-reset" class="text-base grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all">⚠️</span>
+                        <span id="text-hard-reset">Spielstand löschen</span>
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-2 px-1">Community & Support</h3>
+                <div class="flex flex-col gap-2">
+                    <button id="btn-share" onclick="engine.shareGame(this)" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-purple-500 rounded-lg transition-all text-slate-200 text-sm font-medium flex items-center gap-3 group shadow-sm">
+                        <span class="text-base grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all">💌</span> 
+                        <span id="text-share">Spiel mit Freunden teilen</span>
+                    </button>
+
+                    <button onclick="engine.closeSettings(); engine.openReportModal()" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-purple-500 rounded-lg transition-all text-slate-200 text-sm font-medium flex items-center gap-3 group shadow-sm">
+                        <span class="text-base grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all">🐞</span> 
+                        Fehler melden / Feedback
+                    </button>
+                    
+                    <button onclick="window.open('https://github.com/seluce/Layer8Problem', '_blank')" class="w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-purple-500 rounded-lg transition-all text-slate-200 text-sm font-medium flex items-center gap-3 group shadow-sm">
+                        <span class="text-base grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all">💻</span> 
+                        <span>GitHub Projektseite (seluce)</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Systemsteuerung MODAL END -->
 
 <!-- EXPORT IMPORT MODAL START -->
 

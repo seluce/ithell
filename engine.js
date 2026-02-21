@@ -11,6 +11,7 @@ const engine = {
         lunchDone: false,
         bossTimer: null,
         ticketWarning: false,
+        morningMoodShown: false,
       
         // Schwierigkeitsgrad (Standard 1.0)
         difficultyMult: 1.0, 
@@ -63,7 +64,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v2.4.1 geladen. Warte auf User...");
+        this.log("System v2.5.0 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -85,7 +86,7 @@ const engine = {
                 if(!this.state.archive.items) this.state.archive.items = [];
                 if(!this.state.archive.achievements) this.state.archive.achievements = [];
                 if(!this.state.archive.reputation) this.state.archive.reputation = {};
-
+                if(!this.state.archive.stats) this.state.archive.stats = { daysSurvived: 0, daysFired: 0, coffeeDrank: 0, ticketsClosed: 0 };
                 // 3. WICHTIG: Ruf aus dem Archiv in das aktive Spiel übertragen!
                 // Wir überschreiben die Nullen mit den gespeicherten Werten
                 for (let [name, val] of Object.entries(this.state.archive.reputation)) {
@@ -102,6 +103,14 @@ const engine = {
         
         // Dann ab in den LocalStorage
         localStorage.setItem('layer8_archive', JSON.stringify(this.state.archive));
+    },
+    
+    incrementStat: function(key) {
+        if (!this.state.archive.stats) {
+            this.state.archive.stats = { daysSurvived: 0, daysRageQuit: 0, daysFired: 0 };
+        }
+        this.state.archive.stats[key] = (this.state.archive.stats[key] || 0) + 1;
+        this.saveSystem();
     },
 
     addToArchive: function(type, id) {
@@ -287,22 +296,33 @@ const engine = {
         document.getElementById('archive-modal').classList.remove('flex');
     },
 
-    // Startet nicht mehr das Spiel, sondern zeigt die Auswahl
+    // Startet das Spiel und prüft, ob ein Standard-Tag gesetzt ist
     start: function() {
         document.getElementById('intro-modal').style.display = 'none';
-        // Wir gehen davon aus, dass das Modal in index.html existiert (id="difficulty-modal")
-        const diffModal = document.getElementById('difficulty-modal');
-        if(diffModal) {
-            diffModal.style.display = 'flex';
+        
+        // Prüfen, ob der Spieler eine Standard-Schwierigkeit festgelegt hat
+        const defaultDiff = localStorage.getItem('layer8_default_diff') || 'ask';
+        
+        if (defaultDiff !== 'ask') {
+            // Modal überspringen und direkt mit der gespeicherten Auswahl starten!
+            this.setDifficulty(defaultDiff);
         } else {
-            // Fallback falls HTML noch nicht aktualisiert wurde
-            this.setDifficulty('normal');
+            // Ganz normal das Auswähl-Modal zeigen
+            const diffModal = document.getElementById('difficulty-modal');
+            if(diffModal) {
+                diffModal.style.display = 'flex';
+            } else {
+                this.setDifficulty('normal'); // Fallback
+            }
         }
     },
 
     // Setzt Schwierigkeit und startet dann erst den Loop (oder das Tutorial)
     setDifficulty: function(level) {
         document.getElementById('difficulty-modal').style.display = 'none';
+        
+        // Buttons für die halbe Sekunde Ladezeit sperren
+        this.disableButtons(true);
         
         if (level === 'easy') {
             this.state.difficultyMult = 0.8;
@@ -323,19 +343,18 @@ const engine = {
         setTimeout(() => {
             if (typeof tutorial !== 'undefined') {
                 // Wir versuchen, das Tutorial zu starten.
-                // Die start()-Funktion prüft selbst den LocalStorage.
                 tutorial.start();
                 
                 // JETZT prüfen wir: Läuft das Tutorial gerade?
                 // Falls NEIN (weil schon gesehen oder übersprungen), starten wir das Spiel sofort.
                 if (!tutorial.isActive) {
-                    this.checkRandomEmail();
+                    this.reset();
                 }
                 // Falls JA (isActive == true), macht diese Funktion hier nichts mehr.
-                // Das Spiel wird dann später von tutorial.finish() gestartet.
+                // Das Spiel wird dann später von tutorial.finish() per engine.reset() gestartet.
             } else {
                 // Fallback: Falls die tutorial.js fehlt, Spiel einfach starten
-                this.checkRandomEmail();
+                this.reset();
             }
         }, 500);
     },
@@ -665,7 +684,7 @@ const engine = {
                         slot.onclick = () => this.log(`Der Ball ist noch völlig plattgedrückt. Gib ihm Zeit, sich zu entfalten. (${wait} Min)`, "text-slate-500");
                     }
                 }
-                else if (itemData.id === 'energy' || itemData.id === 'donut') {
+                else if (['energy', 'donut', 'sandwich', 'chocolate'].includes(itemData.id)) {
                     slot.className += ' cursor-pointer border-blue-500 hover:bg-blue-900/20';
                     slot.onclick = () => this.askUseItem(itemData.id);
                 }
@@ -1158,6 +1177,9 @@ const engine = {
 
     // 3. GEMEINSAMES HTML-TEMPLATE
     buildEventHTML: function(type, title, text, opts, isChain) {
+		
+        // ---> Mache aus \n echte HTML-Zeilenumbrüche <---
+        let formattedText = text ? text.replace(/\n/g, "<br>") : "";		
         
         // --- STYLE KONFIGURATION ---
         let color = 'text-amber-400';       
@@ -1236,7 +1258,7 @@ const engine = {
         
         html += `
                 <div class="bg-black/40 p-5 rounded-lg border-l-4 ${borderColor} mb-8">
-                    <p class="italic text-slate-300 text-lg leading-relaxed font-serif">"${text}"</p>
+                    <p class="italic text-slate-300 text-lg leading-relaxed font-serif">"${formattedText}"</p>
                 </div>
 
                 <div class="space-y-2.5">
@@ -1386,8 +1408,8 @@ const engine = {
 
         if(type === 'coffee') this.state.coffeeConsumed++;
 		
-		// Wenn man mit Bernd trinkt (ID aus data.js), startet der Effekt
-        if (next === 'path_bernd_drunk') {
+		// Wenn man mit Bernd trinkt ODER den Rum-Kuchen genießt
+        if (next === 'path_bernd_drunk' || next === 'path_cake_drunk') {
             this.state.drunkEndTime = this.state.time + m + 60; 
             this.log("Alles dreht sich ein bisschen...", "text-purple-400 italic");
         }
@@ -1535,6 +1557,13 @@ const engine = {
     },
 
     reset: function() {
+		// --- Morgen-Routinen Abfang-Mechanismus ---
+		if (!this.state.morningMoodShown) {
+            this.state.morningMoodShown = true;
+            this.triggerMorningMood();
+            return;
+        }
+        // -----------------------------------------
         this.state.activeEvent = false;
         this.disableButtons(false);
         const term = document.getElementById('terminal-content');
@@ -1904,6 +1933,7 @@ const engine = {
 
         // A. RAGE QUIT (Aggro >= 100)
         if(this.state.al >= 100) {
+			this.incrementStat('daysRageQuit');
             // 1. Tagebuch generieren
             let diary = this.generateDiaryEntry("RAGE"); 
             
@@ -1915,6 +1945,7 @@ const engine = {
         }
         // B. TICKET LAWINE (Zu viele Tickets)
         else if(this.state.tickets >= 10) {
+			this.incrementStat('daysFired');
             // 1. Tagebuch generieren
             let diary = this.generateDiaryEntry("TICKETS");
 
@@ -1931,6 +1962,7 @@ const engine = {
         }
         // D. FEIERABEND (Zeit abgelaufen)
         else if(this.state.time >= 16*60+30) {
+			this.incrementStat('daysSurvived');
             // 1. Tagebuch generieren
             let diary = this.generateDiaryEntry("WIN");
 
@@ -1942,7 +1974,7 @@ const engine = {
         }
         // E. GEFEUERT (Chef-Radar >= 100)
         else if(this.state.cr >= 100) {
-            
+			            
             // Logik für die "Zweite Chance" basierend auf Schwierigkeit
             let resetTo = 50; // Standard (Mittwoch)
             if (this.state.difficultyMult < 1.0) resetTo = 30; // Freitag
@@ -1959,6 +1991,7 @@ const engine = {
                 
                 this.showModal("ABMAHNUNG", warningText, false);
             } else {
+				this.incrementStat('daysFired');
                 // 1. Tagebuch generieren
                 let diary = this.generateDiaryEntry("FIRED");
 
@@ -2105,7 +2138,7 @@ const engine = {
                         slot.onclick = () => this.log(`Der Ball ist noch völlig plattgedrückt. Gib ihm Zeit, sich zu entfalten. (${wait} Min)`, "text-slate-500");
                     }
                 }
-                else if (itemData.id === 'energy' || itemData.id === 'donut') {
+               else if (['energy', 'donut', 'sandwich', 'chocolate'].includes(itemData.id)) {
                     slot.className += ' cursor-pointer border-blue-500 hover:bg-blue-900/20';
                     slot.onclick = () => this.askUseItem(itemData.id);
                 }
@@ -2187,17 +2220,26 @@ const engine = {
 
         // Daten holen
         let itemDB = DB.items[id];
-        let title = itemDB ? itemDB.name : id; // Wenn du es in data.js in "Stressball" umbenennst, steht hier automatisch "Stressball"
-        let icon = itemDB ? itemDB.icon : "❓";
+        let title = itemDB ? itemDB.name : id; 
+        
+        // --- BILD VS ICON LOGIK ---
+        let displayContent = "❓";
+        if (itemDB) {
+            if (itemDB.img) {
+                // Wenn ein Bild existiert, bauen wir einen IMG-Tag mit passenden Tailwind-Klassen
+                displayContent = `<img src="${itemDB.img}" class="w-full h-full object-contain drop-shadow-md" alt="${itemDB.name}">`;
+            } else {
+                // Fallback auf das Emoji
+                displayContent = itemDB.icon;
+            }
+        }
         
         let desc = "Unbekannter Effekt.";
         let warn = "Dieses Item wird verbraucht.";
 
         // --- FLAVOR TEXTE ---
-        
         if (id === 'stressball') {
             desc = "Senkt AGGRO sofort um -10 Punkte. *Quietsch*";
-            // Statt "Cooldown": Materialermüdung
             warn = "Material-Ermüdung! Nach dem Kneten ist der Ball für 60 Minuten platt und nutzlos.";
         } 
         else if (id === 'energy') {
@@ -2208,6 +2250,14 @@ const engine = {
             desc = "Senkt AGGRO um -15. Seelentröster aus Teig.";
             warn = "Einmaliger Genuss (Hüftgold bleibt für immer). Der Donut ist danach weg.";
         }
+        else if (id === 'sandwich') {
+            desc = "Senkt AGGRO um -10 und FAULHEIT um -5. Ein solides Handwerker-Frühstück.";
+            warn = "Mit viel Remoulade! Einmalig konsumierbar.";
+        }
+        else if (id === 'chocolate') {
+            desc = "Senkt AGGRO um -20. Pures, quadratisches Glück auf Kakaobasis.";
+            warn = "Du hast sie dir verdient. Verschwindet nach dem Essen aus dem Inventar.";
+        }
         else if (id === 'bubble_wrap') {
             desc = "Senkt AGGRO um -10. Sehr befriedigend.";
             warn = "Einweg-Therapie! Wenn alle Blasen geplatzt sind, ist der Spaß vorbei.";
@@ -2215,7 +2265,10 @@ const engine = {
 
         // Modal befüllen
         this.state.pendingItem = id; 
-        document.getElementById('item-confirm-icon').innerText = icon;
+        
+        // WICHTIG: Hier innerHTML nutzen, damit das Bild gerendert wird!
+        document.getElementById('item-confirm-icon').innerHTML = displayContent;
+        
         document.getElementById('item-confirm-title').innerText = title;
         document.getElementById('item-confirm-desc').innerText = desc;
         document.getElementById('item-confirm-warn').innerText = warn;
@@ -2248,7 +2301,7 @@ const engine = {
         }
 
         // B. VERBRAUCHSGÜTER
-        else if (['energy', 'donut', 'bubble_wrap'].includes(id)) {
+        else if (['energy', 'donut', 'bubble_wrap', 'sandwich', 'chocolate'].includes(id)) {
             let index = this.state.inventory.findIndex(i => i.id === id);
             
             if (index > -1) {
@@ -2261,6 +2314,15 @@ const engine = {
                 else if (id === 'donut') {
                     this.state.al = Math.max(0, this.state.al - 15);
                     this.log("Mmmh... Zuckerglasur. Die Wut schmilzt dahin. (Aggro -15)", "text-pink-400");
+                }
+                else if (id === 'sandwich') {
+                    this.state.al = Math.max(0, this.state.al - 10);
+                    this.state.fl = Math.max(0, this.state.fl - 5);
+                    this.log("Eine dicke Scheibe Käse und Remoulade. Das erdet. (Aggro -10, Faulheit -5)", "text-yellow-400");
+                }
+                else if (id === 'chocolate') {
+                    this.state.al = Math.max(0, this.state.al - 20);
+                    this.log("Die Schokolade schmilzt auf der Zunge. Für einen kurzen Moment hasst du niemanden. (Aggro -20)", "text-amber-500");
                 }
                 else if (id === 'bubble_wrap') {
                     this.state.al = Math.max(0, this.state.al - 10);
@@ -2695,6 +2757,81 @@ const engine = {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     },
+    
+    triggerMorningMood: function() {
+        // Fallback, falls die Kategorie in der data.js fehlt
+        if (!DB.moods || DB.moods.length === 0) {
+            this.reset();
+            return;
+        }
+        
+        // Buttons für die halbe Sekunde Ladezeit freigeben
+        this.disableButtons(false);
+        this.state.activeEvent = false;
+
+        // 1. Zufälliges Morgen-Ereignis ziehen
+        let mood = DB.moods[Math.floor(Math.random() * DB.moods.length)];
+        
+        // 2. Mechanik sicher anwenden
+        let statHtml = "";
+        
+        if (mood.effect === "aggro") {
+            this.state.al += 15;
+            statHtml = "<span class='text-orange-400 font-bold'>+15% Aggro</span>";
+        } 
+        else if (mood.effect === "radar") {
+            this.state.cr += 15;
+            statHtml = "<span class='text-red-500 font-bold'>+15% Chef-Radar</span>";
+        } 
+        else if (mood.effect === "lazy") {
+            this.state.fl += 15;
+            this.state.time += 30; // Zeitverlust wegen Verschlafen
+            statHtml = "<span class='text-emerald-400 font-bold'>Start 08:30 Uhr & +15% Faulheit</span>";
+        } 
+        else if (mood.effect === "normal") {
+            statHtml = "<span class='text-slate-400 font-bold'>Neutral. Der ganz normale Wahnsinn beginnt.</span>";
+        } 
+        else if (mood.effect === "snack") {
+            // Nur Snacks als Loot!
+            const possibleItems = ["energy", "donut", "sandwich", "chocolate"];
+            const rItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
+            this.state.inventory.push({ id: rItem, used: false });
+            this.addToArchive('items', rItem);
+            let itemName = DB.items[rItem] ? DB.items[rItem].name : rItem;
+            statHtml = `<span class='text-yellow-400 font-bold'>Inventar: ${itemName} erhalten!</span>`;
+        }
+
+        // GUI sofort aktualisieren, damit die Balken/Uhrzeit richtig stehen
+        this.updateUI();
+
+        // 3. Im Terminal wunderschön im "Special Event" Design rendern
+        const term = document.getElementById('terminal-content');
+        term.className = "flex-1 flex flex-col items-center py-3 w-full min-h-full";
+        
+        term.innerHTML = `
+            <div class="w-full max-w-2xl text-left fade-in bg-slate-900 border border-slate-400 p-4 md:p-6 rounded-xl shadow-2xl mx-auto my-auto shrink-0 relative overflow-hidden">
+                <div class="flex items-center gap-3 mb-4 md:mb-6 border-b border-slate-600 pb-3 md:pb-4">
+                    <span class="text-3xl">🌅</span>
+                    <div class="flex flex-col">
+                        <span class="text-slate-400 font-black uppercase tracking-widest text-sm">DER MORGEN DANACH</span>
+                        <h2 class="text-2xl font-bold text-white">${mood.title}</h2>
+                    </div>
+                </div>
+                
+                <div class="bg-black/40 p-5 rounded-lg border-l-4 border-slate-400 mb-6">
+                    <p class="italic text-slate-300 text-lg leading-relaxed font-serif">"${mood.text}"</p>
+                </div>
+                
+                <div class="mb-8 text-center text-sm bg-slate-950 border border-slate-800 p-3 rounded shadow-inner">
+                    Startbedingungen: ${statHtml}
+                </div>
+
+                <button onclick="engine.reset()" class="w-full text-center p-4 rounded-xl border border-slate-500 bg-slate-800 hover:bg-slate-700 hover:border-slate-300 hover:shadow-lg hover:text-white transition-all text-slate-200 font-bold shadow-md uppercase tracking-widest">
+                    Den Arbeitstag beginnen
+                </button>
+            </div>
+        `;
+    },
      
     // --- SPEICHERSTAND EXPORT / IMPORT SYSTEM ---
 
@@ -3035,7 +3172,178 @@ ${logText}
             alert("Fehler beim Öffnen des Formulars.");
         }
     },
-	
+
+    // --- SYSTEMSTEUERUNG / SETTINGS ---
+    openSettings: function() {
+        const modal = document.getElementById('settings-modal');
+        const select = document.getElementById('setting-diff');
+        
+        // Aktuelle Einstellung laden
+        const currentDef = localStorage.getItem('layer8_default_diff') || 'ask';
+        if(select) select.value = currentDef;
+        
+        // Reset the Hard-Reset button state
+        const resetBtn = document.getElementById('btn-hard-reset');
+        if (resetBtn) {
+            resetBtn.dataset.armed = "false";
+            document.getElementById('text-hard-reset').innerText = "Spielstand löschen";
+            document.getElementById('icon-hard-reset').className = "text-base grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all";
+            resetBtn.className = "w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-red-500 rounded-lg transition-all text-red-400 text-sm font-medium flex items-center gap-3 group shadow-sm";
+        }
+
+        // Statistik ins HTML schreiben (Kompakt in einer Zeile)
+        const s = this.state.archive.stats || { daysSurvived: 0, daysRageQuit: 0, daysFired: 0 };
+        document.getElementById('global-stats-container').innerHTML = `
+            <div class="flex flex-col"><span class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Überlebt</span><span class="font-bold text-emerald-400 text-xl">${s.daysSurvived || 0}</span></div>
+            <div class="flex flex-col"><span class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Rage Quits</span><span class="font-bold text-orange-400 text-xl">${s.daysRageQuit || 0}</span></div>
+            <div class="flex flex-col"><span class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Gefeuert</span><span class="font-bold text-red-500 text-xl">${s.daysFired || 0}</span></div>
+        `;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    },
+
+    // Blitzschneller Neustart ohne Page-Reload
+    softReset: function() {
+        // Alle Menüs schließen
+        this.closeSettings();
+        if (document.getElementById('modal-overlay')) {
+            document.getElementById('modal-overlay').classList.add('hidden');
+            document.getElementById('modal-overlay').classList.remove('flex');
+        }
+
+        // Timer abbrechen
+        if (this.state.emailTimer) clearTimeout(this.state.emailTimer);
+        if (this.state.bossTimer) clearTimeout(this.state.bossTimer);
+
+        // Memory auf 08:00 Uhr setzen (Wir behalten den difficultyMult bei!)
+        this.state.time = 8 * 60;
+        this.state.fl = 0;
+        this.state.al = 0;
+        this.state.cr = 0;
+        this.state.tickets = this.state.difficultyMult > 1.0 ? 2 : 0; // Montag startet mit 2 Tickets
+        this.state.inventory = []; // Taschen werden am neuen Tag geleert
+        this.state.usedIDs = new Set();
+        this.state.usedEmails = new Set();
+        this.state.morningMoodShown = false;
+        this.state.lunchDone = false;
+        this.state.ticketWarning = false;
+        this.state.pendingEnd = null;
+        this.state.coffeeConsumed = 0;
+        this.state.emailsIgnored = 0;
+        this.state.drunkEndTime = 0;
+        this.state.activeEvent = false;
+        this.state.isEmailOpen = false;
+        this.state.emailPending = false;
+        
+        // UI Aufräumen (Phone, Email, Log)
+        document.getElementById('email-modal')?.classList.add('hidden');
+        document.getElementById('phone-app')?.classList.add('hidden');
+        document.getElementById('phone-standby')?.classList.remove('hidden');
+        document.getElementById('phone-notification')?.classList.add('hidden');
+        
+        const logFeed = document.getElementById('log-feed');
+        if(logFeed) logFeed.innerHTML = "";
+        this.state.lastLogMsg = "";
+        this.log("System-Neustart initiiert...", "text-blue-400");
+        
+        // Spiel über den Morgen-Verteiler normal neu starten
+        this.updateUI();
+        this.reset();
+    },
+
+    closeSettings: function() {
+        const modal = document.getElementById('settings-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    },
+
+    saveDefaultDifficulty: function(val) {
+        localStorage.setItem('layer8_default_diff', val);
+        this.log(`Start-Modus geändert auf: ${val.toUpperCase()}`, "text-blue-400");
+    },
+
+    shareGame: function(btn) {
+        const shareData = {
+            title: 'Layer 8 Problem - Der SysAdmin Simulator',
+            text: 'Ich versuche gerade als SysAdmin bei GlobalCorp zu überleben. Hilf mir oder mach es besser!',
+            url: window.location.href
+        };
+        
+        const textSpan = btn.querySelector('#text-share') || btn;
+        const originalText = textSpan.innerText;
+
+        if (navigator.share) {
+            navigator.share(shareData).catch(err => console.log("Teilen abgebrochen:", err));
+        } else {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                textSpan.innerText = "Link erfolgreich kopiert!";
+                btn.classList.add('!bg-green-900/30', '!border-green-500', '!text-green-400');
+                
+                setTimeout(() => {
+                    textSpan.innerText = originalText;
+                    btn.classList.remove('!bg-green-900/30', '!border-green-500', '!text-green-400');
+                }, 3000);
+            }).catch(() => {
+                textSpan.innerText = "Kopieren fehlgeschlagen.";
+                textSpan.classList.add('text-red-400');
+                setTimeout(() => {
+                    textSpan.innerText = originalText;
+                    textSpan.classList.remove('text-red-400');
+                }, 3000);
+            });
+        }
+    },
+
+    triggerHardReset: function(btn) {
+        if (btn.dataset.armed === "true") {
+            // Schritt 2: Ausführen
+            localStorage.removeItem('layer8_archive');
+            localStorage.removeItem('layer8_default_diff');
+            localStorage.removeItem('tutorialSeen');
+            
+            const textSpan = btn.querySelector('#text-hard-reset');
+            textSpan.innerText = "System wird neu gestartet...";
+            
+            btn.className = "w-full text-left px-4 py-3 bg-red-600 border border-red-500 rounded-lg text-white text-sm font-bold flex justify-center items-center mt-2 shadow-md";
+            
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            // Schritt 1: Scharfschalten
+            btn.dataset.armed = "true";
+            const textSpan = btn.querySelector('#text-hard-reset');
+            const iconSpan = btn.querySelector('#icon-hard-reset');
+            
+            textSpan.innerText = "Bist du dir sicher?";
+            iconSpan.className = "text-base"; 
+            
+            btn.className = "w-full text-left px-4 py-3 bg-red-950/30 border border-red-500 rounded-lg transition-all text-red-400 text-sm font-bold flex items-center gap-3 mt-2 animate-pulse shadow-sm";
+            
+            setTimeout(() => {
+                if(btn.dataset.armed === "true") {
+                    btn.dataset.armed = "false";
+                    textSpan.innerText = "Spielstand löschen";
+                    iconSpan.className = "text-base grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all";
+                    btn.className = "w-full text-left px-4 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-red-500 rounded-lg transition-all text-red-400 text-sm font-medium flex items-center gap-3 group shadow-sm";
+                }
+            }, 4000);
+        }
+    }
 };
 
 engine.init();
+
+// Globaler Hotkey: ESC für das Menü
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('settings-modal');
+        if (modal) {
+            // Wenn versteckt -> Öffnen, ansonsten -> Schließen
+            if (modal.classList.contains('hidden')) {
+                engine.openSettings();
+            } else {
+                engine.closeSettings();
+            }
+        }
+    }
+});

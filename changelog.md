@@ -1,3 +1,12 @@
+\[2.5.0] - 2026-02-21
+* Es gibt jetzt ein globales Menü und es lässt sich via ESC öffnen / schließen
+* Es gibt nun ein Stimmungs-Modal, was die Stimmung von Herrn Müller zu Tagesbeginn erläutert
+* Zwei neue Verbrauchsgegenstände wurden ins Spiel integriert, welche man bisher zufällig erhalten kann
+* Beim Bestätigungs-Modal für Verbrauchsgegenstände wird nun das korrekte Bild geladen
+* Bei Events sind nun Absätze (\n) möglich, wie es bereits für einige Calls Events existierte
+* Einige neue Call-Events wurden hinzugefügt, um den Pool für Calls zu erweitern
+* Der Blur-Effekt greift nun zusätzlich für den Geburtstagskuchen, wenn man es zulässt
+
 \[2.4.1] - 2026-02-20
 * Kritischer Bugfix für Phone Events, wodurch nun StoryFlags (Next/ReqStory) korrekt angewendet werden
 * Spenden-Event Link öffnet sich nun korrekt im neuen Fenster

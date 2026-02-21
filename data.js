@@ -9,6 +9,8 @@ const DB = {
 		"arg_list_1": { icon: "📋", name: "Argumente (Ich)", img: "assets/items/arg_list_1.webp" }, 
         "arg_list_2": { icon: "📑", name: "Argumente (Kevin)", img: "assets/items/arg_list_2.webp" },
         "bubble_wrap": { icon: "🫧", name: "Luftpolsterfolie", img: "assets/items/bubble_wrap.webp" },
+        "sandwich": { icon: "🥪", name: "Belegtes Brötchen", img: "assets/items/sandwich.webp" },
+        "chocolate": { icon: "🍫", name: "Tafel Schokolade", img: "assets/items/chocolate.webp" },
         
         // WERKZEUGE (Dauerhaft -> keep: true)
         "admin_pw": { icon: "🔑", name: "Root-Passwort", keep: true, img: "assets/items/admin_pw.webp"  },
@@ -35,6 +37,69 @@ const DB = {
         "corp_chronicles": { icon: "📕", name: "Die Firmenchronik", keep: true, quest: true, img: "assets/items/corp_chronicles.webp" },
         "prince_letter": { icon: "💌", name: "Brief vom Prinzen", keep: true, quest: true,img: "assets/items/prince_letter.webp" },
     },
+    
+    // === MÜLLERS MORGEN (Start-Bedingungen) ===
+    moods: [
+        // --- KATEGORIE 1: AGGRO-MODUS (+15 Aggro) [10% Chance] ---
+        { id: "mood_aggro_1", effect: "aggro", title: "Die Bahn fährt (nicht)", text: "Dein Zug hatte heute Morgen 40 Minuten Verspätung wegen 'freilaufender Tiere im Gleisbett'. Du musstest die letzten zwei Kilometer im Nieselregen zum Büro sprinten. Deine Laune ist bereits im Keller." },
+        { id: "mood_aggro_2", effect: "aggro", title: "Der Zehen-Vorfall", text: "Du bist heute Morgen im Dunkeln mit dem kleinen Zeh volle Kanne gegen den Bettpfosten gerannt. Der Schmerz pocht immer noch in deinem Fuß, während du humpelnd das Büro betrittst." },
+        { id: "mood_aggro_3", effect: "aggro", title: "Kaffee-Katastrophe", text: "Dir ist zuhause die Kaffeekanne aus der Hand gerutscht. Die Küche klebt, du hattest keinen Koffein-Kick und deine Socken riechen nach Filterkaffee. Jeder, der dich heute anspricht, lebt gefährlich." },
+        { id: "mood_aggro_4", effect: "aggro", title: "Der E-Scooter-Schreck", text: "Ein rücksichtsloser Teenager auf einem E-Scooter hat dich auf dem Fußweg fast umgefahren. Das Adrenalin pumpt noch durch deine Adern und du bist maximal auf Krawall gebürstet." },
+        { id: "mood_aggro_5", effect: "aggro", title: "Der Zahnpasta-Fleck", text: "Du hast dir beim Zähneputzen frische Minz-Zahnpasta auf das frisch gebügelte, schwarze Hemd gekleckert. Du musstest dich hastig umziehen und ärgerst dich maßlos über deine eigene Motorik." },
+
+        // --- KATEGORIE 2: RADAR-MODUS (+15 Chef-Radar) [10% Chance] ---
+        { id: "mood_radar_1", effect: "radar", title: "Die ominöse E-Mail", text: "Du hast gestern Abend um 23:45 Uhr noch eine E-Mail vom Chef bekommen: 'Müller. Morgen früh in mein Büro. Ohne Vorwarnung.' Du hast keine Ahnung, worum es geht und schwitzt kalten Angstschweiß." },
+        { id: "mood_radar_2", effect: "radar", title: "Der böse Blick", text: "Als du das Gebäude betreten hast, stand die HR-Chefin am Empfang, sah dich an und hat sich sofort etwas auf ihrem Klemmbrett notiert. Das kann absolut nichts Gutes bedeuten." },
+        { id: "mood_radar_3", effect: "radar", title: "Das falsche Hemd", text: "Du hast heute Morgen versehentlich das Firmen-Polo der Konkurrenz angezogen (ein altes Werbegeschenk). Du hast es erst im Aufzug gemerkt. Wenn der Chef das sieht, bist du fällig." },
+        { id: "mood_radar_4", effect: "radar", title: "Der Datenleck-Alarm", text: "Auf dem Weg zur Arbeit meldete dein privates Handy: 'Ihre Passwörter wurden in einem Datenleck gefunden'. Du fühlst dich extrem angreifbar und rechnest sekündlich mit einer IT-Security-Prüfung." },
+        { id: "mood_radar_5", effect: "radar", title: "Der stille Beobachter", text: "Der Chef stand heute Morgen schweigend am Fenster seines Eckbüros, als du über den Parkplatz gelaufen bist. Er hat dich fixiert und sich etwas notiert. Du stehst definitiv unter Beobachtung." },
+
+        // --- KATEGORIE 3: VERSCHLAFEN (+15 Faulheit, +30 Min Zeit) [10% Chance] ---
+        { id: "mood_lazy_1", effect: "lazy", title: "Der Snooze-Meister", text: "Du hast den Wecker viermal auf 'Snooze' gedrückt und dann geträumt, du wärst schon auf der Arbeit. Du kommst zu spät ins Büro. Deine Motivation liegt noch warm zugedeckt in deinem Bett." },
+        { id: "mood_lazy_2", effect: "lazy", title: "Das Falsche-Bus-Syndrom", text: "Du warst heute Morgen so in Gedanken versunken, dass du in den falschen Bus gestiegen bist. Du kommst viel zu spät an. Eigentlich würdest du am liebsten direkt wieder nach Hause fahren." },
+        { id: "mood_lazy_3", effect: "lazy", title: "Schlüsselsuche", text: "Du hast heute Morgen 30 Minuten lang deinen Autoschlüssel gesucht. Er lag im Kühlschrank neben dem Käse. Du bist zu spät und starrst jetzt mit leerem Blick auf deinen Monitor." },
+        { id: "mood_lazy_4", effect: "lazy", title: "Die Doku-Falle", text: "Du bist gestern Nacht bei YouTube in ein 'Rabbit Hole' gefallen und hast bis 4 Uhr morgens Dokus über den Bau von Pyramiden geschaut. Dein Gehirn ist völliger Matsch und du kannst kaum die Augen offen halten." },
+        { id: "mood_lazy_5", effect: "lazy", title: "Körperliches Wrack", text: "Du hast gestern Abend versucht, im Fitnessstudio 'gesund und aktiv' zu sein. Ein riesiger Fehler. Du hast brutalen Muskelkater und selbst das Tippen auf der Tastatur ist eine körperliche Qual." },
+
+        // --- KATEGORIE 4: SNACK-MODUS (Zufälliges Food-Item) [10% Chance] ---
+        { id: "mood_snack_1", effect: "snack", title: "Der Bäcker-Irrtum", text: "Die nette Dame beim Bäcker hat dir heute Morgen aus Versehen etwas extra in die Tüte gepackt. Du hast natürlich nicht widersprochen. Man muss die kleinen Siege feiern!" },
+        { id: "mood_snack_2", effect: "snack", title: "Mitleid am Kiosk", text: "Du sahst heute Morgen beim Zeitungsverkäufer am Bahnhof so furchtbar fertig aus, dass er dir aus Mitleid etwas Nervennahrung geschenkt hat. 'Sie sehen aus, als könnten Sie das brauchen', sagte er." },
+        { id: "mood_snack_3", effect: "snack", title: "Spontane Entstehung", text: "Du hast in deine Manteltasche gegriffen und völlig unerwartet Essbares gefunden. Wie alt es ist? Keine Ahnung. Ob es noch gut ist? Bestimmt! Hauptsache gratis." },
+        { id: "mood_snack_4", effect: "snack", title: "Die Empfangs-Spende", text: "Auf dem Tresen von Gabi stand heute Morgen ein Karton mit der Aufschrift 'Zu verschenken (Reste von gestern)'. Du hast skrupellos zugegriffen, bevor der Vertrieb alles wegfrisst." },
+        { id: "mood_snack_5", effect: "snack", title: "Der Wintermantel-Fund", text: "Es war heute kalt, also hast du deine alte Jacke aus dem Schrank geholt. In der Innentasche befand sich ein verschweißter kulinarischer Schatz aus dem letzten Winter. Jackpot!" },
+
+        // --- KATEGORIE 5: NORMAL-MODUS (Satire, Null Stats) [60% Chance] ---
+        { id: "mood_normal_1", effect: "normal", title: "Ein Glitch in der Matrix", text: "Dein Wecker klingelte exakt. Die Bahn war auf die Sekunde pünktlich. Der Kaffee schmeckte perfekt. Es ist alles so unfassbar makellos und normal, dass du panische Angst hast, gleich einen Meteoriteneinschlag zu erleben." },
+        { id: "mood_normal_2", effect: "normal", title: "Erschreckende Routine", text: "8 Stunden Schlaf, ein ausgewogenes Müsli, alle Ampeln waren grün. Dein Körper ist so an chronischen IT-Stress gewöhnt, dass diese absolute Normalität bei dir leichte Paranoia auslöst." },
+        { id: "mood_normal_3", effect: "normal", title: "Die Ruhe vor dem Sturm", text: "Niemand hat dich auf dem Weg zur Arbeit angerempelt. Es regnet nicht. Du setzt dich an den Platz. Alles funktioniert. Du kneifst dich selbst. Das kann einfach nicht die Realität sein." },
+        { id: "mood_normal_4", effect: "normal", title: "Grau in Grau", text: "Das Wetter ist grau. Der Teppichboden ist grau. Dein Monitorrahmen ist grau. Du atmest tief ein und verschmilzt nahtlos mit deiner Umgebung. Der perfekte Tarnanzug für die IT." },
+        { id: "mood_normal_5", effect: "normal", title: "Smalltalk-Hölle", text: "Du musstest im Aufzug mit dem Vertriebsleiter fahren. 'Und, gutes Wochenende gehabt?' – 'Mhm. Sie?' – 'Auch.' Diese 20 Sekunden sozialer Interaktion haben deinen Batterie-Ladestand bereits auf 80% gesenkt." },
+        { id: "mood_normal_6", effect: "normal", title: "Der ewige Ladebalken", text: "Du fährst deinen PC hoch. Windows installiert Updates. Du starrst 5 Minuten auf einen blauen Kreis, der sich dreht. Es ist so vorhersehbar, dass es schon wieder fast beruhigend wirkt." },
+        { id: "mood_normal_7", effect: "normal", title: "Gestern ist Heute", text: "Auf deinem Tisch steht noch die Kaffeetasse von gestern Nachmittag. Der Rand ist leicht angetrocknet. Du schiebst sie einfach 10 Zentimeter nach links und beginnst mit der Arbeit. Alles beim Alten." },
+        { id: "mood_normal_8", effect: "normal", title: "Corporate Aroma", text: "Du betrittst das Gebäude. Es riecht nach feuchtem Linoleum, Ozon vom Laserdrucker und verflogenen Karriereträumen. Du nimmst einen tiefen Zug. Der unverkennbare Duft der Heimat." },
+        { id: "mood_normal_9", effect: "normal", title: "Passwort-Erinnerung", text: "Windows meldet gleich nach dem Login: 'Ihr Passwort läuft in 14 Tagen ab'. Du klickst routiniert auf 'Später erinnern'. Das ist ein Problem für den Zukunfts-Müller. Heute nicht." },
+        { id: "mood_normal_10", effect: "normal", title: "Aufzug-Schweigen", text: "Fünf Stockwerke im Aufzug mit Frau Elster. Niemand sagt ein Wort. Man hört nur das leise Surren der Kabelführung. Eine angenehme, unkomplizierte Stille am frühen Morgen." },
+        { id: "mood_normal_11", effect: "normal", title: "Die ewige To-Do-Liste", text: "Du wirfst einen Blick auf deine Post-Its am Monitorrand. Einige hängen da seit 2022. Sie sind vergilbt, aber sie strahlen eine gewisse historische Konstanz aus. Du ignorierst sie gekonnt." },
+        { id: "mood_normal_12", effect: "normal", title: "Der Klang der Server", text: "Du gehst kurz am Serverraum vorbei und legst das Ohr an die Tür. Das tiefe, monotone Rauschen der Lüfter. Nichts brennt, nichts schreit. Ein guter Start in den Tag." },
+        { id: "mood_normal_13", effect: "normal", title: "Synchroner Tinnitus", text: "Die alte Neonröhre an der Decke über deinem Tisch flackert leicht und summt in genau der Frequenz, die du ohnehin leicht im Ohr hast. Eine perfekte, audio-visuelle Symbiose." },
+        { id: "mood_normal_14", effect: "normal", title: "Der Posteingangs-Schock", text: "Du öffnest Outlook. '0 ungelesene Nachrichten'. Dein Herz setzt aus. Ist der Exchange-Server tot?! Nein, eine Sekunde später synchronisiert er und es sind wieder 42 ungelesene Mails. Puh, alles okay." },
+        { id: "mood_normal_15", effect: "normal", title: "Die unauffällige Ankunft", text: "Jacke an die Garderobe, Rucksack unter den Tisch, PC einschalten, seufzen. Die heilige Dreifaltigkeit des Bürostarts. Du bist pünktlich, unauffällig und bereit für den Schmerz." },
+        { id: "mood_normal_16", effect: "normal", title: "Sichtkontakt vermieden", text: "Der Chef ist auf dem Flur an dir vorbeigelaufen, war aber tief in sein Handy vertieft. Kein Augenkontakt, kein spontanes Meeting. Du hast den ersten Boss-Fight des Tages durch reines Glück übersprungen." },
+        { id: "mood_normal_17", effect: "normal", title: "Tickets prüfen", text: "Du öffnest das Ticket-System. Nichts Besonderes. Ein Drucker spinnt, jemand hat sein Passwort vergessen, Kevin hat eine komische Frage gestellt. Der ganz normale Business-Wahnsinn. Lasst die Spiele beginnen." },
+        { id: "mood_normal_18", effect: "normal", title: "Das Phantomschmerz-Syndrom", text: "Du sitzt am Tisch, starrst auf den Monitor und greifst blind nach rechts zu deiner Kaffeetasse. Du greifst ins Leere, weil du dir noch gar keinen geholt hast. Dein Körper funktioniert schon auf Autopilot." },
+        { id: "mood_normal_19", effect: "normal", title: "Das Flur-Protokoll", text: "Ein Kollege nickte dir zu, du hast zurückgenickt. Kein 'Guten Morgen', keine Floskeln. Die maximale Form der mitteleuropäischen Bürozuneigung wurde erfolgreich ausgetauscht." },
+        { id: "mood_normal_20", effect: "normal", title: "Der kalte Stuhl", text: "Du ziehst deinen Stuhl ran und setzt dich. Das Kunstleder ist kalt und hart wie eh und je. Ein beruhigendes Zeichen, dass in der Nacht niemand heimlich an deinem Platz gesessen hat." },
+        { id: "mood_normal_21", effect: "normal", title: "Blick aus dem Fenster", text: "Du starrst aus dem Fenster. Ein Vogel fliegt am grauen Himmel vorbei. Er ist frei, er muss keine Netzwerke patchen. Du seufzt tief und wendest dich wieder der piepsenden Hardware zu." },
+        { id: "mood_normal_22", effect: "normal", title: "Der Maus-Schubser", text: "Du bewegst die Maus leicht hin und her, damit der Bildschirmschoner nicht angeht und der Status in Teams auf 'Verfügbar' springt. Erste und wichtigste Amtshandlung des Tages erfolgreich erledigt." },
+        { id: "mood_normal_23", effect: "normal", title: "Der deutsche Handshake", text: "Ein Kollege fragte im Vorbeigehen 'Wie geht's?'. Du hast pflichtbewusst mit 'Muss ja.' geantwortet. Die Konversation wurde daraufhin als erfolgreich beendet eingestuft." },
+        { id: "mood_normal_24", effect: "normal", title: "Die leere Tasse", text: "Du starrst in deine leere, braun verfärbte Kaffeetasse und fragst dich kurz, ob sie sich heute von selbst füllt. Tut sie natürlich nicht. Physik ist und bleibt unerbittlich." },
+        { id: "mood_normal_25", effect: "normal", title: "Das Neon-Summen", text: "Du schaltest das Licht im Flur an. Die hintere Röhre flackert wie immer dreimal, bevor sie mit einem ungesunden B-Dur-Summen anspringt. Alles ist exakt da, wo es hingehört." },
+        { id: "mood_normal_26", effect: "normal", title: "Desktop-Lotterie", text: "Du blickst auf deinen Desktop. Die 140 wild verstreuten Icons sind noch exakt an der Stelle, wo du sie gestern zurückgelassen hast. Eine beruhigende Konstante in einer chaotischen Welt." },
+        { id: "mood_normal_27", effect: "normal", title: "Die Krawatten-Prüfung", text: "Du hast heute aus Versehen ein gebügeltes Hemd an. Du hast den ganzen Flur überlegt, ob jemand fragt, ob du ein Vorstellungsgespräch hast. Niemandem ist es aufgefallen. Du bist offiziell unsichtbar." },
+        { id: "mood_normal_28", effect: "normal", title: "Taschen-Vibration", text: "Du spürst ein Vibrieren am Oberschenkel und greifst panisch nach dem Firmenhandy. Nichts. Keine Benachrichtigung. Dein Gehirn trollt dich mit Phantom-Vibrationen. Der Tag kann starten." },
+        { id: "mood_normal_29", effect: "normal", title: "Der Wetter-Talk", text: "Jemand im Aufzug sagte 'Kalt heute, was?'. Du hast tief eingeatmet, nickend 'Mhm' gemacht und auf die Schuhspitzen gestarrt. Ein absoluter sozialer Triumph am Morgen." },
+        { id: "mood_normal_30", effect: "normal", title: "Boot-Sequenz", text: "Dein Rechner fährt hoch. Du liest den Text auf dem schwarzen BIOS-Screen, den du schon tausendmal gesehen hast. 'Memory Check OK'. Wenn nur bei den Kollegen auch der Memory Check okay wäre." }
+    ],
 	
     // E-MAILS (Für das Popup System)
     emails: [
@@ -3722,7 +3787,6 @@ const DB = {
             }
         ]
     },
-
     {
         id: "call_excel_hell",
         title: "Zellen-Terror",
@@ -3731,7 +3795,7 @@ const DB = {
             { 
                 t: "Erklären: 'Sie suchen in der falschen Spalte.'", 
                 m: 15, f: -15, a: 15, c: -5,
-                r: "Du musst ihm Excel erklären. Am Telefon. Es dauert ewig. Er versteht es kaum. Du spürst, wie deine Gehirnzellen absterben (+Aggro), aber du hast das Problem gelöst" 
+                r: "Du musst ihm Excel erklären. Am Telefon. Es dauert ewig. Er versteht es kaum. Du spürst, wie deine Gehirnzellen absterben, aber du hast das Problem gelöst" 
             },
             { 
                 t: "Abwimmeln: 'Das ist ein Anwenderfehler.'", 
@@ -3743,6 +3807,240 @@ const DB = {
                 t: "Lügen: 'Server wird gerade neu gestartet.'", 
                 m: 2, f: 5, a: -5, c: 0, 
                 r: "'Ach so! Na dann warte ich.' Er legt zufrieden auf. Du hast nichts getan, aber Ruhe erkauft." 
+            }
+        ]
+    },
+    {
+        id: "call_nato_1",
+        title: "Das Alphabet des Grauens",
+        startNode: "root",
+        nodes: {
+            "root": {
+                text: "Frau Jablonski muss dir ein temporäres Passwort buchstabieren. 'Also, das Passwort ist: A wie... Apfel. C wie... Ceylan? Oder Z? Nein, Moment, C wie Chamäleon!'\n\nDu spürst, wie du langsam aber sicher wertvolle Lebenszeit verlierst.",
+                opts: [
+                    { t: "Geduldig bleiben: 'Meinen Sie C wie Cäsar?'", next: "nato_c" },
+                    { t: "Abkürzen: 'Lesen Sie das ganze Wort vor.'", next: "nato_word" }
+                ]
+            },
+            "nato_c": {
+                text: "Sie schnaubt. 'Cäsar? Das schreibt man doch mit Z! Egal. Nächster Buchstabe: Ypsilon wie... Ypsilon. Und dann Q wie... Quark.'",
+                opts: [
+                    { t: "Das echte NATO-Alphabet aufsagen", next: "res_nato_teach" },
+                    { t: "Die Schmerzen ertragen und zuhören", next: "res_nato_suffer" }
+                ]
+            },
+            "nato_word": {
+                text: "'Das ganze Wort? Das ist kein Wort. Das ist: A, C, Y, Q, 7, Sonderzeichen. Aber Moment, das Y könnte auch ein V sein. Meine Handschrift ist furchtbar.'",
+                opts: [
+                    { t: "Passwort einfach komplett zurücksetzen", req: "admin_pw", next: "res_nato_reset" },
+                    { t: "Auflegen und weinen", next: "res_nato_hangup" }
+                ]
+            }
+        },
+        results: {
+            "res_nato_teach": { txt: "Du erklärst ihr 10 Minuten lang 'Alpha, Bravo, Charlie'. Sie nennt dich am Ende einen 'Klugscheißer'. Aber das Passwort stimmt.", m: 15, f: -5, a: 15, c: -5 },
+            "res_nato_suffer": { txt: "Nach ungelogen 20 Minuten hast du das 8-stellige Passwort zusammen. Deine Aggression ist durch die Decke, dein Wille gebrochen.", m: 20, f: -5, a: 30, c: -10 },
+            "res_nato_reset": { txt: "Du setzt es genervt per Master-Override auf 'Willkommen123!' zurück. Keine Zeit für diesen Buchstabiersalat.", m: 5, f: 10, a: 5, c: -5 },
+            "res_nato_hangup": { txt: "Du legst einfach auf. Du kannst das heute nicht. Das Ticket bleibt offen und wird später garantiert eskalieren.", m: 2, f: 10, a: 0, c: 15 }
+        }
+    },
+    {
+        id: "call_any_key_1",
+        title: "Die mysteriöse Taste",
+        text: "Ein verzweifelter Anruf aus dem Management. 'Müller! Mein Update hängt! Das System blockiert komplett. Da steht: PRESS ANY KEY TO CONTINUE.\n\nIch habe die STRG-Taste probiert, die ALT-Taste, ich habe sogar F12 gedrückt! WO VERDAMMT NOCHMAL IST DIESE ANY-TASTE?!'",
+        opts: [
+            { 
+                t: "Ruhig: 'Drücken Sie einfach die Leertaste.'", 
+                m: 5, f: 0, a: 15, c: -5, 
+                r: "Du hörst ein lautes Klatschen (er haut mit der flachen Hand auf die Leertaste). 'Oh. Es geht weiter. Warum schreiben die das dann nicht so hin?!' Ein weiteres dummes Ticket bravourös geschlossen." 
+            },
+            { 
+                t: "Toternst: 'Die müssen Sie erst bestellen.'", 
+                m: 5, f: 10, a: -10, c: 20, 
+                r: "Er schnappt nach Luft. 'Was für ein Saftladen! Bestellen Sie sofort eine Tastatur mit Any-Taste! Priority-Versand!' Du hast gerade 100€ Budget für einen Gag verbrannt. Der Chef wird weinen." 
+            },
+            { 
+                t: "Seufzen: 'Ich drücke für Sie Enter.'", 
+                m: 5, f: 5, a: 20, c: -10, 
+                r: "Du nutzt die Fernwartung, drückst EINMAL die Enter-Taste auf deinem Keyboard und beendest die Sitzung. Du hast einer hochbezahlten Führungskraft das Drücken einer Taste abgenommen. Traurig, aber maximal effizient." 
+            }
+        ]
+    },
+    {
+        id: "call_physical_window_1",
+        title: "Zugluft im System",
+        startNode: "root",
+        nodes: {
+            "root": {
+                text: "Frau Schulze ruft an: 'Herr Müller, mein PC ist extrem langsam. Und da poppen ständig diese kleinen Werbebildchen auf!'\n\nDu hast den Fehler per Fernwartung sofort erkannt. Zu viele Browser-Tabs offen.",
+                opts: [
+                    { t: "Anweisung: 'Schließen Sie bitte mal alle Fenster.'", next: "window_closed" },
+                    { t: "Wortlos Fernwartung starten", next: "res_remote_fix" }
+                ]
+            },
+            "window_closed": {
+                text: "Du hörst, wie sie den Hörer ablegt. Es quietscht und knallt im Hintergrund. Dann nimmt sie den Hörer wieder auf.\n\n'So, erledigt! Aber jetzt wird es hier drinnen furchtbar stickig. Hilft das mit der frischen Luft wirklich gegen Viren?'",
+                opts: [
+                    { t: "Fassungslos: 'Ich meinte am Computer!'", next: "res_facepalm" },
+                    { t: "Mitspielen: 'Ja, das hält die Viren draußen.'", next: "res_troll_window" }
+                ]
+            }
+        },
+        results: {
+            "res_remote_fix": { txt: "Du klickst die 50 offenen Browser-Fenster per Fernwartung zu. PC läuft wieder. Du hast dir eine furchtbar dumme Konversation erspart und das Ticket professionell geschlossen.", m: 5, f: -5, a: 5, c: -5 },
+            "res_facepalm": { txt: "Du musst ihr mühsam den Unterschied zwischen Glasfenstern und digitalen Fenstern erklären. Deine Gehirnzellen sterben ab, aber der Support war vorbildlich.", m: 15, f: 0, a: 20, c: -5 },
+            "res_troll_window": { txt: "Frau Schulze schwitzt jetzt in ihrem Büro. Der PC ist zwar immer noch langsam, aber sie beschwert sich nicht mehr. Unprofessionell, aber du hast Ruhe.", m: 5, f: 10, a: -5, c: 5 }
+        }
+    },
+    {
+        id: "call_markus_ambush_1",
+        title: "Überfall auf Lautsprecher",
+        text: "Du nimmst ab. Statt einer Begrüßung hörst du Markus' laute, extrem freundliche 'Verkäufer-Stimme', die leicht hallt. Er hat dich auf Freisprechen geschaltet!\n\n'Ah, und hier ist unser Head of IT, Herr Müller! Herr Müller, bitte bestätigen Sie Herrn Tanaka von der Großbank kurz: Unsere neue Datenbank kann Fax-Eingänge per Blockchain in Echtzeit als 3D-Hologramm rendern, absolut korrekt?'\n\nTotenstille im Konferenzraum. Du hörst die Investoren atmen.",
+        opts: [
+            { 
+                t: "Mitspielen: 'Selbstverständlich! Läuft extrem agil!'", 
+                rep: { "Markus": 5, "Dr. Wichtig": 5 },
+                m: 5, f: -5, a: 20, c: -10, 
+                r: "Markus jubelt: 'Sehen Sie, Herr Tanaka? Deutsche Ingenieurskunst!' Der Deal ist im Sack. Markus und der Chef lieben dich. Dein Problem: Du musst bis morgen früh ein Fax-Hologramm programmieren. Die Kündigung rückt näher." 
+            },
+            { 
+                t: "Die Wahrheit: 'Das ist physikalischer Unsinn.'", 
+                rep: { "Markus": -10, "Dr. Wichtig": -10 },
+                m: 10, f: 0, a: -10, c: 30, 
+                r: "Geraune am anderen Ende. Herr Tanaka räuspert sich. 'Wir... überdenken unser Investment.' Markus brüllt auf. Du hast einen Millionen-Deal gekillt, aber die IT vor einer unmöglichen Aufgabe bewahrt." 
+            },
+            { 
+                t: "Taktik: 'Nur im Premium-Tier für 5 Millionen Extra-Budget.'", 
+                rep: { "Markus": 5 },
+                m: 5, f: 5, a: 0, c: -5, 
+                r: "Markus schluckt schwer. Herr Tanaka lacht: 'Ah, gutes Upselling! Wir bleiben beim Standard-Paket.' Du hast den Deal gerettet und die IT-Abteilung elegant aus der Schusslinie manövriert. Chapeau!" 
+            }
+        ]
+    },
+    {
+        id: "call_chantal_hostage_1",
+        title: "SOS aus dem Meeting",
+        text: "Chantal ruft an. Sie flüstert panisch: 'Müller... rette mich. Ich sitze seit 40 Minuten in einem 1-on-1 mit dem Agilen Coach. Er redet ununterbrochen über sein Seelentier und zündet gerade ein Räucherstäbchen an. Ich sterbe.\n\nLass den Feueralarm losgehen oder ruf mich auf dem Handy an und sag, der Marketing-Server brennt!'",
+        opts: [
+            { 
+                t: "Fake-Anruf starten", 
+                rep: { "Chantal": 5 },
+                m: 10, f: 0, a: 5, c: 0, 
+                r: "Du rufst sie auf dem Handy an und brüllst dramatisch: 'Totalausfall! Wir brauchen dich!'. Chantal stürmt mit einem lauten 'Sorry, Notfall!' aus dem Raum. Sie schuldet dir einen massiven Gefallen." 
+            },
+            { 
+                t: "Feueralarm auslösen", 
+                req: "hammer",
+                rep: { "Chantal": 10, "Dr. Wichtig": -10 },
+                m: 30, f: -10, a: 10, c: 30, 
+                r: "Du gehst aufs Ganze und drückst den Melder auf dem Flur ein. Die Sirene heult. Das ganze Gebäude wird evakuiert. Chantal ist frei, aber die Feuerwehr berechnet der IT-Abteilung einen Fehlalarm. Völlig überreagiert." 
+            },
+            { 
+                t: "Trocken: 'Dein Seelentier ist ein Faultier. Viel Spaß.'", 
+                rep: { "Chantal": -10 },
+                m: 5, f: 5, a: -10, c: 0, 
+                r: "Du legst grinsend auf. Chantal ist gefangen. Deine Schadenfreude ist grenzenlos, aber erwarte morgen früh auf keinen Fall ein Lächeln von ihr." 
+            }
+        ]
+    },
+    {
+        id: "call_boss_laser_1",
+        title: "Präsentations-Panik",
+        text: "Dr. Wichtig brüllt ins Telefon: 'Müller! Mein Mauszeiger ist weg! Ich bewege das Gerät über den Tisch, aber auf der Leinwand passiert absolut NICHTS! Die Investoren warten!\n\nIch habe schon die Batterien gewechselt und das rote Licht leuchtet, aber der Pfeil auf der Folie ist wie eingefroren!'",
+        opts: [
+            { 
+                t: "Trocken: 'Chef, haben Sie vielleicht den Laserpointer in der Hand?'", 
+                rep: { "Dr. Wichtig": 2 },
+                m: 5, f: 0, a: 10, c: -10, 
+                r: "Zwei Sekunden Stille. Ein leises Klappern, als er das Gerät wechselt. '...das bleibt unter uns, Müller.' Er legt auf. Ein peinliches Ticket extrem diskret gelöst. Das Radar sinkt massiv, aber du hast Kopfschmerzen vor lauter Dummheit." 
+            },
+            { 
+                t: "Befehl: 'Starten Sie den Rechner sofort hart neu!'", 
+                rep: { "Dr. Wichtig": -10 },
+                m: 5, f: 0, a: 0, c: 40, 
+                r: "FALLE! Er drückt den Power-Knopf. Der PC geht aus – und die ungespeicherte 45-minütige Präsentation gleich mit. Er flucht vor den Investoren über die 'instabile IT'. Du kriegst die volle Breitseite ab!" 
+            },
+            { 
+                t: "Opfergang: 'Ich schalte mich remote auf und bewege die Maus für Sie.'", 
+                rep: { "Dr. Wichtig": 5 },
+                m: 30, f: -10, a: 35, c: -20, 
+                r: "Du musst die nächsten 30 Minuten blind erraten, wann er auf die nächste Folie will. 'MÜLLER, JETZT KLICKEN!' Es ist pure psychologische Folter für dich, aber der Pitch gelingt und der Chef ist zufrieden." 
+            }
+        ]
+    },
+    {
+        id: "call_elster_budget_trap_1",
+        title: "Fristablauf",
+        text: "Frau Elster klingt eiskalt: 'Müller, Ihr Antrag für die neuen Server (15.000€) wird abgelehnt. Ihr digitales Zertifikat für die Unterschrift ist heute um 08:00 Uhr abgelaufen.\n\nDas Jahresbudget verfällt in exakt 10 Minuten. Machen Sie einen neuen Antrag über das offizielle Portal.'\n\nDu weißt ganz genau: Das Portal braucht 3 Werktage für die Freigabe. Deine Server sind weg.",
+        opts: [
+            { 
+                t: "Ich genehmige das remote im System selbst.", 
+                req: "admin_pw",
+                rep: { "Frau Elster": -20 },
+                m: 5, f: 5, a: 5, c: 20, 
+                r: "Du hackst das Buchhaltungssystem und setzt den Status auf 'Genehmigt'. Die Server werden bestellt. Frau Elster meldet diesen massiven Compliance-Verstoß sofort dem Vorstand. Du hast die Hardware, aber massiven Ärger." 
+            },
+            { 
+                t: "Kapitulation: 'Dann eben keine neuen Server.'", 
+                rep: { "Frau Elster": 5 },
+                m: 5, f: 10, a: 10, c: -5, 
+                r: "'Regeln sind Regeln', sagt sie zufrieden. Du lehnst dich zurück. Im nächsten Jahr wird die Firma unter der alten Hardware zusammenbrechen, aber heute hast du keinen Stress mehr." 
+            },
+            { 
+                t: "Ich renne runter und unterschreibe physisch mit Blut!", 
+                m: 20, f: -10, a: 25, c: -5, 
+                r: "Du sprintest über die Treppen in den 2. Stock, reißt ihr das Papier aus der Hand und unterschreibst händisch. Das Budget ist in der letzten Sekunde gerettet. Deine Lunge brennt." 
+            }
+        ]
+    },
+    {
+        id: "call_egon_cooling_trap_1",
+        title: "Druckabfall",
+        text: "Egon brüllt gegen ein lautes Rauschen an: 'Müller! Das Hauptventil der Server-Wasserkühlung im Keller ist gerissen! Ein dicker Strahl schießt quer durch den Raum direkt auf den Starkstrom-Verteilerkasten!\n\nIch muss das Wasser SOFORT abdrehen, sonst brennt die Hütte! Aber wenn ich das tue, fallen in 3 Minuten eure Server wegen Überhitzung aus! Abdrehen oder anlassen?!'",
+        opts: [
+            { 
+                t: "Dreh ab! Das Gebäude und Leben gehen vor Hardware!", 
+                rep: { "Egon": 10, "Dr. Wichtig": -20 },
+                m: 10, f: 0, a: 15, c: 50, 
+                r: "Das Rauschen stoppt. Sofort piepen alle Alarme im Monitoring. Die Server sterben den plötzlichen Hitzetod. Egon lobt deine Prioritäten, aber der Chef verlangt deinen Kopf auf einem Silbertablett wegen des Datenverlusts." 
+            },
+            { 
+                t: "Lass an! Ich muss das System erst händisch runterfahren!", 
+                rep: { "Egon": -10 },
+                m: 45, f: -20, a: 40, c: -10, 
+                r: "Du hetzt in den Serverraum und fährst 40 Maschinen panisch einzeln herunter, während Egon unten Todesangst vor einem Stromschlag aussteht. Du bist nassgeschwitzt und zitterst, aber die Daten sind sicher." 
+            },
+            { 
+                t: "Wickel Panzertape drum! Ich brauche die Kühlung!", 
+                req: "tape",
+                rep: { "Egon": -15 },
+                m: 5, f: 10, a: -5, c: 30, 
+                r: "Egon flucht: 'Das hält keine fünf Minuten bei dem Druck!' Es hält genau vier. Dann gibt es einen lauten Knall, Funkenflug und das Gebäude ist komplett stromlos. Totales Desaster." 
+            }
+        ]
+    },
+    {
+        id: "call_gabi_gossip_1",
+        title: "Diplomatische Krise",
+        text: "Gabi flüstert aufgeregt: 'Müller! Eure blöde Firewall blockiert 'Promi-Klatsch24.de'! Ich brauche das JETZT!\n\nDie Frau vom Aufsichtsratsvorsitzenden steht gleich hier. Ich muss wissen, ob ihr Hund gestorben ist oder ob sie sich scheiden lässt! Sonst trete ich beim Smalltalk ins Fettnäpfchen und wir sind beide dran!\n\nSchalt die Seite frei! Nur für 10 Minuten!'",
+        opts: [
+            { 
+                t: "IT-Richtlinie: 'Klatsch-Seiten bleiben gesperrt, Gabi.'", 
+                rep: { "Gabi": -15, "Dr. Wichtig": -10 },
+                m: 5, f: 0, a: 5, c: 20, 
+                r: "Gabi flucht leise und legt auf. Zehn Minuten später fragt sie die VIP-Gattin nach ihrem Mann. Die lässt sich gerade scheiden und stürmt weinend raus. Der Chef macht DICH für das PR-Desaster verantwortlich." 
+            },
+            { 
+                t: "Sicherheitsrisiko: 'Na gut, ich setze dich auf die Whitelist.'", 
+                rep: { "Gabi": 15 },
+                m: 10, f: 10, a: 0, c: 30, 
+                r: "Gabi liest den Artikel und meistert den Smalltalk brillant. Aber du hast die Firewall für ein unsicheres Werbenetzwerk geöffnet. Das IT-Sicherheits-Audit am Nachmittag schlägt Alarm. Du bist fällig." 
+            },
+            { 
+                t: "Kompromiss: 'Sag mir den Namen, ich google es für dich auf dem Handy.'", 
+                rep: { "Gabi": 5 },
+                m: 15, f: -5, a: 20, c: -5, 
+                r: "Du sitzt an deinem Platz und musst für Gabi auf deinem Privathandy Klatsch-Artikel über C-Promis lesen und ihr die Infos diktieren. Deine Würde sinkt auf den Nullpunkt, aber du hast die Krise regelkonform abgewendet." 
             }
         ]
     },
@@ -8828,7 +9126,8 @@ const DB = {
         text: "Hoppla. Das war nicht nur Schokolade. Das war 'Schwarzwälder Kirsch' mit 80% Stroh-Rum. Dir wird warm ums Herz und leicht schwindelig. Der Stress fällt von dir ab, aber deine Zunge fühlt sich pelzig an.",
         opts: [
             { 
-                t: "Den Rausch genießen", 
+                t: "Den Rausch genießen",
+                next: "path_cake_drunk", 
                 m: 5, f: 0, a: -20, c: 5, 
                 r: "Du lehnst dich an die Wand und grinst blöd. Ein Kollege fragt dich was, du kicherst nur. Der beste Arbeitstag seit Jahren." 
             },
