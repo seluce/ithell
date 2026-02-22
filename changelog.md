@@ -1,3 +1,10 @@
+\[2.5.2] - 2026-02-22
+* Das letzte Mood-Event wird nun gespeichert, sodass es nächsten Tag nicht nochmal erscheint
+* Weitere Mood-Events, um mehr Abwechslung bei den Events zu erhalten
+* Weitere Tagebuch-Einträge, um mehr Abwechslung beim Tagebuch zu erhalten
+* Ein paar weitere Events für Kaffee, Dienstgang, Serverraum und Mittagessen
+* Kleine Fehlerkorrekturen im Backend
+
 \[2.5.1] - 2026-02-21
 * Im aktiven Tutorial sind nun die Aktion Buttons nicht mehr deaktiviert 
 * Globale Statistiken sind von Menü ins Archiv umgezogen

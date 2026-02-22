@@ -64,7 +64,7 @@ const engine = {
         this.loadSystem();
         document.getElementById('intro-modal').style.display = 'flex';
         this.updateUI();
-        this.log("System v2.5.1 geladen. Warte auf User...");
+        this.log("System v2.5.2 geladen. Warte auf User...");
     },
 
     // --- PERSISTENZ (Speichern & Laden) ---
@@ -1270,10 +1270,6 @@ const engine = {
                 borderColor = 'border-amber-500';
                 icon = '☕';
                 break;
-        }
-
-        if (this.state.currentEventId && this.state.currentEventId.includes('_story_')) {          
-            icon = '📖'; 
         }
 
         let html = `
@@ -2684,6 +2680,9 @@ const engine = {
             return arr.join(", ") + " und " + last;
         };
 
+        // ZUFALLS-GENERATOR: Wählt einen zufälligen Textbaustein aus einem Array
+        const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
         // 1. EVENT-ANALYSE (Orte)
         const usedArray = Array.from(state.usedIDs);
         const serverVisits = usedArray.filter(id => id.startsWith('srv_')).length;
@@ -2695,22 +2694,70 @@ const engine = {
         // ==========================================
         let p1 = "";
         
-        // Hier nutzen wir Achievements für extreme Playstyles
-        if (state.achievements.includes('ach_rage')) p1 += "Heute war ich ein wandelndes Pulverfass. Ein falsches Wort und ich hätte den Router angezündet. ";
-        else if (state.achievements.includes('ach_lazy')) p1 += "Mein Motto heute lautete ganz klar: Warum heute arbeiten, wenn man es auch auf unbestimmte Zeit verschieben kann? ";
-        else if (state.achievements.includes('ach_ascetic')) p1 += "Ich habe den Tag ohne einen Tropfen Kaffee überlebt – mein Kopf dröhnt vor Tugendhaftigkeit. ";
-        else if (state.achievements.includes('ach_coffee')) p1 += "Mein Blut besteht mittlerweile zu 90% aus Koffein. Ich kann Farben schmecken. ";
-        else if (state.achievements.includes('ach_workaholic')) p1 += "Ich habe heute tatsächlich so hart gearbeitet, dass ich uns alle schlecht aussehen lasse. ";
-        else p1 += "Ein weiterer Tag im alltäglichen Corporate-Wahnsinn neigt sich dem Ende. ";
-
-        if (questVisits > serverVisits && questVisits > callVisits) {
-            p1 += "Anstatt mich um echte Probleme zu kümmern, bin ich lieber ziellos durch die Flure gegeistert und habe mich in seltsame Büro-Dramen verwickeln lassen.";
-        } else if (serverVisits > callVisits + 2) {
-            p1 += "Um den nervigen Menschen aus dem Weg zu gehen, habe ich mich heute größtenteils im fensterlosen Serverraum verschanzt.";
-        } else if (callVisits > serverVisits + 3) {
-            p1 += "Gefühlt klebte mir das Telefon pausenlos am Ohr, während ich der halben Belegschaft erklären durfte, wie man einen Stecker in die Steckdose drückt.";
+        // Grundstimmung (Achievements)
+        if (state.achievements.includes('ach_rage')) {
+            p1 += pick([
+                "Heute war ich ein wandelndes Pulverfass. Ein falsches Wort und ich hätte den Router angezündet. ",
+                "Mein Puls war heute konstant auf 180. Ich habe mehrfach überlegt, einfach den Feueralarm zu drücken. ",
+                "Wenn Blicke töten könnten, wäre das Großraumbüro heute ein Friedhof geworden. "
+            ]);
+        } else if (state.achievements.includes('ach_lazy')) {
+            p1 += pick([
+                "Mein Motto heute: Warum heute arbeiten, wenn man es auch auf unbestimmte Zeit verschieben kann? ",
+                "Ich habe die Kunst der produktiven Arbeitsvermeidung heute absolut perfektioniert. ",
+                "Wenn Faulenzen olympisch wäre, hätte ich heute Gold für die Firma geholt. "
+            ]);
+        } else if (state.achievements.includes('ach_ascetic')) {
+            p1 += pick([
+                "Ich habe den Tag ohne einen Tropfen Kaffee überlebt – mein Kopf dröhnt vor Tugendhaftigkeit. ",
+                "Kein Koffein heute. Ich funktioniere nur noch durch pure Willenskraft und unterdrückte Wut. ",
+                "Ein völlig entkoffeinierter Tag. Ich fühle mich wie eine leere Hülle, aber mein Blutdruck ist fantastisch. "
+            ]);
+        } else if (state.achievements.includes('ach_coffee')) {
+            p1 += pick([
+                "Mein Blut besteht mittlerweile zu 90% aus Koffein. Ich kann Farben schmecken. ",
+                "Ich zittere am ganzen Körper. Nicht vor Angst, sondern weil ich den halben Kaffeeautomaten geleert habe. ",
+                "Wenn ich noch einen Espresso trinke, kann ich wahrscheinlich durch die Zeit reisen. Mein Puls ist auf Rekordjagd. "
+            ]);
+        } else if (state.achievements.includes('ach_workaholic')) {
+            p1 += pick([
+                "Ich habe heute tatsächlich so hart gearbeitet, dass ich uns alle schlecht aussehen lasse. ",
+                "Heute war ich beängstigend produktiv. Ich hoffe, das Management gewöhnt sich nicht daran. ",
+                "Ein Tag wie ein Maschinengewehr. Tickets gelöst, Probleme gefixt. Ich habe heute quasi die ganze Firma im Alleingang getragen. "
+            ]);
         } else {
-            p1 += "Zwischen piepsenden Servern und panischen Anrufen habe ich irgendwie versucht, den Betrieb am Laufen zu halten.";
+            p1 += pick([
+                "Ein weiterer Tag im alltäglichen Corporate-Wahnsinn neigt sich dem Ende. ",
+                "Wieder acht Stunden meines Lebens, die mir niemand zurückgeben wird. ",
+                "Die Neonröhren surren, der Kaffee war kalt, der Wahnsinn hatte Methode. "
+            ]);
+        }
+
+        // Haupt-Aufenthaltsort
+        if (questVisits > serverVisits && questVisits > callVisits) {
+            p1 += pick([
+                "Anstatt mich um echte Probleme zu kümmern, bin ich lieber ziellos durch die Flure gegeistert.",
+                "Meine Hauptaufgabe bestand heute scheinbar darin, seltsame Büro-Dramen abseits meines Schreibtisches zu lösen.",
+                "Ich war heute öfter auf 'Dienstgang' unterwegs als am eigenen Platz."
+            ]);
+        } else if (serverVisits > callVisits + 2) {
+            p1 += pick([
+                "Um den nervigen Menschen aus dem Weg zu gehen, habe ich mich größtenteils im dunklen Serverraum verschanzt.",
+                "Die lauten Lüfter im Serverraum waren heute meine einzige, echte Gesellschaft.",
+                "Ich habe heute fast schon eine emotionale Bindung zu den blinkenden Racks im Keller aufgebaut."
+            ]);
+        } else if (callVisits > serverVisits + 3) {
+            p1 += pick([
+                "Gefühlt klebte mir das Telefon pausenlos am Ohr. Die User haben mir den letzten Nerv geraubt.",
+                "Ich habe heute mehr Support-Gespräche geführt als eine vollbesetzte Call-Center-Schicht.",
+                "Das ständige Klingeln des Telefons wird mich vermutlich noch bis in meine Träume verfolgen."
+            ]);
+        } else {
+            p1 += pick([
+                "Zwischen piepsenden Servern und panischen Anrufen habe ich irgendwie versucht, den Betrieb am Laufen zu halten.",
+                "Ein chaotischer Mix aus Hardware-Ausfällen und menschlicher Inkompetenz hielt mich heute auf Trab.",
+                "Ich bin von Brandherd zu Brandherd gerannt, ohne jemals wirklich etwas zu löschen."
+            ]);
         }
 
         // ==========================================
@@ -2721,35 +2768,39 @@ const engine = {
         const hasAch = (id) => state.achievements.includes(id);
         const hasItem = (id) => state.inventory.some(i => i.id === id);
 
-        // Story-Erfolge prüfen
-        if (hasAch('ach_mentor')) encounters.push("ich Azubi Kevin vor dem totalen IT-Kollaps bewahrt habe");
-        if (hasAch('ach_ally')) encounters.push("ich eine unheilige Allianz mit Chantal aus dem Marketing geschmiedet habe");
-        if (hasAch('ach_rockstar')) encounters.push("mir Gabi vom Empfang ihr feinstes Death-Metal-Mixtape anvertraut hat");
-        if (hasAch('ach_cat_whisperer')) encounters.push("ich das Katzenproblem der Buchhaltung ein für alle Mal gelöst habe");
-        if (hasAch('ach_keymaster')) encounters.push("mir Hausmeister Egon seinen Generalschlüssel überlassen hat");
-        if (hasAch('ach_closer')) encounters.push("ich mit Markus aus dem Sales einen wichtigen Deal gerettet habe");
-        if (hasAch('ach_wolf')) encounters.push("ich dem Chef einen neuen Arbeitsvertrag aus den Rippen geleiert habe");
-        if (hasAch('ach_hacker')) encounters.push("ich mir illegale Admin-Rechte im System verschafft habe");
-        if (hasAch('ach_rich')) encounters.push("ich dem nigerianischen Prinzen mein Vertrauen (und mein Konto) geschenkt habe");
+        // Story-Erfolge mit 3 Variationen
+        if (hasAch('ach_mentor')) encounters.push(pick(["ich Azubi Kevin vor dem totalen IT-Kollaps bewahrt habe", "ich Kevins Haut gerettet habe", "Kevin mir nun auf ewig etwas schuldig ist"]));
+        if (hasAch('ach_ally')) encounters.push(pick(["ich eine unheilige Allianz mit Chantal aus dem Marketing geschmiedet habe", "Chantal und ich jetzt ein tödliches Team sind", "das Marketing nun in meiner Schuld steht"]));
+        if (hasAch('ach_rockstar')) encounters.push(pick(["mir Gabi ihr feinstes Death-Metal-Mixtape anvertraut hat", "ich mit Gabi musikalisch voll auf einer Wellenlänge war", "Gabi und ich den Empfang gerockt haben"]));
+        if (hasAch('ach_cat_whisperer')) encounters.push(pick(["ich das Katzenproblem der Buchhaltung gelöst habe", "ich zum offiziellen Katzenflüsterer von Frau Elster wurde", "Frau Elsters Kater Rüdiger und ich jetzt quasi Best Friends sind"]));
+        if (hasAch('ach_keymaster')) encounters.push(pick(["mir Hausmeister Egon seinen Generalschlüssel überlassen hat", "ich dank Egon nun theoretisch überall reinpasse", "ich jetzt dank Egons Schlüssel die wahre Macht im Gebäude habe"]));
+        if (hasAch('ach_closer')) encounters.push(pick(["ich mit Markus aus dem Sales einen extrem wichtigen Deal gerettet habe", "ich dem Vertrieb buchstäblich den Hintern gerettet habe", "Markus ohne mich heute seinen fetten Bonus verloren hätte"]));
+        if (hasAch('ach_wolf')) encounters.push(pick(["ich dem Chef einen neuen Arbeitsvertrag aus den Rippen geleiert habe", "ich gehaltstechnisch endlich aufgestiegen bin", "ich den Chef in der Gehaltsverhandlung absolut dominiert habe"]));
+        if (hasAch('ach_hacker')) encounters.push(pick(["ich mir illegale Admin-Rechte im System verschafft habe", "ich mich unbemerkt ins Root-Verzeichnis gehackt habe", "ich dank Root-Passwort jetzt der absolute Gott im Netzwerk bin"]));
+        if (hasAch('ach_rich')) encounters.push(pick(["ich dem nigerianischen Prinzen mein Vertrauen geschenkt habe", "ich unfassbar reich werde (falls der Scam echt ist)", "ich bald Millionen auf dem Konto habe (hoffentlich)"]));
         
-        // Lore Items (die keine Achievements sind)
-        if (hasItem('corp_chronicles')) encounters.push("ich mich in die tiefen Geheimnisse der verbotenen Firmenchronik eingelesen habe");
-        if (hasItem('prince_letter')) encounters.push("ich einen sehr verdächtigen Brief von einem Prinzen erhalten habe");
+        // Lore Items mit 3 Variationen
+        if (hasItem('corp_chronicles')) encounters.push(pick(["ich die verbotene Firmenchronik studiert habe", "ich finstere Wahrheiten in einem alten Buch entdeckt habe", "ich die düsteren Geheimnisse des Gründers in der Chronik gelesen habe"]));
+        if (hasItem('prince_letter')) encounters.push(pick(["ich diesen absurden Prinzen-Brief mit mir herumschleppe", "ich heute königliche Post erhalten habe", "mir ein echter Brief von einem Prinzen in die Hände gefallen ist"]));
 
         if (encounters.length > 0) {
-            p2 += `Besonders denkwürdig war heute, dass ${formatList(encounters)}. `;
+            p2 += pick([
+                `Besonders denkwürdig war heute, dass ${formatList(encounters)}. `,
+                `Wenn ich auf den Tag zurückblicke, sticht besonders hervor, dass ${formatList(encounters)}. `,
+                `Man wird sich wohl noch lange daran erinnern, dass ${formatList(encounters)}. `
+            ]);
         }
 
-        // Gewohnheiten (Basierend auf Achievements)
+        // Gewohnheiten mit 3 Variationen
         let habits = [];
-        if (hasAch('ach_ignore')) habits.push("die Entf-Taste bei eintreffenden Mails mein absolut bester Freund war");
-        if (hasAch('ach_hoarder')) habits.push("ich meinen Rucksack mit absolutem Müll vollgestopft habe");
-        if (hasAch('ach_intranet')) habits.push("ich mich stundenlang im toxischen Firmen-Intranet versteckt habe");
-        if (hasAch('ach_macgyver')) habits.push("ich mich mit Tape und Kabelbindern wie ein IT-MacGyver gefühlt habe");
-        if (hasAch('ach_clean')) habits.push("ich tatsächlich 'Inbox Zero' erreicht habe (ein Wunder!)");
+        if (hasAch('ach_ignore')) habits.push(pick(["die Entf-Taste bei E-Mails mein absoluter bester Freund war", "ich das Ignorieren von Mails zur Kunst erhoben habe", "ich heute einen Rekord im Löschen ungelesener E-Mails aufgestellt habe"]));
+        if (hasAch('ach_hoarder')) habits.push(pick(["ich meinen Rucksack mit absolutem Müll vollgestopft habe", "ich heute alles eingesteckt habe, was nicht niet- und nagelfest war", "ich wie ein echter Loot-Goblin jeden Schrott im Büro gesammelt habe"]));
+        if (hasAch('ach_intranet')) habits.push(pick(["ich mich stundenlang im toxischen Intranet versteckt habe", "ich das Firmen-Wiki auf den Kopf gestellt habe", "ich mehr Zeit im Firmen-Intranet als mit echter Arbeit verbracht habe"]));
+        if (hasAch('ach_macgyver')) habits.push(pick(["ich mich mit Tape und Kabelbindern wie MacGyver gefühlt habe", "ich IT-Probleme mit reiner Bastel-Energie gelöst habe", "ich bewiesen habe, dass man mit Panzertape einfach alles reparieren kann"]));
+        if (hasAch('ach_clean')) habits.push(pick(["ich tatsächlich 'Inbox Zero' erreicht habe (ein Wunder!)", "mein Ticket-System am Ende völlig leer war", "ich jedes verdammte Ticket abgearbeitet habe"]));
         
         if (habits.length > 0) {
-            let conn = encounters.length > 0 ? "Ansonsten" : "Meine Strategie";
+            let conn = encounters.length > 0 ? pick(["Ansonsten", "Darüber hinaus", "Zu guter Letzt"]) : pick(["Meine Strategie", "Mein grundlegender Ansatz"]);
             p2 += `${conn} bestand heute hauptsächlich daraus, dass ${formatList(habits)}.`;
         }
 
@@ -2758,13 +2809,29 @@ const engine = {
         // ==========================================
         let p3 = "";
         if (endReason === "RAGE") {
-            p3 = "Das bittere Ende vom Lied? Mir ist die Sicherung durchgebrannt. Ein fliegender Monitor ist schließlich auch eine Form von fristloser Kündigung!";
+            p3 = pick([
+                "Das bittere Ende vom Lied? Mir ist die Sicherung durchgebrannt. Ein fliegender Monitor ist schließlich auch eine Form von fristloser Kündigung!",
+                "Irgendwann war das Maß voll. Ich habe getobt, geschrien und bin gegangen. Ein glorreicher Abgang, den hier so schnell niemand vergisst.",
+                "Ich habe komplett die Kontrolle verloren. Es fühlt sich großartig an, auch wenn ich morgen wohl arbeitslos bin."
+            ]);
         } else if (endReason === "TICKETS") {
-            p3 = "Schlussendlich hat mich die Ticket-Lawine komplett unter sich begraben. Das System ist restlos kollabiert – und ich bin meinen Job los.";
+            p3 = pick([
+                "Schlussendlich hat mich die Ticket-Lawine komplett unter sich begraben. Das System ist restlos kollabiert – und ich bin meinen Job los.",
+                "Die Flut an Anfragen war nicht mehr zu stoppen. Ich habe kapituliert. Morgen sitze ich wohl auf der Straße.",
+                "Das Ticket-Limit wurde gesprengt. Der Chef hat persönlich den Stecker gezogen. Ende der Vorstellung."
+            ]);
         } else if (endReason === "FIRED") {
-            p3 = "Dass der Sicherheitsdienst mich am Ende persönlich rauseskortiert hat, ist der perfekte Schlusspunkt für dieses Trauerspiel.";
+            p3 = pick([
+                "Dass der Sicherheitsdienst mich am Ende persönlich rauseskortiert hat, ist der perfekte Schlusspunkt für dieses Trauerspiel.",
+                "Der Chef hat ernst gemacht. Meine Sachen sind gepackt, meine Karriere hier ist offiziell und endgültig beendet.",
+                "Ein kalter Blick, ein kurzes Wort von HR, und das war's. Ich bin gefeuert. Wenigstens muss ich diesen Teppichboden nie wieder sehen."
+            ]);
         } else if (endReason === "WIN") {
-            p3 = "Irgendwie habe ich es lebend bis 16:30 Uhr geschafft. Feierabend. Morgen geht der ganze Zirkus wieder von vorne los...";
+            p3 = pick([
+                "Irgendwie habe ich es lebend bis 16:30 Uhr geschafft. Feierabend. Morgen geht der ganze Zirkus wieder von vorne los...",
+                "Die Uhr springt auf Feierabend. Ich klappe den Laptop zu und flüchte. Ein weiterer Tag in der IT-Hölle wurde erfolgreich überlebt.",
+                "Überlebt. Erschöpft, aber lebendig. Ich brauche jetzt dringend etwas, das weitaus stärker ist als Kaffee."
+            ]);
         }
 
         // ==========================================
@@ -2815,8 +2882,14 @@ const engine = {
         this.disableButtons(false);
         this.state.activeEvent = false;
 
-        // 1. Zufälliges Morgen-Ereignis ziehen
-        let mood = DB.moods[Math.floor(Math.random() * DB.moods.length)];
+        // 1. Zufälliges Morgen-Ereignis ziehen (mit Anti-Repeat-Schutz)
+        let availableMoods = DB.moods.filter(m => m.id !== this.state.lastMoodId);
+        
+        // Fallback, falls (theoretisch) nur noch einer übrig ist
+        if (availableMoods.length === 0) availableMoods = DB.moods; 
+        
+        let mood = availableMoods[Math.floor(Math.random() * availableMoods.length)];
+        this.state.lastMoodId = mood.id; // Fürs nächste Mal merken
         
         // 2. Mechanik sicher anwenden
         let statHtml = "";
